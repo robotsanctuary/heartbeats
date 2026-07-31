@@ -1,0 +1,50 @@
+[
+  {
+    "id": "golden_001",
+    "raw_text": "🚨🚨 URGENT URGENT 🚨🚨 Sweet boy Diesel (ID# A2145501) is on the list at Dallas Animal Services!! He is due out 8/2!! 3yo pit mix, great with kids, SO scared in the shelter 😭 please share!! #adoptdontshop",
+    "expected": {
+      "pet_id": "A2145501",
+      "shelter_name": "Dallas Animal Services",
+      "animal_name": "Diesel",
+      "deadline_not_null": true
+    }
+  },
+  {
+    "id": "golden_002",
+    "raw_text": "This girl needs OUT TODAY. Vegas shelter is slammed. Sweet senior lab mix, super mellow, would do great in an apartment. No id visible in the pic sorry, DM for more info 🙏",
+    "expected": {
+      "pet_id": null,
+      "animal_name": null,
+      "deadline_not_null": false
+    }
+  },
+  {
+    "id": "golden_003",
+    "raw_text": "San Antonio Animal Care Services #4521 — Bella, 2yo chihuahua mix, due out Aug 5th. Tiny and terrified. Someone please step up for her!!",
+    "expected": {
+      "pet_id": "#4521",
+      "shelter_name": "San Antonio Animal Care Services",
+      "animal_name": "Bella",
+      "deadline_not_null": true
+    }
+  },
+  {
+    "id": "golden_004",
+    "raw_text": "no info on this one yet just saw him in the kennel video, black lab, maybe 1-2 years, seemed friendly. will update when I know more",
+    "expected": {
+      "pet_id": null,
+      "shelter_name": null,
+      "deadline_not_null": false
+    }
+  },
+  {
+    "id": "golden_005",
+    "raw_text": "MEET MAX!!! 🐕 ID A9988771 at Dallas Animal Services. This handsome senior boy is due out TOMORROW at 5pm if no rescue steps up. He's 8yo, house trained, loves belly rubs.",
+    "expected": {
+      "pet_id": "A9988771",
+      "shelter_name": "Dallas Animal Services",
+      "animal_name": "Max",
+      "deadline_not_null": false
+    }
+  }
+]

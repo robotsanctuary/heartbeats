@@ -11,7 +11,8 @@ Usage:
     print(result)
 
 Environment:
-    OPENAI_API_KEY must be set.
+    See .env.example for LLM_BASE_URL/LLM_API_KEY/LLM_MODEL -- works
+    with OpenAI, LM Studio, Ollama, or any OpenAI-compatible endpoint.
 
 Install:
     pip install openai
@@ -26,9 +27,32 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# LLM connection is fully configurable, not hardcoded to OpenAI. This is
+# what makes swapping models later (a new local model, a different
+# provider, whatever comes next) a one-line .env change instead of a
+# code change -- LM Studio, Ollama, and OpenAI itself all speak the
+# same OpenAI-compatible API shape, just at different URLs.
+#
+# .env examples:
+#   OpenAI (real API, costs money):
+#     LLM_BASE_URL=            (leave blank -- defaults to OpenAI's real endpoint)
+#     LLM_API_KEY=sk-...
+#     LLM_MODEL=gpt-4o-mini
+#
+#   LM Studio (local, free, default port when you start its local server):
+#     LLM_BASE_URL=http://localhost:1234/v1
+#     LLM_API_KEY=not-needed        (LM Studio ignores this, but the client requires *something*)
+#     LLM_MODEL=whatever model name LM Studio shows loaded, e.g. gemma-3-12b
+#
+#   Ollama (local, free):
+#     LLM_BASE_URL=http://localhost:11434/v1
+#     LLM_API_KEY=not-needed
+#     LLM_MODEL=gemma3:12b
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL") or None  # None -> OpenAI client's own default
+LLM_API_KEY = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY") or "not-needed"
+MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
 
-MODEL = "gpt-4o-mini"
+client = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
 
 # JSON Schema the model's output is constrained to. Using strict mode
 # guarantees the response always matches this shape -- no more regexing

@@ -35,7 +35,15 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# Same configurable LLM connection as ai_extractor.py -- see that file
+# for the full explanation and .env examples (OpenAI/LM Studio/Ollama).
+# Both files read the same LLM_BASE_URL/LLM_API_KEY/LLM_MODEL vars, so
+# switching models is one .env change, not a two-file edit.
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL") or None
+LLM_API_KEY = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY") or "not-needed"
+MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
+
+client = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
 DATABASE_URL = os.environ["LOCAL_DATABASE_URL"]
 
 # Confidence bands. Anything at or above the upper bound auto-commits.
@@ -326,7 +334,7 @@ def _llm_fuzzy_match(post_description: str, candidates: list) -> tuple[Optional[
     )
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=MODEL,
         messages=[
             {
                 "role": "system",

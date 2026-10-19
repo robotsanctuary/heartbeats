@@ -28,6 +28,15 @@ Short version:
 8. Once per clone: `git config core.hooksPath .githooks` -- enables the
    pre-commit check that blocks real passwords/API keys from being committed
 
+## Schedule
+
+Runs as Hermes cron jobs (script-only, no LLM) that call
+`~/.hermes/scripts/heartbeats_scrape.sh` at 9am and 3pm, and
+`heartbeats_summary.sh` at 9pm (Central). Normal runs are silent; failures
+and the 9pm daily summary go to Telegram. Every run appends a line to
+`RUN_LOG_PATH` (default `data/runs.jsonl`). Jobs only fire while the Hermes
+gateway is running.
+
 ## Architecture
 
 - **Local SQLite** (one file on your machine, never exposed to the internet) --
@@ -53,4 +62,5 @@ Short version:
 | `image_archive.py` | Downloads and retains animal photos locally |
 | `publish.py` | Pushes vetted data from local to remote |
 | `moderate.py` | Reviews public comments/submissions (remote) |
+| `run_scheduled.py` | Scheduled entry point: runs scrapers, logs each run, prints failure alerts / the daily summary |
 | `tests/` | Offline test suite (`python -m pytest`) |

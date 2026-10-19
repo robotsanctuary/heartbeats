@@ -14,12 +14,9 @@ three outcomes:
                        auto-merge (attach media). Otherwise, park it in
                        PendingProfile for a human to review.
 
-Install:
-    pip install psycopg2-binary openai
-
 Environment:
-    LOCAL_DATABASE_URL   e.g. postgresql://user:pass@localhost:5432/animals
-    OPENAI_API_KEY
+    LOCAL_DB_PATH        local SQLite database (see db.py; default ./data/heartbeats.db)
+    LLM_BASE_URL / LLM_API_KEY / LLM_MODEL   see .env.example
 """
 
 import json
@@ -28,12 +25,9 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-import psycopg2
-import psycopg2.extras
-from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+from db import session, to_utc  # also loads .env
 
 # Same configurable LLM connection as ai_extractor.py -- see that file
 # for the full explanation and .env examples (OpenAI/LM Studio/Ollama).
@@ -44,7 +38,6 @@ LLM_API_KEY = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY") 
 MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
 
 client = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
-DATABASE_URL = os.environ["LOCAL_DATABASE_URL"]
 
 # Confidence bands. Anything at or above the upper bound auto-commits.
 # Anything below the lower bound is treated as effectively "no match" /
@@ -65,10 +58,6 @@ class SocialPost:
     url: str
     posted_by: Optional[str]
     raw_text: str
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
 
 
 def _log_audit(
@@ -92,7 +81,7 @@ def _log_audit(
         INSERT INTO audit_log
             (id, stage, action, input_text, model_output, confidence,
              related_pet_id, platform, url)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             str(uuid.uuid4()),
@@ -121,17 +110,15 @@ def process_extraction(extraction: dict, post: SocialPost) -> dict:
     # animal's profile. Below the floor, don't act on it at all; just log
     # and park it for a human.
     if confidence < EXTRACTION_REVIEW_FLOOR:
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                _create_pending_profile(
-                    cur, extraction, post,
-                    extracted_pet_id=extraction.get("pet_id"),
-                    needs_review=True,
-                    review_reason=f"low extraction confidence ({confidence:.2f})",
-                )
-                _log_audit(cur, "extraction", "FLAGGED_FOR_REVIEW",
-                           post.raw_text, extraction, confidence, None, post)
-                conn.commit()
+        with session() as cur:
+            _create_pending_profile(
+                cur, extraction, post,
+                extracted_pet_id=extraction.get("pet_id"),
+                needs_review=True,
+                review_reason=f"low extraction confidence ({confidence:.2f})",
+            )
+            _log_audit(cur, "extraction", "FLAGGED_FOR_REVIEW",
+                       post.raw_text, extraction, confidence, None, post)
         return {"action": "FLAGGED_FOR_REVIEW", "reason": "low_extraction_confidence", "confidence": confidence}
 
     pet_id = extraction.get("pet_id")
@@ -149,32 +136,28 @@ def process_extraction(extraction: dict, post: SocialPost) -> dict:
 def _handle_with_pet_id(pet_id: str, extraction: dict, post: SocialPost) -> dict:
     confidence = extraction.get("confidence", 0.0)
 
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT pet_id FROM pets WHERE pet_id = %s", (pet_id,))
-            existing = cur.fetchone()
+    with session() as cur:
+        existing = cur.execute("SELECT pet_id FROM pets WHERE pet_id = ?", (pet_id,)).fetchone()
 
-            if existing:
-                _attach_media_source(cur, pet_id, post)
-                _log_audit(cur, "extraction", "APPENDED_TO_EXISTING_PET",
-                           post.raw_text, extraction, confidence, pet_id, post)
-                conn.commit()
-                return {"action": "APPENDED_TO_EXISTING_PET", "pet_id": pet_id}
-
-            # Shelter scraper (Script A) hasn't ingested this ID yet.
-            # Stage it as pending so the next scraper cycle can promote it.
-            # A mid-confidence extraction still gets staged, but flagged,
-            # so a human glances at it before it's treated as gospel.
-            needs_review = confidence < EXTRACTION_AUTO_TRUST
-            _create_pending_profile(
-                cur, extraction, post, extracted_pet_id=pet_id,
-                needs_review=needs_review,
-                review_reason=f"unconfirmed pet_id, confidence {confidence:.2f}" if needs_review else None,
-            )
-            _log_audit(cur, "extraction", "CREATED_PENDING_PROFILE",
+        if existing:
+            _attach_media_source(cur, pet_id, post)
+            _log_audit(cur, "extraction", "APPENDED_TO_EXISTING_PET",
                        post.raw_text, extraction, confidence, pet_id, post)
-            conn.commit()
-            return {"action": "CREATED_PENDING_PROFILE", "extracted_pet_id": pet_id, "needs_review": needs_review}
+            return {"action": "APPENDED_TO_EXISTING_PET", "pet_id": pet_id}
+
+        # Shelter scraper hasn't ingested this ID yet.
+        # Stage it as pending so the next scraper cycle can promote it.
+        # A mid-confidence extraction still gets staged, but flagged,
+        # so a human glances at it before it's treated as gospel.
+        needs_review = confidence < EXTRACTION_AUTO_TRUST
+        _create_pending_profile(
+            cur, extraction, post, extracted_pet_id=pet_id,
+            needs_review=needs_review,
+            review_reason=f"unconfirmed pet_id, confidence {confidence:.2f}" if needs_review else None,
+        )
+        _log_audit(cur, "extraction", "CREATED_PENDING_PROFILE",
+                   post.raw_text, extraction, confidence, pet_id, post)
+        return {"action": "CREATED_PENDING_PROFILE", "extracted_pet_id": pet_id, "needs_review": needs_review}
 
 
 # ---------------------------------------------------------------------
@@ -187,64 +170,63 @@ def _handle_without_pet_id(extraction: dict, post: SocialPost) -> dict:
 
     if not description:
         # Nothing usable to match on at all.
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                _create_pending_profile(cur, extraction, post, extracted_pet_id=None)
-                conn.commit()
+        with session() as cur:
+            _create_pending_profile(cur, extraction, post, extracted_pet_id=None)
         return {"action": "CREATED_PENDING_PROFILE", "reason": "no_description"}
 
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            candidates = _fetch_active_candidates(cur, shelter_name)
+    # Read candidates, then CLOSE the connection before calling the LLM --
+    # a local model can take a while, and holding the database open that
+    # long would block the scraper's writes.
+    with session() as cur:
+        candidates = _fetch_active_candidates(cur, shelter_name)
 
-            if not candidates:
-                _create_pending_profile(cur, extraction, post, extracted_pet_id=None)
-                conn.commit()
-                return {"action": "CREATED_PENDING_PROFILE", "reason": "no_candidates"}
-
-            best_match, probability = _llm_fuzzy_match(description, candidates)
-            match_pet_id = best_match["pet_id"] if best_match else None
-
-            # High confidence -> auto-merge.
-            if best_match and probability >= FUZZY_MATCH_AUTO_MERGE:
-                _attach_media_source(cur, match_pet_id, post)
-                _log_audit(cur, "fuzzy_match", "FUZZY_MATCHED_AND_MERGED",
-                           description, best_match, probability, match_pet_id, post)
-                conn.commit()
-                return {
-                    "action": "FUZZY_MATCHED_AND_MERGED",
-                    "pet_id": match_pet_id,
-                    "probability": probability,
-                }
-
-            # Middle band -> genuinely ambiguous. Don't guess either way;
-            # stage it and let a human confirm or reject the suggested match.
-            if best_match and probability >= FUZZY_MATCH_REVIEW_FLOOR:
-                _create_pending_profile(
-                    cur, extraction, post, extracted_pet_id=None,
-                    needs_review=True,
-                    review_reason=f"possible match to {match_pet_id} at {probability:.2f} probability",
-                )
-                _log_audit(cur, "fuzzy_match", "FLAGGED_FOR_REVIEW",
-                           description, best_match, probability, match_pet_id, post)
-                conn.commit()
-                return {
-                    "action": "FLAGGED_FOR_REVIEW",
-                    "possible_pet_id": match_pet_id,
-                    "probability": probability,
-                }
-
-            # Low confidence -> treat as no match.
+    if not candidates:
+        with session() as cur:
             _create_pending_profile(cur, extraction, post, extracted_pet_id=None)
-            _log_audit(cur, "fuzzy_match", "CREATED_PENDING_PROFILE",
+        return {"action": "CREATED_PENDING_PROFILE", "reason": "no_candidates"}
+
+    best_match, probability = _llm_fuzzy_match(description, candidates)
+
+    with session() as cur:
+        match_pet_id = best_match["pet_id"] if best_match else None
+
+        # High confidence -> auto-merge.
+        if best_match and probability >= FUZZY_MATCH_AUTO_MERGE:
+            _attach_media_source(cur, match_pet_id, post)
+            _log_audit(cur, "fuzzy_match", "FUZZY_MATCHED_AND_MERGED",
                        description, best_match, probability, match_pet_id, post)
-            conn.commit()
             return {
-                "action": "CREATED_PENDING_PROFILE",
-                "reason": "fuzzy_match_below_threshold",
-                "best_candidate": match_pet_id,
+                "action": "FUZZY_MATCHED_AND_MERGED",
+                "pet_id": match_pet_id,
                 "probability": probability,
             }
+
+        # Middle band -> genuinely ambiguous. Don't guess either way;
+        # stage it and let a human confirm or reject the suggested match.
+        if best_match and probability >= FUZZY_MATCH_REVIEW_FLOOR:
+            _create_pending_profile(
+                cur, extraction, post, extracted_pet_id=None,
+                needs_review=True,
+                review_reason=f"possible match to {match_pet_id} at {probability:.2f} probability",
+            )
+            _log_audit(cur, "fuzzy_match", "FLAGGED_FOR_REVIEW",
+                       description, best_match, probability, match_pet_id, post)
+            return {
+                "action": "FLAGGED_FOR_REVIEW",
+                "possible_pet_id": match_pet_id,
+                "probability": probability,
+            }
+
+        # Low confidence -> treat as no match.
+        _create_pending_profile(cur, extraction, post, extracted_pet_id=None)
+        _log_audit(cur, "fuzzy_match", "CREATED_PENDING_PROFILE",
+                   description, best_match, probability, match_pet_id, post)
+        return {
+            "action": "CREATED_PENDING_PROFILE",
+            "reason": "fuzzy_match_below_threshold",
+            "best_candidate": match_pet_id,
+            "probability": probability,
+        }
 
 
 def _fetch_active_candidates(cur, shelter_name: Optional[str], limit: int = 25) -> list:
@@ -253,30 +235,31 @@ def _fetch_active_candidates(cur, shelter_name: Optional[str], limit: int = 25) 
     pets, optionally scoped to the shelter mentioned in the post, to keep the
     LLM comparison cheap and accurate.
     """
+    # SQLite's LIKE is already case-insensitive for ASCII (Postgres needed
+    # ILIKE). Escape % and _ so a shelter name can't act as a wildcard.
     if shelter_name:
-        cur.execute(
+        pattern = "%" + shelter_name.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+        return cur.execute(
             """
             SELECT pet_id, name, breed, age, sex, description, shelter_name
             FROM pets
             WHERE status IN ('AT_RISK', 'PENDING_VERIFICATION')
-              AND shelter_name ILIKE %s
+              AND shelter_name LIKE ? ESCAPE '\\'
             ORDER BY updated_at DESC
-            LIMIT %s
+            LIMIT ?
             """,
-            (f"%{shelter_name}%", limit),
-        )
-    else:
-        cur.execute(
-            """
-            SELECT pet_id, name, breed, age, sex, description, shelter_name
-            FROM pets
-            WHERE status IN ('AT_RISK', 'PENDING_VERIFICATION')
-            ORDER BY updated_at DESC
-            LIMIT %s
-            """,
-            (limit,),
-        )
-    return cur.fetchall()
+            (pattern, limit),
+        ).fetchall()
+    return cur.execute(
+        """
+        SELECT pet_id, name, breed, age, sex, description, shelter_name
+        FROM pets
+        WHERE status IN ('AT_RISK', 'PENDING_VERIFICATION')
+        ORDER BY updated_at DESC
+        LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
 
 
 FUZZY_MATCH_SCHEMA = {
@@ -366,7 +349,7 @@ def _attach_media_source(cur, pet_id: str, post: SocialPost) -> None:
     cur.execute(
         """
         INSERT INTO media_sources (id, pet_id, platform, url, posted_by, raw_text)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?)
         ON CONFLICT (pet_id, url) DO NOTHING
         """,
         (str(uuid.uuid4()), pet_id, post.platform, post.url, post.posted_by, post.raw_text),
@@ -387,19 +370,21 @@ def _create_pending_profile(
             (id, extracted_pet_id, shelter_name_guess, description,
              deadline_guess, platform, url, posted_by, raw_text,
              needs_review, review_reason)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             str(uuid.uuid4()),
             extracted_pet_id,
             extraction.get("shelter_name"),
             extraction.get("animal_description"),
-            extraction.get("deadline"),
+            # The model returns ISO dates; normalize to the canonical UTC
+            # text format. Unparseable -> NULL (it's only a guess anyway).
+            to_utc(extraction.get("deadline")),
             post.platform,
             post.url,
             post.posted_by,
             post.raw_text,
-            needs_review,
+            int(bool(needs_review)),
             review_reason,
         ),
     )

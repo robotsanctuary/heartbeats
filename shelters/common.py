@@ -6,27 +6,27 @@ script (e.g. shelters/texas/dallas.py) should import from here rather
 than reimplementing HTML stripping, DB writes, etc. Keep this file
 generic -- anything specific to one shelter's feed quirks belongs in
 that shelter's own file, not here.
+
+All DB helpers take a sqlite3 connection from db.session() (the local
+SQLite database) and leave committing to the caller.
 """
 
-import os
 import re
-from pathlib import Path
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import psycopg2
-import psycopg2.extras
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
+from db import _fmt, utcnow
 
-LOCAL_DATABASE_URL = os.environ.get("LOCAL_DATABASE_URL")  # optional -- scripts can run in print-only mode without it
+USER_AGENT = "heartbeats-shelter-aggregator/0.1 (+https://github.com/robotsanctuary/heartbeats)"
 
-
-def get_local_conn():
-    if not LOCAL_DATABASE_URL:
-        raise RuntimeError("LOCAL_DATABASE_URL is not set -- can't write to the database. Run in print-only/dry-run mode instead.")
-    return psycopg2.connect(LOCAL_DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+PET_COLUMNS = [
+    "pet_id", "name", "species", "breed", "age", "sex",
+    "shelter_name", "shelter_location", "intake_date", "intake_reason",
+    "deadline_timestamp", "status", "description", "image_url",
+]
 
 
 def strip_html(text: Optional[str]) -> Optional[str]:
@@ -38,11 +38,18 @@ def strip_html(text: Optional[str]) -> Optional[str]:
     return cleaned or None
 
 
-def fetch_xml(url: str, timeout: int = 30):
-    import xml.etree.ElementTree as ET
-    resp = requests.get(url, timeout=timeout)
+def fetch_bytes(url: str, timeout: int = 30) -> bytes:
+    resp = requests.get(url, timeout=timeout, headers={"User-Agent": USER_AGENT})
     resp.raise_for_status()
-    return ET.fromstring(resp.content)
+    return resp.content
+
+
+def parse_xml(content: bytes):
+    return ET.fromstring(content)
+
+
+def fetch_xml(url: str, timeout: int = 30):
+    return parse_xml(fetch_bytes(url, timeout))
 
 
 def check_unknown_categories(values_seen: set, known_values: set, label: str) -> set:
@@ -52,8 +59,7 @@ def check_unknown_categories(values_seen: set, known_values: set, label: str) ->
     silently ignoring unrecognized values -- which is how animals
     quietly fall through the cracks -- every shelter script should call
     this after normalizing a batch, and print/log anything unexpected
-    so a human notices and updates the mapping, instead of finding out
-    only when someone asks "why wasn't this animal on the list?"
+    so a human notices and updates the mapping.
 
     Returns the set of genuinely new (unrecognized) values.
     """
@@ -63,71 +69,90 @@ def check_unknown_categories(values_seen: set, known_values: set, label: str) ->
     return unknown
 
 
-def upsert_pet_local(cur, pet: dict) -> None:
+def upsert_pet_local(conn, pet: dict) -> str:
     """
-    Writes one normalized pet dict directly into the LOCAL `pets` table.
-    Script A doesn't need matching_logic.py's AI-extraction/fuzzy-match
-    machinery -- that exists for messy social captions with no reliable
-    ID. Official shelter feeds already hand us a clean pet_id, so this
-    is a plain upsert, same shape as publish.py's upsert_pet() but
-    targeting LOCAL instead of REMOTE.
+    Writes one normalized pet dict into the LOCAL `pets` table. Official
+    shelter feeds hand us a clean pet_id, so this is a plain upsert --
+    no AI matching needed.
 
-    Expects `pet` to have at least: pet_id, shelter_name. All other
-    keys are optional and should match pets table column names.
+    updated_at is NOT set here: the schema's trigger bumps it only when
+    a published field actually changed, so re-scraping an unchanged
+    animal doesn't make publish.py re-send it.
+
+    Returns "inserted", "updated" (a published field changed) or
+    "unchanged".
     """
-    columns = [
-        "pet_id", "name", "species", "breed", "age", "sex",
-        "shelter_name", "shelter_location", "intake_date", "intake_reason",
-        "deadline_timestamp", "status", "description", "image_url",
-    ]
-    values = {c: pet.get(c) for c in columns}
+    if not pet.get("pet_id") or not pet.get("shelter_name"):
+        raise ValueError(f"pet_id and shelter_name are required, got {pet.get('pet_id')!r}/{pet.get('shelter_name')!r}")
 
-    cur.execute(
+    values = {c: pet.get(c) for c in PET_COLUMNS}
+    before = conn.execute(
+        f"SELECT {', '.join(PET_COLUMNS)} FROM pets WHERE pet_id = ?", (values["pet_id"],)
+    ).fetchone()
+
+    conn.execute(
         f"""
-        INSERT INTO pets ({', '.join(columns)})
-        VALUES ({', '.join(f'%({c})s' for c in columns)})
+        INSERT INTO pets ({', '.join(PET_COLUMNS)})
+        VALUES ({', '.join(':' + c for c in PET_COLUMNS)})
         ON CONFLICT (pet_id) DO UPDATE SET
-            {', '.join(f"{c} = EXCLUDED.{c}" for c in columns if c != 'pet_id')},
-            updated_at = now()
+            {', '.join(f"{c} = excluded.{c}" for c in PET_COLUMNS if c != 'pet_id')}
         """,
         values,
     )
+    if before is None:
+        return "inserted"
+    # Compare field values (not updated_at, which only has millisecond
+    # resolution and could miss a change made within the same ms).
+    return "updated" if any(before[c] != values[c] for c in PET_COLUMNS) else "unchanged"
 
 
-def touch_last_seen(cur, pet_ids: list) -> None:
+def touch_last_seen(conn, pet_ids: list, seen_at: Optional[str] = None) -> None:
     """
     Marks these pet_ids as seen in this scrape cycle. Combined with
-    mark_missing_as_resolved(), this is how Script A detects an animal
-    dropping off a shelter's feed (adopted, transferred, or worse)
-    without the shelter explicitly telling us the outcome.
+    mark_missing_as_resolved(), this is how a scraper detects an animal
+    dropping off a shelter's feed without the shelter telling us why.
     """
     if not pet_ids:
         return
-    cur.execute(
-        "UPDATE pets SET last_seen_in_scrape_at = now() WHERE pet_id = ANY(%s)",
-        (pet_ids,),
+    seen_at = seen_at or utcnow()
+    conn.executemany(
+        "UPDATE pets SET last_seen_in_scrape_at = ? WHERE pet_id = ?",
+        [(seen_at, pid) for pid in pet_ids],
     )
 
 
-def mark_missing_as_resolved(cur, shelter_name: str, seen_pet_ids: list, grace_period_hours: int = 12) -> int:
+def mark_missing_as_resolved(conn, shelter_name: str, seen_pet_ids: list, grace_period_hours: int = 12) -> list:
     """
     Any AT_RISK pet from this shelter that wasn't in this scrape's
     results, and hasn't been seen in over `grace_period_hours`, gets
-    archived. This does NOT mark them EUTHANIZED -- that's a claim that
-    needs actual confirmation (see README section on this), not an
-    inference from "they disappeared." ARCHIVED means "no longer
-    confirmed at-risk per this shelter's feed, outcome unknown" -- a
-    human can promote it to a real outcome once known.
+    ARCHIVED. This does NOT mark them EUTHANIZED -- that needs actual
+    confirmation, not an inference from "they disappeared." ARCHIVED
+    means "no longer on this shelter's feed, outcome unknown."
+
+    Safety: if this scrape saw ZERO animals, nothing is archived. An
+    empty result is far more likely a broken/empty feed than every
+    animal leaving at once, and archiving on it would wipe the list.
+
+    Returns the list of pet_ids that were archived.
     """
-    cur.execute(
-        f"""
-        UPDATE pets
-        SET status = 'ARCHIVED'
-        WHERE shelter_name = %s
+    if not seen_pet_ids:
+        print(f"⚠️  [{shelter_name}] Scrape returned 0 animals -- skipping archive step (likely a feed problem).")
+        return []
+
+    cutoff = _fmt(datetime.now(timezone.utc) - timedelta(hours=int(grace_period_hours)))
+    seen = set(seen_pet_ids)
+    candidates = conn.execute(
+        """
+        SELECT pet_id FROM pets
+        WHERE shelter_name = ?
           AND status = 'AT_RISK'
-          AND NOT (pet_id = ANY(%s))
-          AND (last_seen_in_scrape_at IS NULL OR last_seen_in_scrape_at < now() - interval '{int(grace_period_hours)} hours')
+          AND (last_seen_in_scrape_at IS NULL OR last_seen_in_scrape_at < ?)
         """,
-        (shelter_name, seen_pet_ids),
+        (shelter_name, cutoff),
+    ).fetchall()
+    to_archive = [r["pet_id"] for r in candidates if r["pet_id"] not in seen]
+    conn.executemany(
+        "UPDATE pets SET status = 'ARCHIVED' WHERE pet_id = ?",
+        [(pid,) for pid in to_archive],
     )
-    return cur.rowcount
+    return to_archive

@@ -17,35 +17,23 @@ Usage:
     python accuracy_report.py
 """
 
-import os
 from datetime import datetime, timedelta, timezone
 
-import psycopg2
-import psycopg2.extras
-from dotenv import load_dotenv
-
-load_dotenv()
-
-DATABASE_URL = os.environ["LOCAL_DATABASE_URL"]
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+from db import _fmt, init_db, parse_ts, session
 
 
 def print_review_queue(cur, limit: int = 20) -> None:
-    cur.execute(
+    rows = cur.execute(
         """
         SELECT id, extracted_pet_id, shelter_name_guess, description,
                review_reason, platform, url, created_at
         FROM pending_profiles
-        WHERE needs_review = TRUE
+        WHERE needs_review = 1
         ORDER BY created_at DESC
-        LIMIT %s
+        LIMIT ?
         """,
         (limit,),
-    )
-    rows = cur.fetchall()
+    ).fetchall()
 
     print(f"=== Review Queue ({len(rows)} shown, most recent first) ===")
     if not rows:
@@ -53,7 +41,7 @@ def print_review_queue(cur, limit: int = 20) -> None:
         return
 
     for r in rows:
-        print(f"- [{r['created_at']:%Y-%m-%d %H:%M}] {r['review_reason']}")
+        print(f"- [{parse_ts(r['created_at']):%Y-%m-%d %H:%M} UTC] id={r['id']}  {r['review_reason']}")
         print(f"    shelter: {r['shelter_name_guess']}  pet_id_guess: {r['extracted_pet_id']}")
         print(f"    desc: {r['description']}")
         print(f"    source: {r['platform']} -> {r['url']}")
@@ -61,22 +49,21 @@ def print_review_queue(cur, limit: int = 20) -> None:
 
 
 def print_confidence_trend(cur, days: int = 14) -> None:
-    since = datetime.now(timezone.utc) - timedelta(days=days)
-    cur.execute(
+    since = _fmt(datetime.now(timezone.utc) - timedelta(days=days))
+    rows = cur.execute(
         """
         SELECT
-            date_trunc('day', created_at) AS day,
+            substr(created_at, 1, 10) AS day,
             stage,
             avg(confidence) AS avg_confidence,
             count(*) AS n
         FROM audit_log
-        WHERE created_at >= %s AND confidence IS NOT NULL
+        WHERE created_at >= ? AND confidence IS NOT NULL
         GROUP BY day, stage
         ORDER BY day ASC, stage ASC
         """,
         (since,),
-    )
-    rows = cur.fetchall()
+    ).fetchall()
 
     print(f"=== Daily Average Confidence, last {days} days ===")
     if not rows:
@@ -84,7 +71,7 @@ def print_confidence_trend(cur, days: int = 14) -> None:
         return
 
     for r in rows:
-        print(f"  {r['day']:%Y-%m-%d}  {r['stage']:<13}  avg={r['avg_confidence']:.2f}  n={r['n']}")
+        print(f"  {r['day']}  {r['stage']:<13}  avg={r['avg_confidence']:.2f}  n={r['n']}")
 
     # Simple drift flag: compare the most recent 3 days' average against
     # the preceding period. Not statistically rigorous, but enough to
@@ -105,18 +92,17 @@ def print_confidence_trend(cur, days: int = 14) -> None:
 
 
 def print_action_breakdown(cur, days: int = 7) -> None:
-    since = datetime.now(timezone.utc) - timedelta(days=days)
-    cur.execute(
+    since = _fmt(datetime.now(timezone.utc) - timedelta(days=days))
+    rows = cur.execute(
         """
         SELECT action, count(*) AS n
         FROM audit_log
-        WHERE created_at >= %s
+        WHERE created_at >= ?
         GROUP BY action
         ORDER BY n DESC
         """,
         (since,),
-    )
-    rows = cur.fetchall()
+    ).fetchall()
 
     print(f"=== Action Breakdown, last {days} days ===")
     for r in rows:
@@ -125,15 +111,14 @@ def print_action_breakdown(cur, days: int = 7) -> None:
 
 
 def print_human_verified_accuracy(cur) -> None:
-    cur.execute(
+    row = cur.execute(
         """
         SELECT
-            count(*) FILTER (WHERE human_verdict = 'correct') AS correct,
-            count(*) FILTER (WHERE human_verdict IS NOT NULL) AS reviewed
+            sum(human_verdict = 'correct') AS correct,
+            sum(human_verdict IS NOT NULL) AS reviewed
         FROM audit_log
         """
-    )
-    row = cur.fetchone()
+    ).fetchone()
     reviewed = row["reviewed"] or 0
     correct = row["correct"] or 0
 
@@ -147,9 +132,9 @@ def print_human_verified_accuracy(cur) -> None:
 
 
 if __name__ == "__main__":
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            print_review_queue(cur)
-            print_confidence_trend(cur)
-            print_action_breakdown(cur)
-            print_human_verified_accuracy(cur)
+    init_db()  # no-op if the tables already exist
+    with session() as cur:
+        print_review_queue(cur)
+        print_confidence_trend(cur)
+        print_action_breakdown(cur)
+        print_human_verified_accuracy(cur)

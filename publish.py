@@ -31,8 +31,13 @@ Usage:
     python publish.py --full     # ignore the watermark, push every row
 
 Environment:
-    LOCAL_DATABASE_URL   your local Postgres (the working/review DB)
+    LOCAL_DB_PATH        the local SQLite working/review DB (see db.py)
     REMOTE_DATABASE_URL  the hosted Postgres the website reads from.
+                          Only needed for a real publish -- --dry-run
+                          works without it. NOTE: the remote side is
+                          still undecided (it may become Cloudflare D1
+                          instead of Postgres); this path is kept as-is
+                          until hosting is chosen.
                           Use a role scoped to INSERT/UPDATE on
                           `pets` and `media_sources` ONLY -- not a
                           superuser/admin connection string. That way
@@ -44,29 +49,23 @@ Environment:
 import argparse
 import mimetypes
 import os
-from datetime import datetime, timezone
 from pathlib import Path
 
-import psycopg2
-import psycopg2.extras
-from dotenv import load_dotenv
-
-load_dotenv()
-
-LOCAL_DATABASE_URL = os.environ["LOCAL_DATABASE_URL"]
-REMOTE_DATABASE_URL = os.environ["REMOTE_DATABASE_URL"]
-
-
-def _utcnow():
-    return datetime.now(timezone.utc)
-
-
-def get_local_conn():
-    return psycopg2.connect(LOCAL_DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+from db import init_db, session, utcnow  # also loads .env
 
 
 def get_remote_conn():
-    return psycopg2.connect(REMOTE_DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+    """Remote is still Postgres for now; psycopg2 is only needed here,
+    so the rest of the project (and --dry-run) runs without it."""
+    url = os.environ.get("REMOTE_DATABASE_URL")
+    if not url or "remote-host" in url:
+        raise RuntimeError("REMOTE_DATABASE_URL is not configured -- use --dry-run until a remote database exists.")
+    try:
+        import psycopg2
+        import psycopg2.extras
+    except ImportError as e:
+        raise RuntimeError("Publishing to a Postgres remote needs: pip install psycopg2-binary") from e
+    return psycopg2.connect(url, cursor_factory=psycopg2.extras.RealDictCursor)
 
 
 def get_last_published_at(local_cur):
@@ -75,8 +74,7 @@ def get_last_published_at(local_cur):
     Returns None on the very first run (no row yet), which the caller
     treats as "publish everything."
     """
-    local_cur.execute("SELECT last_published_at FROM publish_state WHERE id = 1")
-    row = local_cur.fetchone()
+    row = local_cur.execute("SELECT last_published_at FROM publish_state WHERE id = 1").fetchone()
     return row["last_published_at"] if row else None
 
 
@@ -84,8 +82,8 @@ def set_last_published_at(local_cur, timestamp) -> None:
     local_cur.execute(
         """
         INSERT INTO publish_state (id, last_published_at)
-        VALUES (1, %s)
-        ON CONFLICT (id) DO UPDATE SET last_published_at = EXCLUDED.last_published_at
+        VALUES (1, ?)
+        ON CONFLICT (id) DO UPDATE SET last_published_at = excluded.last_published_at
         """,
         (timestamp,),
     )
@@ -107,7 +105,7 @@ def fetch_publishable_pets(local_cur, since=None) -> list:
     casing.
     """
     if since is None:
-        local_cur.execute(
+        return local_cur.execute(
             """
             SELECT pet_id, name, species, breed, age, sex,
                    shelter_name, shelter_location, intake_date, intake_reason,
@@ -117,9 +115,8 @@ def fetch_publishable_pets(local_cur, since=None) -> list:
             FROM pets
             ORDER BY updated_at ASC
             """
-        )
-    else:
-        local_cur.execute(
+        ).fetchall()
+    return local_cur.execute(
             """
             SELECT pet_id, name, species, breed, age, sex,
                    shelter_name, shelter_location, intake_date, intake_reason,
@@ -127,45 +124,43 @@ def fetch_publishable_pets(local_cur, since=None) -> list:
                    local_image_path, image_permanently_archived, remote_image_uploaded_at,
                    created_at, updated_at
             FROM pets
-            WHERE updated_at > %s
+            WHERE updated_at >= ?  -- >=, not >: never skip a row written in the same millisecond as the watermark (re-sending is a harmless upsert)
             ORDER BY updated_at ASC
             """,
             (since,),
-        )
-    return local_cur.fetchall()
+        ).fetchall()
 
 
-def fetch_media_sources(local_cur, pet_ids: list, since=None) -> list:
+def fetch_media_sources(local_cur, since=None) -> list:
     """
-    Media sources don't have their own `updated_at` (they're
-    effectively immutable once inserted), so the watermark is applied
-    against `created_at` instead -- new links attached since the last
-    publish. `pet_ids` further narrows this to pets we're already
-    publishing in this run, though in practice the `since` filter alone
-    is usually enough.
-    """
-    if not pet_ids:
-        return []
+    Media sources are effectively immutable once inserted, so the
+    watermark is applied against `created_at` -- every link attached
+    since the last publish.
 
+    This deliberately does NOT only look at pets changing in this same
+    run: attaching a new social post to an existing animal doesn't
+    change any published pet field, so that pet won't be in this run's
+    batch -- and the link would otherwise never be published. (Bug in
+    the original Postgres version.) The pet itself was already pushed
+    on an earlier run, so the remote foreign key is satisfied.
+    """
     if since is None:
-        local_cur.execute(
+        return local_cur.execute(
             """
             SELECT pet_id, platform, url, posted_by, posted_at, raw_text
             FROM media_sources
-            WHERE pet_id = ANY(%s)
-            """,
-            (pet_ids,),
-        )
-    else:
-        local_cur.execute(
+            ORDER BY created_at ASC
             """
-            SELECT pet_id, platform, url, posted_by, posted_at, raw_text
-            FROM media_sources
-            WHERE pet_id = ANY(%s) AND created_at > %s
-            """,
-            (pet_ids, since),
-        )
-    return local_cur.fetchall()
+        ).fetchall()
+    return local_cur.execute(
+        """
+        SELECT pet_id, platform, url, posted_by, posted_at, raw_text
+        FROM media_sources
+        WHERE created_at >= ?
+        ORDER BY created_at ASC
+        """,
+        (since,),
+    ).fetchall()
 
 
 def upsert_pet(remote_cur, pet: dict) -> None:
@@ -235,7 +230,7 @@ def upload_euthanized_photo(remote_cur, pet_id: str, local_image_path: str) -> s
         SET euthanized_photo = %s, euthanized_photo_content_type = %s
         WHERE pet_id = %s
         """,
-        (psycopg2.Binary(path.read_bytes()), content_type, pet_id),
+        (path.read_bytes(), content_type, pet_id),  # psycopg2 sends bytes as BYTEA
     )
     return "uploaded"
 
@@ -256,18 +251,17 @@ def publish(dry_run: bool = False, full: bool = False) -> dict:
     database, or to recover if you ever suspect remote has drifted out
     of sync with local.
     """
-    with get_local_conn() as local_conn:
-        with local_conn.cursor() as local_cur:
-            since = None if full else get_last_published_at(local_cur)
+    init_db()  # no-op if the tables already exist
+    with session() as local_cur:
+        since = None if full else get_last_published_at(local_cur)
 
-            # Captured BEFORE the fetch, not after -- so anything updated
-            # while this run is in flight gets picked up on the *next*
-            # run rather than silently skipped.
-            run_started_at = _utcnow()
+        # Captured BEFORE the fetch, not after -- so anything updated
+        # while this run is in flight gets picked up on the *next*
+        # run rather than silently skipped.
+        run_started_at = utcnow()
 
-            pets = fetch_publishable_pets(local_cur, since=since)
-            pet_ids = [p["pet_id"] for p in pets]
-            media_sources = fetch_media_sources(local_cur, pet_ids, since=since)
+        pets = fetch_publishable_pets(local_cur, since=since)
+        media_sources = fetch_media_sources(local_cur, since=since)
 
     photos_to_upload = [p for p in pets if should_upload_euthanized_photo(p)]
 
@@ -301,21 +295,18 @@ def publish(dry_run: bool = False, full: bool = False) -> dict:
                 photo_results[result] = photo_results.get(result, 0) + 1
         remote_conn.commit()
 
-    with get_local_conn() as local_conn:
-        with local_conn.cursor() as local_cur:
-            set_last_published_at(local_cur, run_started_at)
-            # Mark successfully uploaded photos so future runs don't
-            # re-upload the same bytes.
-            uploaded_ids = [
-                p["pet_id"] for p in photos_to_upload
-                if Path(p["local_image_path"]).exists()
-            ]
-            if uploaded_ids:
-                local_cur.execute(
-                    "UPDATE pets SET remote_image_uploaded_at = %s WHERE pet_id = ANY(%s)",
-                    (run_started_at, uploaded_ids),
-                )
-        local_conn.commit()
+    with session() as local_cur:
+        set_last_published_at(local_cur, run_started_at)
+        # Mark successfully uploaded photos so future runs don't
+        # re-upload the same bytes.
+        uploaded_ids = [
+            p["pet_id"] for p in photos_to_upload
+            if Path(p["local_image_path"]).exists()
+        ]
+        local_cur.executemany(
+            "UPDATE pets SET remote_image_uploaded_at = ? WHERE pet_id = ?",
+            [(run_started_at, pid) for pid in uploaded_ids],
+        )
 
     print(f"Published {len(pets)} pets and {len(media_sources)} media sources to remote. "
           f"Uploaded {photo_results['uploaded']} memorial photo(s) "

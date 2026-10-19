@@ -1,0 +1,1581 @@
+<rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>24Petconnect RSS Feed</title>
+    <description>Animal Results from 24Petconnect.com </description>
+    <copyright>Copyright HLP, Inc. All Rights Reserved 2026</copyright>
+    <lastBuildDate>Mon, 19 Oct 2026 18:42:56 Z</lastBuildDate>
+    <image>
+      <url>http://www.24petconnect.com/images/24Petconnect350.png</url>
+      <title>24Petconnect RSS Feed</title>
+      <link />
+    </image>
+    <a10:id>td48ev36</a10:id>
+    <a10:link rel="self" href="http://example.com/feed/" />
+    <item>
+      <guid isPermaLink="false">DLLS-A1299729</guid>
+      <title>A1299729</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299729</Animal_ID>
+      <AnimalName>Hazel</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 YEARS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Tan</PrimaryColor>
+      <SecondaryColor>Black</SecondaryColor>
+      <AnimalWeight>63.50 lbs.</AnimalWeight>
+      <IntakeDate>09/24/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299729/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1299771</guid>
+      <title>A1299771</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299771</Animal_ID>
+      <AnimalName>Pozole</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.38 lbs.</AnimalWeight>
+      <IntakeDate>09/25/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299771/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1299767</guid>
+      <title>A1299767</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299767</Animal_ID>
+      <AnimalName>Queso</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>2.00 lbs.</AnimalWeight>
+      <IntakeDate>09/25/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299767/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1299766</guid>
+      <title>A1299766</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299766</Animal_ID>
+      <AnimalName>Nacho</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.44 lbs.</AnimalWeight>
+      <IntakeDate>09/25/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299766/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1299768</guid>
+      <title>A1299768</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299768</Animal_ID>
+      <AnimalName>Fajita</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Tan</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.50 lbs.</AnimalWeight>
+      <IntakeDate>09/25/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299768/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1299769</guid>
+      <title>A1299769</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299769</Animal_ID>
+      <AnimalName>Tamale</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Gray</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.89 lbs.</AnimalWeight>
+      <IntakeDate>09/25/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299769/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1299770</guid>
+      <title>A1299770</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1299770</Animal_ID>
+      <AnimalName>Tostada</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Gray</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.75 lbs.</AnimalWeight>
+      <IntakeDate>09/25/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1908</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1299770/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301118</guid>
+      <title>A1301118</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301118</Animal_ID>
+      <AnimalName>Zona</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>Brown</SecondaryColor>
+      <AnimalWeight>2.60 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301118/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301122</guid>
+      <title>A1301122</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301122</Animal_ID>
+      <AnimalName>Zora</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>2.50 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301122/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301117</guid>
+      <title>A1301117</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301117</Animal_ID>
+      <AnimalName>Dash</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>2.90 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301117/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301119</guid>
+      <title>A1301119</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301119</Animal_ID>
+      <AnimalName>Ari</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>2.20 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301119/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301116</guid>
+      <title>A1301116</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301116</Animal_ID>
+      <AnimalName>Dart</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>2.60 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301116/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301120</guid>
+      <title>A1301120</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301120</Animal_ID>
+      <AnimalName>Xena</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>2.00 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301120/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301114</guid>
+      <title>A1301114</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301114</Animal_ID>
+      <AnimalName>Star</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>3 YEARS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>Brown</SecondaryColor>
+      <AnimalWeight>52.80 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1902</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301114/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301164</guid>
+      <title>A1301164</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301164</Animal_ID>
+      <AnimalName>Pup8</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>1.13 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301164/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301161</guid>
+      <title>A1301161</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301161</Animal_ID>
+      <AnimalName>Pup5</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>White</PrimaryColor>
+      <SecondaryColor>Black</SecondaryColor>
+      <AnimalWeight>1.19 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301161/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301162</guid>
+      <title>A1301162</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301162</Animal_ID>
+      <AnimalName>Pup6</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>White</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.25 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301162/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301160</guid>
+      <title>A1301160</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301160</Animal_ID>
+      <AnimalName>Pup4</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.25 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301160/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301156</guid>
+      <title>A1301156</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301156</Animal_ID>
+      <AnimalName>Pup1</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>White</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.06 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301156/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301158</guid>
+      <title>A1301158</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301158</Animal_ID>
+      <AnimalName>Pup3</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>1.00 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301158/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301157</guid>
+      <title>A1301157</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301157</Animal_ID>
+      <AnimalName>Pup2</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>0.94 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301157/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301163</guid>
+      <title>A1301163</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301163</Animal_ID>
+      <AnimalName>Pup7</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.13 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301163/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301155</guid>
+      <title>A1301155</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301155</Animal_ID>
+      <AnimalName>Aries</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>1 YEAR 6 MONTHS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Gray</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>56.00 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301155/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301166</guid>
+      <title>A1301166</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301166</Animal_ID>
+      <AnimalName>Pup10</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>White</PrimaryColor>
+      <SecondaryColor>Black</SecondaryColor>
+      <AnimalWeight>1.25 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301166/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301165</guid>
+      <title>A1301165</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301165</Animal_ID>
+      <AnimalName>Pup9</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.25 lbs.</AnimalWeight>
+      <IntakeDate>10/10/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1901</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301165/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301514</guid>
+      <title>A1301514</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301514</Animal_ID>
+      <AnimalName>Westy</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Shorthair</PrimaryBreed>
+      <SecondaryBreed>Mix</SecondaryBreed>
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.88 lbs.</AnimalWeight>
+      <IntakeDate>10/14/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>425</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301514/DLLS/3</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301515</guid>
+      <title>A1301515</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301515</Animal_ID>
+      <AnimalName>Wally</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>5 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Shorthair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Gray Tabby</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.63 lbs.</AnimalWeight>
+      <IntakeDate>10/14/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>425</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301515/DLLS/3</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1300469</guid>
+      <title>A1300469</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1300469</Animal_ID>
+      <AnimalName>Lilith</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>6 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Tortoiseshell</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.75 lbs.</AnimalWeight>
+      <IntakeDate>10/02/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>N14</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1300469/DLLS/2</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301651</guid>
+      <title>A1301651</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301651</Animal_ID>
+      <AnimalName>Spooky</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight />
+      <IntakeDate>10/16/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 04</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301651/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301652</guid>
+      <title>A1301652</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301652</Animal_ID>
+      <AnimalName>Soot</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight />
+      <IntakeDate>10/16/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 04</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301652/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301655</guid>
+      <title>A1301655</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301655</Animal_ID>
+      <AnimalName>Ebony</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight />
+      <IntakeDate>10/16/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 04</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301655/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301656</guid>
+      <title>A1301656</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301656</Animal_ID>
+      <AnimalName>Eclipse</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight />
+      <IntakeDate>10/16/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 04</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301656/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301339</guid>
+      <title>A1301339</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301339</Animal_ID>
+      <AnimalName>Anna</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.50 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301339/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301344</guid>
+      <title>A1301344</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301344</Animal_ID>
+      <AnimalName>Jack</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.63 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301344/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301338</guid>
+      <title>A1301338</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301338</Animal_ID>
+      <AnimalName>Bell</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.88 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301338/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301341</guid>
+      <title>A1301341</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301341</Animal_ID>
+      <AnimalName>Tom</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.75 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301341/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301340</guid>
+      <title>A1301340</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301340</Animal_ID>
+      <AnimalName>Marie</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.31 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301340/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301343</guid>
+      <title>A1301343</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301343</Animal_ID>
+      <AnimalName>Fred</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.13 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301343/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301336</guid>
+      <title>A1301336</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301336</Animal_ID>
+      <AnimalName>Izzy</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>1 YEAR 8 MONTHS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>Tan</SecondaryColor>
+      <AnimalWeight>52.00 lbs.</AnimalWeight>
+      <IntakeDate>10/13/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1906</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301336/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301699</guid>
+      <title>A1301699</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301699</Animal_ID>
+      <AnimalName>Bianca</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.56 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>421</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301699/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301693</guid>
+      <title>A1301693</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301693</Animal_ID>
+      <AnimalName>Mortica</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>2 YEARS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Tortoiseshell</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>5.80 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>421</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301693/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301697</guid>
+      <title>A1301697</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301697</Animal_ID>
+      <AnimalName>Pugsley</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Orange Tabby</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.56 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>421</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301697/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301698</guid>
+      <title>A1301698</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301698</Animal_ID>
+      <AnimalName>Enid</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.56 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>421</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301698/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301696</guid>
+      <title>A1301696</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301696</Animal_ID>
+      <AnimalName>Wednesday</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Orange Tabby</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.56 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>421</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301696/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301695</guid>
+      <title>A1301695</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301695</Animal_ID>
+      <AnimalName>Fester</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Orange Tabby</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight />
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>421</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301695/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301654</guid>
+      <title>A1301654</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301654</Animal_ID>
+      <AnimalName>Inky</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>2 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight />
+      <IntakeDate>10/16/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 04</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301654/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1300470</guid>
+      <title>A1300470</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1300470</Animal_ID>
+      <AnimalName>Morticia</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>6 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Orange Tabby</PrimaryColor>
+      <SecondaryColor>White Tips</SecondaryColor>
+      <AnimalWeight>0.38 lbs.</AnimalWeight>
+      <IntakeDate>10/02/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 05</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1300470/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301529</guid>
+      <title>A1301529</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301529</Animal_ID>
+      <AnimalName>Stretch</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>3 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Tricolor</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>2.94 lbs.</AnimalWeight>
+      <IntakeDate>10/15/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1903</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301529/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301530</guid>
+      <title>A1301530</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301530</Animal_ID>
+      <AnimalName>Mini</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>3 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>1.69 lbs.</AnimalWeight>
+      <IntakeDate>10/15/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1903</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301530/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301528</guid>
+      <title>A1301528</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301528</Animal_ID>
+      <AnimalName>Cava</AnimalName>
+      <AnimalType>Dog</AnimalType>
+      <AnimalAge>2 YEARS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Mixed Breed</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor>White</SecondaryColor>
+      <AnimalWeight>66.00 lbs.</AnimalWeight>
+      <IntakeDate>10/15/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>1903</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301528/DLLS/2</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301728</guid>
+      <title>A1301728</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301728</Animal_ID>
+      <AnimalName>Jack-O-Lantern</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>3 WEEKS</AnimalAge>
+      <AnimalSex>Male</AnimalSex>
+      <PrimaryBreed>Domestic Shorthair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Orange Tabby</PrimaryColor>
+      <SecondaryColor>Orange</SecondaryColor>
+      <AnimalWeight>0.63 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>INCU 07</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301728/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301724</guid>
+      <title>A1301724</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301724</Animal_ID>
+      <AnimalName>Terri</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>4 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Mediumhair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.69 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>N01</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301724/DLLS/2</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1301725</guid>
+      <title>A1301725</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1301725</Animal_ID>
+      <AnimalName>Sammy</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>3 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Shorthair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Brown Tabby</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>0.44 lbs.</AnimalWeight>
+      <IntakeDate>10/17/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>N02</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1301725/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+    <item>
+      <guid isPermaLink="false">DLLS-A1300800</guid>
+      <title>A1300800</title>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 Z</pubDate>
+      <Animal_ID>A1300800</Animal_ID>
+      <AnimalName>Minnie</AnimalName>
+      <AnimalType>Cat</AnimalType>
+      <AnimalAge>7 WEEKS</AnimalAge>
+      <AnimalSex>Female</AnimalSex>
+      <PrimaryBreed>Domestic Shorthair</PrimaryBreed>
+      <SecondaryBreed />
+      <PrimaryColor>Black</PrimaryColor>
+      <SecondaryColor />
+      <AnimalWeight>1.06 lbs.</AnimalWeight>
+      <IntakeDate>10/06/2026</IntakeDate>
+      <KennelStatus>AVAILABLE</KennelStatus>
+      <KennelSubstatus />
+      <Pathway>RESC FOSTR</Pathway>
+      <KennelNumber>426</KennelNumber>
+      <OutcomeType />
+      <Location>Shelter</Location>
+      <UrgentPet>Yes</UrgentPet>
+      <Neonate>Yes</Neonate>
+      <EmergencyPlacementDate />
+      <WebMemo />
+      <WebMemoType />
+      <imageURL>https://24Petconnect.com/image/A1300800/DLLS/1</imageURL>
+      <userid>DLLS</userid>
+    </item>
+  </channel>
+</rss>

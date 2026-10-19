@@ -28,7 +28,8 @@ Usage:
     local_path = archive_image(pet_id="A1293734", image_url="https://...")
 
     # Periodically (e.g. once a day, after Script A runs):
-    cleanup_resolved_images(local_cur)
+    with db.session() as conn:
+        cleanup_resolved_images(conn)
 
 Environment:
     LOCAL_IMAGE_DIR   directory on the external SSD to store photos in,
@@ -36,16 +37,27 @@ Environment:
 """
 
 import os
+import re
 from pathlib import Path
+from typing import Optional
 from urllib.parse import urlparse
 
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
+from db import REPO_DIR  # also loads .env
 
-IMAGE_DIR = Path(os.environ.get("LOCAL_IMAGE_DIR", "./animal-images"))
-IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+USER_AGENT = "heartbeats-shelter-aggregator/0.1 (+https://github.com/robotsanctuary/heartbeats)"
+
+# Only real image types are kept; anything else in a URL path (".php",
+# ".aspx", nothing at all) falls back to .jpg.
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+
+def image_dir() -> Path:
+    """Read at call time (not import) so tests/scripts can override it.
+    Relative paths are resolved against the repo folder, not the cwd."""
+    p = Path(os.environ.get("LOCAL_IMAGE_DIR") or "./animal-images").expanduser()
+    return p if p.is_absolute() else REPO_DIR / p
 
 # Statuses where the animal is confirmed fine -- no reason to keep a
 # local photo copy going forward.
@@ -53,12 +65,20 @@ RESOLVED_SAFE_STATUSES = ("SAFE", "ADOPTED", "TRANSFERRED", "ARCHIVED")
 
 
 def _guess_extension(image_url: str) -> str:
-    path = urlparse(image_url).path
-    ext = Path(path).suffix
-    return ext if ext else ".jpg"  # shelter image endpoints often omit a real extension
+    ext = Path(urlparse(image_url).path).suffix.lower()
+    return ext if ext in ALLOWED_EXTENSIONS else ".jpg"  # shelter image endpoints often omit a real extension
 
 
-def archive_image(pet_id: str, image_url: str) -> str | None:
+def _safe_filename(pet_id: str) -> str:
+    """pet_id comes from an outside feed -- never let it become a path
+    like '../../x'. Keep only letters, digits, '-' and '_'."""
+    safe = re.sub(r"[^A-Za-z0-9_-]", "_", pet_id or "")
+    if not safe.strip("_"):
+        raise ValueError(f"unusable pet_id for a filename: {pet_id!r}")
+    return safe
+
+
+def archive_image(pet_id: str, image_url: str) -> Optional[str]:
     """
     Downloads the animal's photo to LOCAL_IMAGE_DIR if not already
     present. Returns the local file path (as a string, suitable for
@@ -70,35 +90,42 @@ def archive_image(pet_id: str, image_url: str) -> str | None:
     if not image_url:
         return None
 
-    local_path = IMAGE_DIR / f"{pet_id}{_guess_extension(image_url)}"
+    folder = image_dir()
+    folder.mkdir(parents=True, exist_ok=True)
+    local_path = folder / f"{_safe_filename(pet_id)}{_guess_extension(image_url)}"
 
-    if local_path.exists():
+    if local_path.exists() and local_path.stat().st_size > 0:
         return str(local_path)
 
-    resp = requests.get(image_url, timeout=30)
+    resp = requests.get(image_url, timeout=30, headers={"User-Agent": USER_AGENT})
     resp.raise_for_status()
+    content_type = resp.headers.get("Content-Type", "")
+    if not resp.content or (content_type and not content_type.startswith("image/")):
+        raise ValueError(f"not an image (Content-Type {content_type!r}, {len(resp.content)} bytes)")
 
-    local_path.write_bytes(resp.content)
+    # Write to a temp name, then rename: an interrupted download never
+    # leaves a truncated file that later looks like a valid photo.
+    tmp = local_path.with_suffix(local_path.suffix + ".part")
+    tmp.write_bytes(resp.content)
+    tmp.replace(local_path)
     return str(local_path)
 
 
-def cleanup_resolved_images(local_cur) -> dict:
+def cleanup_resolved_images(conn) -> dict:
     """
     Walks every pet with a local_image_path set and applies the
     retention rule: delete the file for anything resolved safely,
     leave EUTHANIZED files alone forever, leave still-open cases alone.
 
-    `local_cur` is a psycopg2 cursor against LOCAL_DATABASE_URL (see
-    matching_logic.py's get_connection() for the pattern).
+    `conn` is a connection from db.session(); the caller commits.
     """
-    local_cur.execute(
+    rows = conn.execute(
         """
         SELECT pet_id, local_image_path, status, image_permanently_archived
         FROM pets
         WHERE local_image_path IS NOT NULL
         """
-    )
-    rows = local_cur.fetchall()
+    ).fetchall()
 
     deleted = 0
     archived = 0
@@ -111,8 +138,8 @@ def cleanup_resolved_images(local_cur) -> dict:
 
         if status == "EUTHANIZED":
             if not row["image_permanently_archived"]:
-                local_cur.execute(
-                    "UPDATE pets SET image_permanently_archived = TRUE WHERE pet_id = %s",
+                conn.execute(
+                    "UPDATE pets SET image_permanently_archived = 1 WHERE pet_id = ?",
                     (pet_id,),
                 )
             archived += 1
@@ -120,8 +147,8 @@ def cleanup_resolved_images(local_cur) -> dict:
         elif status in RESOLVED_SAFE_STATUSES:
             if path.exists():
                 path.unlink()
-            local_cur.execute(
-                "UPDATE pets SET local_image_path = NULL WHERE pet_id = %s",
+            conn.execute(
+                "UPDATE pets SET local_image_path = NULL WHERE pet_id = ?",
                 (pet_id,),
             )
             deleted += 1

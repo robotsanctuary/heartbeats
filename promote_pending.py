@@ -17,84 +17,67 @@ Usage:
 """
 
 import argparse
-import os
 import uuid
 
-import psycopg2
-import psycopg2.extras
-from dotenv import load_dotenv
-
-load_dotenv()
-
-LOCAL_DATABASE_URL = os.environ["LOCAL_DATABASE_URL"]
-
-
-def get_conn():
-    return psycopg2.connect(LOCAL_DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+from db import session, utcnow
 
 
 def promote(pending_id: str, pet_id: str, shelter_name: str) -> None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM pending_profiles WHERE id = %s", (pending_id,))
-            row = cur.fetchone()
-            if not row:
-                raise ValueError(f"No pending_profiles row with id {pending_id}")
+    with session() as cur:
+        row = cur.execute("SELECT * FROM pending_profiles WHERE id = ?", (pending_id,)).fetchone()
+        if not row:
+            raise ValueError(f"No pending_profiles row with id {pending_id}")
 
-            # Create (or update) the real pet row.
-            cur.execute(
-                """
-                INSERT INTO pets (pet_id, shelter_name, description, deadline_timestamp, status)
-                VALUES (%s, %s, %s, %s, 'AT_RISK')
-                ON CONFLICT (pet_id) DO UPDATE SET
-                    description = COALESCE(pets.description, EXCLUDED.description)
-                """,
-                (pet_id, shelter_name, row["description"], row["deadline_guess"]),
-            )
+        # Create (or update) the real pet row.
+        cur.execute(
+            """
+            INSERT INTO pets (pet_id, shelter_name, description, deadline_timestamp, status)
+            VALUES (?, ?, ?, ?, 'AT_RISK')
+            ON CONFLICT (pet_id) DO UPDATE SET
+                description = COALESCE(pets.description, excluded.description)
+            """,
+            (pet_id, shelter_name, row["description"], row["deadline_guess"]),
+        )
 
-            # Carry the post over as a media source on the now-confirmed pet.
-            cur.execute(
-                """
-                INSERT INTO media_sources (id, pet_id, platform, url, posted_by, raw_text)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                ON CONFLICT (pet_id, url) DO NOTHING
-                """,
-                (str(uuid.uuid4()), pet_id, row["platform"], row["url"], row["posted_by"], row["raw_text"]),
-            )
+        # Carry the post over as a media source on the now-confirmed pet.
+        cur.execute(
+            """
+            INSERT INTO media_sources (id, pet_id, platform, url, posted_by, raw_text)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT (pet_id, url) DO NOTHING
+            """,
+            (str(uuid.uuid4()), pet_id, row["platform"], row["url"], row["posted_by"], row["raw_text"]),
+        )
 
-            # Mark the corresponding audit_log entry as human-verified correct,
-            # feeding the accuracy numbers in accuracy_report.py.
-            cur.execute(
-                """
-                UPDATE audit_log SET human_verdict = 'correct', reviewed_at = now()
-                WHERE url = %s AND platform = %s AND human_verdict IS NULL
-                """,
-                (row["url"], row["platform"]),
-            )
+        # Mark the corresponding audit_log entry as human-verified correct,
+        # feeding the accuracy numbers in accuracy_report.py.
+        cur.execute(
+            """
+            UPDATE audit_log SET human_verdict = 'correct', reviewed_at = ?
+            WHERE url = ? AND platform = ? AND human_verdict IS NULL
+            """,
+            (utcnow(), row["url"], row["platform"]),
+        )
 
-            cur.execute("DELETE FROM pending_profiles WHERE id = %s", (pending_id,))
-        conn.commit()
+        cur.execute("DELETE FROM pending_profiles WHERE id = ?", (pending_id,))
 
     print(f"Promoted pending profile {pending_id} -> pet {pet_id}")
 
 
 def reject(pending_id: str) -> None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT platform, url FROM pending_profiles WHERE id = %s", (pending_id,))
-            row = cur.fetchone()
-            if not row:
-                raise ValueError(f"No pending_profiles row with id {pending_id}")
+    with session() as cur:
+        row = cur.execute("SELECT platform, url FROM pending_profiles WHERE id = ?", (pending_id,)).fetchone()
+        if not row:
+            raise ValueError(f"No pending_profiles row with id {pending_id}")
 
-            cur.execute(
-                """
-                UPDATE audit_log SET human_verdict = 'incorrect', reviewed_at = now()
-                WHERE url = %s AND platform = %s AND human_verdict IS NULL
-                """,
-                (row["url"], row["platform"]),
-            )
-            cur.execute("DELETE FROM pending_profiles WHERE id = %s", (pending_id,))
-        conn.commit()
+        cur.execute(
+            """
+            UPDATE audit_log SET human_verdict = 'incorrect', reviewed_at = ?
+            WHERE url = ? AND platform = ? AND human_verdict IS NULL
+            """,
+            (utcnow(), row["url"], row["platform"]),
+        )
+        cur.execute("DELETE FROM pending_profiles WHERE id = ?", (pending_id,))
 
     print(f"Rejected and removed pending profile {pending_id}")
 

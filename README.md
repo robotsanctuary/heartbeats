@@ -15,23 +15,27 @@ database, the public website -- is designed but not yet running.
 
 Short version:
 
-1. Install Postgres locally (ideally on an external drive you control)
-2. `cp .env.example .env` and fill in `LOCAL_DATABASE_URL` + the `LLM_*` settings
+1. Python 3.10+ required (macOS's built-in 3.9 is too old).
+   `python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
+2. `cp .env.example .env` and set `LOCAL_DB_PATH` (where the SQLite file lives) + the `LLM_*` settings
    (local LM Studio/Ollama or OpenAI). Never commit `.env` or put real
    passwords in `.env.example`.
-3. `psql "$LOCAL_DATABASE_URL" -f schema.sql`
-4. Python 3.10+ required (macOS's built-in 3.9 is too old). `python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
+3. `python db.py init` (creates the database; the scraper also does this automatically)
+4. `python -m shelters.texas.dallas` for a dry run (prints only)
 5. `python -m shelters.texas.dallas --write`
-6. `python accuracy_report.py` to confirm it worked
-7. Once per clone: `git config core.hooksPath .githooks` -- enables the
+6. `python db.py info` / `python accuracy_report.py` to confirm it worked
+7. Tests: `pip install -r requirements-dev.txt && python -m pytest` (offline, no network or LLM needed)
+8. Once per clone: `git config core.hooksPath .githooks` -- enables the
    pre-commit check that blocks real passwords/API keys from being committed
 
 ## Architecture
 
-- **Local Postgres** (your machine only, never exposed to the internet) --
-  where all scraping, review, and accuracy tracking happens
-- **Remote Postgres** (hosted separately) -- receives only vetted,
-  approved data via `publish.py`; this is what the public website reads from
+- **Local SQLite** (one file on your machine, never exposed to the internet) --
+  where all scraping, review, and accuracy tracking happens. `db.py` is the
+  only place that opens it.
+- **Remote database** (hosting not chosen yet; code currently assumes Postgres) --
+  receives only vetted, approved data via `publish.py`; this is what the public
+  website reads from
 - **`shelters/{state}/{shelter}.py`** -- one script per shelter,
   sharing common logic via `shelters/common.py`
 
@@ -39,7 +43,8 @@ Short version:
 
 | File | Purpose |
 |---|---|
-| `schema.sql` / `schema.prisma` | Local database schema |
+| `db.py` | Local SQLite connection, setup (`init`/`info`), timestamp helpers |
+| `schema.sql` | Local database schema (SQLite) |
 | `schema_remote.sql` | Remote (public-facing) database schema |
 | `shelters/` | Per-shelter scraper scripts |
 | `matching_logic.py` | Matches social-media posts to known animals |
@@ -48,3 +53,4 @@ Short version:
 | `image_archive.py` | Downloads and retains animal photos locally |
 | `publish.py` | Pushes vetted data from local to remote |
 | `moderate.py` | Reviews public comments/submissions (remote) |
+| `tests/` | Offline test suite (`python -m pytest`) |

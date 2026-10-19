@@ -13,15 +13,18 @@ database, the public website -- is designed but not yet running.
 
 ## Setup
 
-See the full setup walkthrough in this project's conversation history,
-or follow this short version:
+Short version:
 
 1. Install Postgres locally (ideally on an external drive you control)
-2. `cp .env.example .env` and fill in `LOCAL_DATABASE_URL` + `OPENAI_API_KEY`
+2. `cp .env.example .env` and fill in `LOCAL_DATABASE_URL` + the `LLM_*` settings
+   (local LM Studio/Ollama or OpenAI). Never commit `.env` or put real
+   passwords in `.env.example`.
 3. `psql "$LOCAL_DATABASE_URL" -f schema.sql`
-4. `python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
+4. Python 3.10+ required (macOS's built-in 3.9 is too old). `python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
 5. `python -m shelters.texas.dallas --write`
 6. `python accuracy_report.py` to confirm it worked
+7. Once per clone: `git config core.hooksPath .githooks` -- enables the
+   pre-commit check that blocks real passwords/API keys from being committed
 
 ## Architecture
 

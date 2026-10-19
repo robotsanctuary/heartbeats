@@ -26,6 +26,7 @@ Usage:
 
 import argparse
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from shelters.common import (
     check_unknown_categories,
@@ -40,23 +41,34 @@ from image_archive import archive_image
 
 SHELTER_NAME = "Dallas Animal Services"
 
+# Dallas reports dates in its own local time. Dates are stored as
+# midnight *Dallas time* (not UTC), otherwise "8/2" lands in Postgres as
+# 8/1 7pm Central and shows up a day early on the site.
+SHELTER_TZ = ZoneInfo("America/Chicago")
+
 PRE_LAB_FEED_URL = "https://24petconnect.com/RSS/RSSFeed?id=td48ev36&sl=DLLS&KennelStatus=PRE-LAB"
 NEONATE_FEED_URL = "https://24petconnect.com/RSS/RSSFeed?id=td48ev36&sl=DLLS&Neonate=Yes"
 
 # Confirmed against live pulls. Update this set the moment
 # check_unknown_categories() flags something new -- that's the signal
 # a genuinely new outcome type exists, not a reason to ignore the warning.
-KNOWN_OUTCOME_TYPES = {"RTO", "TRANSFER", "ADOPTION"}
+KNOWN_OUTCOME_TYPES = {"RTO", "TRANSFER", "ADOPTION", "FOSTER"}
 OUTCOME_TYPE_TO_STATUS = {
     "RTO": "SAFE",
     "TRANSFER": "TRANSFERRED",
     "ADOPTION": "ADOPTED",
+    "FOSTER": "SAFE",  # out of the shelter in a foster home (seen live 2026-10-19)
 }
+# An outcome type we haven't mapped yet is NOT assumed safe -- it gets
+# PENDING_VERIFICATION so a human checks it instead of it quietly
+# disappearing from the at-risk list as "SAFE".
+UNKNOWN_OUTCOME_STATUS = "PENDING_VERIFICATION"
 
 # Every Pathway value seen across PRE-LAB + Neonate pulls so far.
-# "RESCUE ONLY" / "EMER RESCUE" are NOT in here on purpose -- if they
+# "RESCUE ONLY" is NOT in here on purpose -- if they
 # ever appear, check_unknown_categories() should flag them loudly.
-KNOWN_PATHWAYS = {"ADOP RESCU", "RESC FOSTR", "QUARANTINE", None}
+# "EM RESCUE" (emergency rescue) first seen in the live PRE-LAB feed 2026-10-19.
+KNOWN_PATHWAYS = {"ADOP RESCU", "RESC FOSTR", "QUARANTINE", "EM RESCUE", None}
 
 
 def _text(item, tag: str):
@@ -70,7 +82,7 @@ def _parse_mmddyyyy(value):
     if not value:
         return None
     try:
-        return datetime.strptime(value, "%m/%d/%Y").date().isoformat()
+        return datetime.strptime(value, "%m/%d/%Y").replace(tzinfo=SHELTER_TZ).isoformat()
     except ValueError:
         return None
 
@@ -96,7 +108,7 @@ def normalize_item(item, source: str) -> dict:
         "outcome_type": outcome_type,
         "status": (
             "AT_RISK" if outcome_type is None
-            else OUTCOME_TYPE_TO_STATUS.get(outcome_type, "SAFE")
+            else OUTCOME_TYPE_TO_STATUS.get(outcome_type, UNKNOWN_OUTCOME_STATUS)
         ),
         "image_url": _text(item, "imageURL"),
         "pathway": _text(item, "Pathway"),

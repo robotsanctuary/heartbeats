@@ -1,0 +1,16 @@
+#!/bin/sh
+# Blocks commits that contain likely secrets or personal data.
+# Enable once per clone:  git config core.hooksPath .githooks
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$staged" ] && exit 0
+fail=0
+for f in $staged; do
+  [ "$f" = ".githooks/pre-commit" ] && continue
+  case "$f" in .env|.env.*) [ "$f" != ".env.example" ] && { echo "BLOCKED: $f must never be committed"; fail=1; } ;; esac
+  hits=$(git show ":$f" 2>/dev/null | grep -nE \
+    'postgres(ql)?://[^:/"]+:[^@"]+@|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|xox[baprs]-|BEGIN [A-Z ]*PRIVATE KEY' \
+    | grep -vE '://[^:]+:password@|sk-\.\.\.')
+  [ -n "$hits" ] && { echo "BLOCKED: possible secret in $f:"; echo "$hits" | cut -c1-60 | sed 's/^/   /'; fail=1; }
+done
+[ $fail -ne 0 ] && echo "Use placeholders (e.g. user:password@) and keep real values in .env."
+exit $fail

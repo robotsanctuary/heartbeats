@@ -1,0 +1,1 @@
+<ellipse cx="166" cy="36" rx="6.5" ry="8.5" transform="rotate(-30 166 36)"/><ellipse cx="185" cy="24" rx="7" ry="9.5" transform="rotate(-10 185 24)"/><ellipse cx="207" cy="24" rx="7" ry="9.5" transform="rotate(10 207 24)"/><ellipse cx="226" cy="36" rx="6.5" ry="8.5" transform="rotate(30 226 36)"/>

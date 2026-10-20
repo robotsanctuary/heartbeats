@@ -152,3 +152,12 @@ def test_launch_defaults_hide_remembered_and_single_shelter_menu(site, tmp_path)
     assert "Choose your shelter" not in idx                 # only one registered shelter
     assert 'class="where"' not in idx
     assert (out / "tx/dallas/index.html").exists()          # shelter page itself still built
+
+
+def test_brand_assets_and_logo(site):
+    out, _ = site
+    assert (out / "icon.svg").exists() and (out / "og.png").exists()
+    idx = (out / "index.html").read_text()
+    assert 'rel="icon" href="icon.svg"' in idx and 'class="beat"' in idx
+    assert 'href="../../icon.svg"' in (out / "tx/dallas/index.html").read_text()
+    assert "prefers-reduced-motion" in idx           # animations switch off for reduced-motion users

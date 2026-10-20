@@ -185,10 +185,106 @@ h1{font-size:44px}
 .dwrap .detail{padding:0}
 .dwrap .actions{max-width:420px}
 }
+/* ---- modern skin (2026-10-20): brand option 6, Instrument Serif + gradient italic ---- */
+:root{--accent:#D9472F;--ink:#1F1A17;--muted:#6B625C;--line:rgba(31,26,23,.09);--soft:#FDEBE4;--paper:#FBF7F3;
+--grad:linear-gradient(95deg,#D9472F,#C4304F 55%,#9E2A66);--shadow:0 1px 2px rgba(31,26,23,.04),0 10px 28px -14px rgba(120,60,40,.22)}
+body{background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+background:radial-gradient(38% 32% at 15% 8%,#FFD6C2 0,transparent 70%),radial-gradient(34% 30% at 92% 28%,#FCDDE8 0,transparent 70%),radial-gradient(40% 34% at 45% 100%,#FFE7D6 0,transparent 70%);
+animation:drift 30s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(4%,-3%,0) scale(1.07)}}
+h1,.name,.brand{font-family:"Instrument Serif",serif;font-weight:400}
+h1 i,.brand i{font-style:italic}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.07em;filter:drop-shadow(0 6px 16px rgba(217,71,47,.28))}
+nav{position:sticky;top:0;z-index:20;margin:0;padding:12px 22px 0;background:rgba(251,247,243,.74);
+-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border-bottom:0;
+border-image:linear-gradient(to top,rgba(31,26,23,.09) 1px,rgba(251,247,243,.74) 1px) fill 0//0 100vmax}
+.brand{font-size:27px;line-height:1;color:var(--ink);gap:10px;font-weight:400}
+.brand svg{width:56px;height:auto;overflow:visible}
+nav .links a{transition:color .2s}nav .links a:hover{color:var(--ink)}
+header{padding:28px 22px 14px}
+h1{font-size:50px;line-height:1;letter-spacing:-.01em;margin-bottom:14px}
+.lede{font-size:17.5px;color:var(--muted)}
+.heromark{display:block;width:210px;height:auto;margin:0 0 10px -4px;overflow:visible}
+.stats{font-size:14.5px}
+h2{border-top:0;padding:30px 0 14px;display:flex;align-items:center;gap:10px}
+h2.now::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ping 1.8s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(217,71,47,.55)}70%,100%{box-shadow:0 0 0 10px rgba(217,71,47,0)}}
+.pets{display:grid;gap:14px}
+.pet{background:#fff;border-radius:22px;padding:14px;gap:16px;border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);
+transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.pet:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(31,26,23,.05),0 22px 44px -16px rgba(120,60,40,.32)}
+.pet img,.pet .noimg{border-radius:18px;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.pet:hover img{transform:scale(1.05) rotate(-1deg)}
+.name{font-size:30px;line-height:1}
+.more{transition:transform .25s}.pet:hover .more{transform:translateX(5px)}
+.btn{background:var(--grad);box-shadow:0 12px 26px -12px rgba(196,48,79,.65);transition:transform .15s,box-shadow .25s,filter .2s}
+.btn:hover{transform:translateY(-2px);filter:saturate(1.15)}.btn:active{transform:scale(.97)}
+.btn.soft{background:#fff;color:var(--accent);border:1px solid var(--line);box-shadow:var(--shadow)}
+.dwrap{padding:16px 14px 0}.dwrap .detail{padding:22px 8px}
+.hero{border-radius:26px;box-shadow:0 24px 50px -24px rgba(120,60,40,.45)}
+.detail h1{font-size:60px;margin:10px 0 6px}
+.when{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);padding:7px 13px;border-radius:999px;font-size:12px;box-shadow:var(--shadow)}
+.when.now::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);animation:ping 1.8s infinite}
+.facts{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px 18px;box-shadow:var(--shadow)}
+.chip{border-radius:14px;box-shadow:0 1px 2px rgba(31,26,23,.04);transition:transform .15s,border-color .2s,box-shadow .2s}
+.chip:hover{border-color:rgba(217,71,47,.45);transform:translateY(-1px);box-shadow:var(--shadow)}.chip:active{transform:scale(.95)}
+.picker select{border-radius:14px;box-shadow:var(--shadow)}
+.empty{background:#fff;border:1px solid var(--line)}
+.prose h2{padding-top:26px}
+footer{border-top:1px solid var(--line)}
+/* scroll reveal (only when JS runs, so no-JS browsers still see everything) */
+.js .rv{opacity:0;transform:translateY(18px)}
+.js .rv.in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+/* logo: the heartbeat draws itself, the toes pop in, then a glowing blip runs along the line */
+.beat{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.5s cubic-bezier(.6,0,.2,1) .1s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.toes ellipse{opacity:0;transform-box:fill-box;transform-origin:center;animation:pop .45s cubic-bezier(.3,1.6,.5,1) forwards}
+.toes ellipse:nth-child(1){animation-delay:1.25s}.toes ellipse:nth-child(2){animation-delay:1.35s}
+.toes ellipse:nth-child(3){animation-delay:1.45s}.toes ellipse:nth-child(4){animation-delay:1.55s}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:none}}
+.blip{stroke-dasharray:.05 2;stroke-dashoffset:.05;opacity:0;filter:drop-shadow(0 0 3px #FF7A5C);animation:blip 3.2s linear 2s infinite}
+@keyframes blip{0%{opacity:1;stroke-dashoffset:.05}60%{opacity:1;stroke-dashoffset:-1}61%,100%{opacity:0;stroke-dashoffset:-1}}
+@media (min-width:900px){
+h1{font-size:72px}.heromark{width:260px}
+.pets{gap:18px 22px}
+.pet{grid-template-columns:120px 1fr;padding:16px}.pet img,.pet .noimg{width:120px;height:120px}
+.dwrap{padding:36px 22px 0}.dwrap .detail{padding:0}.detail h1{font-size:76px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}
+.beat{stroke-dashoffset:0}.toes ellipse{opacity:1}.js .rv{opacity:1;transform:none}.blip{display:none}}
 """
 
 HEART = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.7 4.5'
          'c2.1 0 3.6 1.1 4.3 2.4h2c.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>')
+
+
+BRAND_DIR = Path(__file__).resolve().parent / "brand"
+_MARK_PATH = (BRAND_DIR / "path.txt").read_text().strip()
+_MARK_TOES = (BRAND_DIR / "toes.txt").read_text().strip()
+
+
+def mark_svg(uid, cls="", blip=False):
+    """The logo mark inline (so it can animate): heartbeat line that becomes a paw."""
+    b = (f'<path class="blip" pathLength="1" d="{_MARK_PATH}" stroke="#FFB59F" stroke-width="7" '
+         f'stroke-linecap="round" stroke-linejoin="round"/>') if blip else ""
+    return (f'<svg class="{cls}" viewBox="0 0 240 100" fill="none" aria-hidden="true"><defs>'
+            f'<linearGradient id="{uid}" gradientUnits="userSpaceOnUse" x1="0" x2="240">'
+            f'<stop offset="0" stop-color="#D9472F" stop-opacity="0"/><stop offset=".3" stop-color="#D9472F"/>'
+            f'<stop offset="1" stop-color="#C4304F"/></linearGradient></defs>'
+            f'<path class="beat" pathLength="1" d="{_MARK_PATH}" stroke="url(#{uid})" stroke-width="5.5" '
+            f'stroke-linecap="round" stroke-linejoin="round"/>{b}'
+            f'<g class="toes" stroke="#C93A3F" stroke-width="5.5">{_MARK_TOES}</g></svg>')
+
+
+def wordmark():
+    return 'Fading <i class="grad">Heartbeats</i>'
+
+
+REVEAL_JS = """<script>(()=>{const els=[...document.querySelectorAll(".rv")];
+if(!("IntersectionObserver" in window)){els.forEach(e=>e.classList.add("in"));return}
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}}),{rootMargin:"0px 0px -6% 0px"});
+els.forEach((e,i)=>{e.style.transitionDelay=(i%2)*90+"ms";io.observe(e)})})()</script>"""
 
 
 def page(title, body, active, root="", wide=False, meta=""):
@@ -198,15 +294,17 @@ def page(title, body, active, root="", wide=False, meta=""):
     nav = "".join(f'<a href="{root}{h}" class="{"on" if k == active else ""}">{t}</a>' for h, t, k in links)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(title)}</title>{meta or f'<meta name="description" content="{e(TAGLINE)}">'}
+<title>{e(title)}</title>{meta or f'<meta name="description" content="{e(TAGLINE)}"><meta property="og:title" content="{e(SITE_NAME)}"><meta property="og:description" content="{e(TAGLINE)}"><meta property="og:image" content="{SITE_URL}/og.png"><meta name="twitter:card" content="summary_large_image">'}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="{root}icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
+<meta name="theme-color" content="#FBF7F3"><script>document.documentElement.classList.add("js")</script>
 <style>{CSS}</style></head><body><div class="wrap{" wide" if wide else ""}">
-<nav><a class="brand" href="{root}index.html">{HEART}{e(SITE_NAME)}</a><div class="links">{nav}</div></nav>
+<nav><a class="brand" href="{root}index.html" aria-label="{e(SITE_NAME)} home">{mark_svg("mk-nav")}<span>{wordmark()}</span></a><div class="links">{nav}</div></nav>
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
 please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
-</div></body></html>"""
+</div>{REVEAL_JS}</body></html>"""
 
 
 def photo(p, root, cls=""):
@@ -337,7 +435,7 @@ def pet_sections(pets, root="", show_shelter=True):
             text = blurb(p["desc"]) if p["desc"] else (
                 "Too young to stay in the shelter. Needs a foster home." if k == "nodate" else "")
             where = f'<div class="where">{e(p["shelter"])}{" · " + e(p["city"]) if p["city"] else ""}</div>' if show_shelter else ""
-            rows.append(f"""<a class="pet" href="{root}animals/{e(p['id'])}.html">{photo(p, root)}
+            rows.append(f"""<a class="pet rv" href="{root}animals/{e(p['id'])}.html">{photo(p, root)}
 <div><div class="name">{e(p['name'])}</div><div class="meta">{e(p['age'])} · {e(p['breed'])}</div>{where}
 <p class="blurb">{e(text)}</p><span class="more">Meet {e(p['name'])} →</span></div></a>""")
         secs.append(f'<section><h2 class="{"now" if k in ("past", "today") else ""}">{e(labels.get(k, k))}</h2><div class="pets">{"".join(rows)}</div></section>')
@@ -375,7 +473,7 @@ def shelter_counts(pets):
 def index_page(pets, saved, today):
     dated = sum(p["days"] is not None for p in pets)
     n_shelters = len({p["shelter"] for p in pets})
-    body = f"""<header><h1>{e(TAGLINE)}</h1>
+    body = f"""<header>{mark_svg("mk-hero", "heromark", blip=True)}<h1>Every heartbeat deserves a <i class="grad">home.</i></h1>
 <p class="lede">Dogs and cats at {n_shelters} shelter{"" if n_shelters == 1 else "s"} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
 <p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p>
 {picker("", None, shelter_counts(pets))}</header>
@@ -416,8 +514,8 @@ def detail_page(p):
         main = '<p class="small">No direct link to this shelter yet.</p>'
     mail = (f'<a class="btn soft" href="mailto:{e(p["contact"])}?subject={e(p["id"])}%20{e(p["name"])}">'
             f'Email the shelter about {e(p["name"])}</a>') if p["contact"] else ""
-    body = f"""<div class="dwrap">{photo(p, "../", "hero")}
-<div class="detail"><span class="when">{e(("Shelter date: " + when(p)) if p["days"] is not None and p["days"] >= 0 else when(p))}</span><h1>{e(p['name'])}</h1>
+    body = f"""<div class="dwrap">{photo(p, "../", "hero rv")}
+<div class="detail"><span class="when{" now" if p["days"] is not None and p["days"] <= 1 else ""}">{e(("Shelter date: " + when(p)) if p["days"] is not None and p["days"] >= 0 else when(p))}</span><h1>{e(p['name'])}</h1>
 <div class="actions">{main}</div>
 <p class="small">Opens {e(p['name'])}'s page on the shelter's own site. Mention ID {e(p['id'])} when you contact them.</p>
 {share_block(p, f"Share {p['name']}")}
@@ -428,7 +526,7 @@ def detail_page(p):
 
 
 def help_page():
-    body = f"""<header><h1>How you can help</h1>
+    body = f"""<header><h1>How you can <i class="grad">help</i></h1>
 <p class="lede">You don't need a big house or a lot of money. Most of these take one afternoon. <span class="draft">[draft]</span></p></header>
 <div class="prose">
 <h2>Foster</h2>
@@ -486,6 +584,9 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
         if p["img"]:
             shutil.copy2(p["img"], tmp / "img" / p["img"].name)
         (tmp / "animals" / f"{p['id']}.html").write_text(detail_page(p))
+    for src, dst in (("icon.svg", "icon.svg"), ("apple-touch-icon.png", "apple-touch-icon.png"), ("og-1200x630.png", "og.png")):
+        if (BRAND_DIR / src).exists():
+            shutil.copy2(BRAND_DIR / src, tmp / dst)
     (tmp / "index.html").write_text(index_page(pets, saved, today))
     for name, info in SHELTERS.items():
         d = tmp / shelter_path(name)

@@ -36,8 +36,11 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    `dog.png`). Engine `DOG_JS`: jump UP = frames 8 sit -> 7 rear up, paws in air -> 10 spring -> 4 leap
    -> 11 reach -> 12 land, on a lower arc; jump DOWN = 12 -> 4 -> 11 -> 12. A card scrolling up from
    below now LIFTS a dog standing on the floor. Wanders, rides cards, hops off at the top bar.
-   Run/trot/skip/nap are stand-ins built from jump frames until those rows of art arrive (owner is
-   doing animations one at a time). Old stick-dog sheet: `design/sprite_template.py` (template only).
+   RUN art in (2nd zip, `design/brand/dog-src-run/`): packed with `--name run --frames 3,6,1,4,7,8`, then
+   `python design/dog_art.py --combine jump run` -> `dog-all.png` (cells 0-11 jump, 12-17 run; build
+   copies it to `dog.png`). Run/skip play run frames over a bounding hop (`STRIDE`). Weakness: the run
+   frames are all stretched-leap poses (no gathered-legs frame), so it reads as bounding, not galloping.
+   Trot/nap/sit still use jump frames as stand-ins (owner is doing animations one at a time). Old stick-dog sheet: `design/sprite_template.py` (template only).
 3. Small polish: "More…" share button alone on its row; check nav edge on wide screens.
 4. Hosting: Cloudflare (same account as the owner's other sites). The domain stays
    at Porkbun and its nameservers point to Cloudflare. A static Worker goes to a

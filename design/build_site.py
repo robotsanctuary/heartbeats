@@ -347,7 +347,8 @@ def dog_html(root=""):
 # Only jump art exists so far; run/trot/skip/nap reuse jump frames as stand-ins until those rows arrive.
 DOG_JS = """<script>(()=>{const d=document.querySelector(".dog");if(!d)return;
 if(matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove();return}
-const N=12,FOOT=250/300,CX=110/300;
+const N=18,RUN0=12,RUNN=6,FOOT=250/300,CX=110/300;
+const STRIDE={run:[.40,.20],skip:[.55,.34]};/* bounding: one hop per stride = [seconds, hop height x size], run frames 1-6 play across each hop */
 const A={stand:[[11]],look:[[7]],sit:[[0]],paw:[[6]],sniff:[[11]],lie:[[0]],sleep:[[0]],stretch:[[9]],
 run:[[10,3,11],10],trot:[[11,7],4],skip:[[11,3],5],hop:[[11,3],6]};
 const SPEED={run:300,trot:60,skip:130},BOB={run:.10,trot:.025,skip:.16,hop:.2};
@@ -399,6 +400,8 @@ else if(goal!==null){const sp=(SPEED[st]||100)*K(),dx=goal-x;face=dx>=0?1:-1;
 if(Math.abs(dx)<=sp*dt){x=goal;const f=after;goal=null;after=null;f?f():set("stand",400+Math.random()*900)}else x+=Math.sign(dx)*sp*dt;
 if(on)off=x-on.getBoundingClientRect().left}
 else if(n>until)next();
+if(fr===null&&STRIDE[st]&&goal!==null){const[per,hh]=STRIDE[st],ph=((n-t0)/1000/per)%1;
+fr=RUN0+Math.min(RUNN-1,Math.floor(ph*RUNN));lift=Math.sin(Math.PI*ph)*hh*S}
 if(fr===null){const a=A[st]||A.stand,fs=a[0],fps=a[1]||0,i=fps?Math.floor((n-t0)/1000*fps)%fs.length:0;fr=fs[i];
 if(BOB[st])lift=Math.abs(Math.sin((n-t0)/1000*(fps||5)*Math.PI/fs.length*fs.length))*BOB[st]*S}
 d.style.backgroundSize=N*S+"px "+S+"px";d.style.backgroundPosition=-fr*S+"px 0";
@@ -741,7 +744,7 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
         if p["img"]:
             shutil.copy2(p["img"], tmp / "img" / p["img"].name)
         (tmp / "animals" / f"{p['id']}.html").write_text(detail_page(p))
-    for src, dst in (("dog-jump.png", "dog.png"), ("icon.svg", "icon.svg"), ("apple-touch-icon.png", "apple-touch-icon.png"), ("og-1200x630.png", "og.png")):
+    for src, dst in (("dog-all.png", "dog.png"), ("icon.svg", "icon.svg"), ("apple-touch-icon.png", "apple-touch-icon.png"), ("og-1200x630.png", "og.png")):
         if (BRAND_DIR / src).exists():
             shutil.copy2(BRAND_DIR / src, tmp / dst)
     (tmp / "index.html").write_text(index_page(pets, saved, today))

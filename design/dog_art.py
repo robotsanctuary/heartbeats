@@ -35,8 +35,12 @@ def hind_foot_x(im: Image.Image) -> float:
     return sum(xs) / len(xs) if xs else w * .25
 
 
-def build(src: Path, name: str = "jump"):
+def build(src: Path, name: str = "jump", pick=None):
+    """pick = frame numbers to keep, in play order (e.g. [3, 6, 1, 4, 7, 8]); default = all, numbered order."""
     files = sorted(src.glob("*.png"), key=lambda p: int(re.findall(r"(\d+)\.png$", p.name)[0]))
+    if pick:
+        byn = {int(re.findall(r"(\d+)\.png$", f.name)[0]): f for f in files}
+        files = [byn[n] for n in pick]
     cells = []
     for f in files:
         im = clean(Image.open(f))
@@ -54,7 +58,24 @@ def build(src: Path, name: str = "jump"):
     return out, meta
 
 
+def combine(names=("jump", "run")):
+    """Joins the strips side by side into brand/dog-all.png (what the site uses). Prints each strip's first cell."""
+    strips = [Image.open(BRAND / f"dog-{n}.png") for n in names]
+    out = Image.new("RGBA", (sum(i.width for i in strips), CELL))
+    x, starts = 0, {}
+    for n, im in zip(names, strips):
+        starts[n] = x // CELL
+        out.paste(im, (x, 0))
+        x += im.width
+    out.save(BRAND / "dog-all.png", optimize=True)
+    return {"cells": x // CELL, "start": starts}
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
+    if args and args[0] == "--combine":
+        print(combine(tuple(args[1:]) or ("jump", "run")))
+        sys.exit()
     name = args[args.index("--name") + 1] if "--name" in args else "jump"
-    print(build(Path(args[0]), name))
+    pick = [int(n) for n in args[args.index("--frames") + 1].split(",")] if "--frames" in args else None
+    print(build(Path(args[0]), name, pick))

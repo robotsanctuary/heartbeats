@@ -24,11 +24,13 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
 - Texas expansion research: `docs/texas-shelter-survey.md`.
 
 ## Next steps
-1. **Header redesign (owner is choosing).** Current header looks awkward on desktop (not full
-   width, giant text). Mockups A (slim bar + full-width heartbeat strip), B (photo band),
-   C (app style + filter chips) in `/Volumes/Extreme/heartbeats-data/mockups/header-options/`
-   (also `site-preview/_opt-a|b|c.html`, wiped by the next build). Recommended: C with A's
-   heartbeat strip. Owner liked the heartbeat (EKG) animation.
+1. **Header: DONE 2026-10-20 (option B + daily scroller).** Full-width sticky `.topbar` (logo left,
+   menu right) on every page; home page has a full-width pink `.band` (headline, stat pills, "See who
+   needs help today") and an "Out of time soonest" scroller of photo tiles (`reel_pets()`: photos only,
+   soonest date first, past-date first, max `REEL_MAX`=20, tops up with no-date animals below `REEL_MIN`=8).
+   It is rebuilt with the site, so it changes every day. Auto-drifts sideways (`REEL_JS`, loops via cloned
+   tiles), pauses on touch/hover, off under reduced motion. Old A/C mockups kept in
+   `/Volumes/Extreme/heartbeats-data/mockups/header-options/`.
 2. **Scrolling dogs (owner wants it):** small subtle dog(s) that run along the bottom as the
    user scrolls and, when scrolling stops, do random actions (sit, wave, give paw, wag, nap,
    second dog/cat joins); tap = wiggle; off for reduced motion. Art source undecided:

@@ -41,6 +41,7 @@ DOMAIN = "fadingheartbeats.com"
 # Launch switches. Remembered (memorial) stays hidden until it's announced: no tab, no page,
 # no pages for those animals. The shelter menu + shelter line on cards appear once 2+ shelters exist.
 SHOW_REMEMBERED = os.environ.get("SHOW_REMEMBERED") == "1"
+REEL_MAX, REEL_MIN = 20, 8  # home scroller: at most 20 tiles; top up with no-date animals below 8
 SHOW_PICKER = None  # None = automatic (2+ registered shelters); set by build()
 SITE_URL = (os.environ.get("SITE_URL") or f"https://{DOMAIN}").rstrip("/")
 DEFAULT_TZ = ZoneInfo("America/Chicago")
@@ -118,12 +119,7 @@ CSS = """
 --accent:oklch(52% 0.11 35);--soft:oklch(93% 0.03 50);--quiet:oklch(94% 0.008 75)}
 body{background:var(--paper);color:var(--ink);font:16px/1.55 "Source Sans 3",system-ui,sans-serif;-webkit-text-size-adjust:100%}
 .wrap{max-width:640px;margin:0 auto}
-nav{margin:0 22px;padding:14px 0 0;border-bottom:1px solid var(--line)}
 .brand{font:600 17px/1 "Fraunces",serif;color:var(--accent);text-decoration:none;display:flex;gap:7px;align-items:center}
-.brand svg{width:16px;height:16px}
-nav .links{display:flex;gap:20px;font-size:15px;margin-top:6px}
-nav .links a{text-decoration:none;color:var(--muted);padding:10px 0 12px;white-space:nowrap;border-bottom:2px solid transparent}
-nav .links a.on{color:var(--ink);font-weight:600;border-color:var(--accent)}
 header{padding:30px 22px 18px}
 h1{font:400 36px/1.08 "Fraunces",serif;letter-spacing:-.01em;margin-bottom:12px}
 .lede{color:var(--muted);max-width:56ch}
@@ -196,16 +192,9 @@ animation:drift 30s ease-in-out infinite alternate}
 h1,.name,.brand{font-family:"Instrument Serif",serif;font-weight:400}
 h1 i,.brand i{font-style:italic}
 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.07em;filter:drop-shadow(0 6px 16px rgba(217,71,47,.28))}
-nav{position:sticky;top:0;z-index:20;margin:0;padding:12px 22px 0;background:rgba(251,247,243,.74);
--webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border-bottom:0;
-border-image:linear-gradient(to top,rgba(31,26,23,.09) 1px,rgba(251,247,243,.74) 1px) fill 0//0 100vmax}
-.brand{font-size:27px;line-height:1;color:var(--ink);gap:10px;font-weight:400}
-.brand svg{width:56px;height:auto;overflow:visible}
-nav .links a{transition:color .2s}nav .links a:hover{color:var(--ink)}
 header{padding:28px 22px 14px}
 h1{font-size:50px;line-height:1;letter-spacing:-.01em;margin-bottom:14px}
 .lede{font-size:17.5px;color:var(--muted)}
-.heromark{display:block;width:210px;height:auto;margin:0 0 10px -4px;overflow:visible}
 .stats{font-size:14.5px}
 h2{border-top:0;padding:30px 0 14px;display:flex;align-items:center;gap:10px}
 h2.now::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ping 1.8s infinite}
@@ -233,6 +222,36 @@ transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
 .empty{background:#fff;border:1px solid var(--line)}
 .prose h2{padding-top:26px}
 footer{border-top:1px solid var(--line)}
+/* top bar (header option B, 2026-10-20): full width, logo left, menu right, sticks on scroll */
+.topbar{position:sticky;top:0;z-index:30;background:rgba(251,247,243,.8);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid rgba(31,26,23,.08)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-size:24px;line-height:1;color:var(--ink);gap:10px;font-weight:400}.brand svg{width:46px;height:auto;overflow:visible}
+.topbar .links{display:flex;gap:4px}
+.topbar .links a{padding:8px 14px;border-radius:999px;font-size:15px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color .2s}
+.topbar .links a:hover{color:var(--ink)}.topbar .links a.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+@media(max-width:560px){.topbar .in{padding:8px 14px}.brand{font-size:20px;gap:6px}.brand svg{width:32px}.topbar .links a{padding:6px 9px;font-size:13.5px}}
+/* home band + "out of time soon" scroller (rebuilt after every scrape, so it changes daily) */
+.band{background:linear-gradient(120deg,#FFE3D6,#FCE6EE 60%,#FFF1E6);border-bottom:1px solid var(--line);overflow:hidden}
+.band .in{max-width:1080px;margin:0 auto;padding:28px 22px 6px}
+.band h1{font-size:42px;margin-bottom:10px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.pills span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;color:var(--muted);box-shadow:var(--shadow)}.pills b{color:var(--ink)}
+.band .btn{width:auto;margin-top:20px}#list{display:block;scroll-margin-top:70px}
+.reel{padding:22px 0 26px}
+.reel .lbl{max-width:1080px;margin:0 auto 12px;padding:0 22px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.reel .lbl::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ping 1.8s infinite}
+.track{display:flex;gap:14px;overflow-x:auto;padding:4px 22px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent)}
+.track::-webkit-scrollbar{display:none}
+.tile{flex:none;width:136px;text-decoration:none;color:var(--ink)}
+.tile .ph{position:relative;display:block;width:136px;height:164px;border-radius:20px;overflow:hidden;border:4px solid #fff;background:var(--soft);box-shadow:0 14px 26px -16px rgba(120,60,40,.5);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.tile img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
+.tile:hover .ph{transform:translateY(-4px) rotate(-1.5deg)}
+.tile .d{position:absolute;left:7px;bottom:7px;background:rgba(255,255,255,.92);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
+.tile .d.hot{background:var(--grad);color:#fff}
+.tile .nm{display:block;margin-top:7px;font:400 21px/1.05 "Instrument Serif",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .br{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(min-width:900px){.band .in{padding:46px 22px 8px}.band h1{font-size:62px}
+.track{padding-left:max(22px,calc((100vw - 1080px)/2 + 22px))}.tile,.tile .ph{width:190px}.tile .ph{height:226px}.reel{padding-bottom:40px}}
 /* scroll reveal (only when JS runs, so no-JS browsers still see everything) */
 .js .rv{opacity:0;transform:translateY(18px)}
 .js .rv.in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
@@ -246,7 +265,7 @@ footer{border-top:1px solid var(--line)}
 .blip{stroke-dasharray:.05 2;stroke-dashoffset:.05;opacity:0;filter:drop-shadow(0 0 3px #FF7A5C);animation:blip 3.2s linear 2s infinite}
 @keyframes blip{0%{opacity:1;stroke-dashoffset:.05}60%{opacity:1;stroke-dashoffset:-1}61%,100%{opacity:0;stroke-dashoffset:-1}}
 @media (min-width:900px){
-h1{font-size:72px}.heromark{width:260px}
+h1{font-size:72px}
 .pets{gap:18px 22px}
 .pet{grid-template-columns:120px 1fr;padding:16px}.pet img,.pet .noimg{width:120px;height:120px}
 .dwrap{padding:36px 22px 0}.dwrap .detail{padding:0}.detail h1{font-size:76px}
@@ -287,7 +306,21 @@ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.t
 els.forEach((e,i)=>{e.style.transitionDelay=(i%2)*90+"ms";io.observe(e)})})()</script>"""
 
 
-def page(title, body, active, root="", wide=False, meta=""):
+REEL_JS = """<script>(()=>{const t=document.querySelector(".track");if(!t)return;
+if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+const kids=[...t.children];if(kids.length<3)return;
+kids.forEach(k=>{const c=k.cloneNode(true);c.setAttribute("aria-hidden","true");c.tabIndex=-1;t.appendChild(c)});
+let pausedUntil=0,last=0,x=0;const half=()=>t.scrollWidth/2;
+const pause=ms=>{pausedUntil=performance.now()+ms;x=t.scrollLeft};
+["pointerdown","touchstart","wheel","focusin"].forEach(ev=>t.addEventListener(ev,()=>pause(4000),{passive:true}));
+t.addEventListener("mouseenter",()=>pause(1e9));t.addEventListener("mouseleave",()=>pause(600));
+t.addEventListener("scroll",()=>{if(performance.now()<pausedUntil){if(t.scrollLeft>=half())t.scrollLeft-=half();x=t.scrollLeft}},{passive:true});
+const step=now=>{const dt=Math.min(now-(last||now),50);last=now;
+if(now>=pausedUntil&&!document.hidden){x+=dt*0.035;if(x>=half())x-=half();t.scrollLeft=x}
+requestAnimationFrame(step)};requestAnimationFrame(step)})()</script>"""
+
+
+def page(title, body, active, root="", wide=False, meta="", band=""):
     links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help")]
     if SHOW_REMEMBERED:
         links.append(("remembered.html", "Remembered", "mem"))
@@ -299,12 +332,13 @@ def page(title, body, active, root="", wide=False, meta=""):
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="{root}icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <meta name="theme-color" content="#FBF7F3"><script>document.documentElement.classList.add("js")</script>
-<style>{CSS}</style></head><body><div class="wrap{" wide" if wide else ""}">
-<nav><a class="brand" href="{root}index.html" aria-label="{e(SITE_NAME)} home">{mark_svg("mk-nav")}<span>{wordmark()}</span></a><div class="links">{nav}</div></nav>
+<style>{CSS}</style></head><body>
+<div class="topbar"><div class="in"><a class="brand" href="{root}index.html" aria-label="{e(SITE_NAME)} home">{mark_svg("mk-nav")}<span>{wordmark()}</span></a><nav class="links" aria-label="Main">{nav}</nav></div></div>
+{band}<div class="wrap{" wide" if wide else ""}">
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
 please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
-</div>{REVEAL_JS}</body></html>"""
+</div>{REVEAL_JS}{REEL_JS if band else ""}</body></html>"""
 
 
 def photo(p, root, cls=""):
@@ -470,15 +504,49 @@ def shelter_counts(pets):
     return c
 
 
+def tag(p):
+    """Short day label for a scroller tile."""
+    d = p["days"]
+    if d is None:
+        return "Foster now"
+    if d < 0:
+        return "Past date"
+    return "Today" if d == 0 else "Tomorrow" if d == 1 else f"{p['deadline']:%a %b %-d}"
+
+
+def reel_pets(pets, n=REEL_MAX):
+    """Who goes in today's scroller: soonest shelter date first (past-date ones lead), photos only.
+    Tops up with no-date animals (e.g. neonates needing a foster) if fewer than REEL_MIN have dates."""
+    withimg = [p for p in pets if p["img"]]
+    dated = sorted((p for p in withimg if p["days"] is not None), key=lambda p: (p["days"], p["name"]))
+    if len(dated) < REEL_MIN:
+        dated += [p for p in withimg if p["days"] is None]
+    return dated[:n]
+
+
+def reel(pets, root=""):
+    picks = reel_pets(pets)
+    if not picks:
+        return ""
+    tiles = "".join(
+        f'<a class="tile" href="{root}animals/{e(p["id"])}.html"><span class="ph">'
+        f'<img src="{root}img/{e(p["img"].name)}" alt="Photo of {e(p["name"])}" loading="lazy">'
+        f'<span class="d{" hot" if p["days"] is not None and p["days"] <= 1 else ""}">{e(tag(p))}</span></span>'
+        f'<span class="nm">{e(p["name"])}</span><span class="br">{e(p["age"])} · {e(p["breed"])}</span></a>' for p in picks)
+    return (f'<div class="reel" aria-label="Animals whose shelter date is soonest"><div class="lbl">Out of time soonest</div>'
+            f'<div class="track">{tiles}</div></div>')
+
+
 def index_page(pets, saved, today):
     dated = sum(p["days"] is not None for p in pets)
     n_shelters = len({p["shelter"] for p in pets})
-    body = f"""<header>{mark_svg("mk-hero", "heromark", blip=True)}<h1>Every heartbeat deserves a <i class="grad">home.</i></h1>
+    band = f"""<section class="band"><div class="in"><h1>Every heartbeat deserves a <i class="grad">home.</i></h1>
 <p class="lede">Dogs and cats at {n_shelters} shelter{"" if n_shelters == 1 else "s"} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
-<p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p>
-{picker("", None, shelter_counts(pets))}</header>
-{pet_sections(pets, "", show_shelter=bool(SHOW_PICKER))}"""
-    return page(f"{SITE_NAME}: {TAGLINE}", body, "list", wide=True)
+<div class="pills"><span><b>{len(pets)}</b> need a way out</span><span><b>{dated}</b> have a date</span><span><b>{saved}</b> made it out recently</span></div>
+{picker("", None, shelter_counts(pets))}<a class="btn" href="#list">See who needs help today</a></div>
+{reel(pets)}</section>"""
+    body = f'<span id="list"></span>\n{pet_sections(pets, "", show_shelter=bool(SHOW_PICKER))}'
+    return page(f"{SITE_NAME}: {TAGLINE}", body, "list", wide=True, band=band)
 
 
 def shelter_page(name, info, pets, all_pets):

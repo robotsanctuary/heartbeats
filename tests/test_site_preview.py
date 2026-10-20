@@ -161,3 +161,28 @@ def test_brand_assets_and_logo(site):
     assert 'rel="icon" href="icon.svg"' in idx and 'class="beat"' in idx
     assert 'href="../../icon.svg"' in (out / "tx/dallas/index.html").read_text()
     assert "prefers-reduced-motion" in idx           # animations switch off for reduced-motion users
+
+
+def test_home_band_and_full_width_topbar(site):
+    out, _ = site
+    idx = (out / "index.html").read_text()
+    assert idx.index('class="topbar"') < idx.index('class="band"') < idx.index('class="wrap')  # full-width, outside the column
+    assert 'href="#list"' in idx and 'id="list"' in idx
+    assert 'class="track"' not in idx                 # fixture animals have no photos -> no empty scroller
+    assert 'class="band"' not in (out / "help.html").read_text()
+
+
+def test_scroller_picks_soonest_dates_with_photos(site):
+    import build_site as m
+    from datetime import date as d
+    img = Path(__file__)
+    def pet(n, days, has_img=True):
+        return {"name": n, "days": days, "img": img if has_img else None,
+                "deadline": d(2026, 10, 20) if days is not None else None}
+    pets = [pet("Later", 5), pet("Today", 0), pet("NoPhoto", 0, False), pet("Past", -1), pet("Baby", None)]
+    names = [p["name"] for p in m.reel_pets(pets)]
+    assert names[:3] == ["Past", "Today", "Later"]   # soonest first; no photo = left out
+    assert "NoPhoto" not in names
+    assert names[-1] == "Baby"                        # topped up with no-date animals when few have dates
+    many = [pet(f"P{i}", i % 4) for i in range(30)]
+    assert len(m.reel_pets(many)) == m.REEL_MAX and all(p["days"] is not None for p in m.reel_pets(many))

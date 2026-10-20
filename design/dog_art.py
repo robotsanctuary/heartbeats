@@ -15,6 +15,7 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 BRAND = Path(__file__).resolve().parent / "brand"
+FRONT_OFFSET = 100  # landing art: front paws sit this far in front of where hind feet usually go
 CELL = 300          # px per square cell (native frames are ~150-185 px wide)
 ANCHOR = (110, 250)  # where the hind feet land inside each cell (x, y)
 
@@ -65,6 +66,12 @@ def clean(im: Image.Image, max_depth: int = 14) -> Image.Image:
     return im.crop(im.getchannel("A").getbbox())
 
 
+def front_foot_x(im: Image.Image) -> float:
+    a = im.getchannel("A"); w, h = im.size
+    xs = [x for y in range(max(0, h - 8), h) for x in range(int(w * .5), w) if a.getpixel((x, y))]
+    return sum(xs) / len(xs) if xs else w * .75
+
+
 def hind_foot_x(im: Image.Image) -> float:
     """Mean x of opaque pixels in the bottom 8 rows of the back 45% of the frame."""
     a = im.getchannel("A")
@@ -82,7 +89,7 @@ def build(src: Path, name: str = "jump", pick=None):
     cells = []
     for f in files:
         im = clean(Image.open(f))
-        fx = hind_foot_x(im)
+        fx = hind_foot_x(im) if name != "landart" else front_foot_x(im) - FRONT_OFFSET
         cell = Image.new("RGBA", (CELL, CELL))
         cell.paste(im, (round(ANCHOR[0] - fx), ANCHOR[1] - im.height), im)
         cells.append(cell)
@@ -111,15 +118,16 @@ def tilt(cell: Image.Image, deg: float) -> Image.Image:
 
 
 # Jump-down landing, drawn from existing art: (strip, cell in that strip, tilt degrees)
+# Jump-down landing: (strip, cell in that strip, tilt degrees). "landart" = owner's 3 landing frames.
 LAND = [("jump", 11, 0),     # 1 peek over the edge
         ("jump", 3, -14),    # 2 hop off
-        ("run", 5, -28),     # 3 falling nose-down, front legs reaching (engine keeps it in the air)
-        ("run", 5, -40),     # 4 FRONT PAWS TOUCH DOWN, back end still up
-        ("jump", 11, 0)]     # 5 back end drops, all four down in a soft crouch
+        ("landart", 0, 0),   # 3 falling nose-down, front legs reaching (engine keeps it in the air)
+        ("landart", 1, 0),   # 4 FRONT PAWS TOUCH DOWN, back end still up
+        ("landart", 2, 0)]   # 5 back end drops, crouch
 
 
 def build_land():
-    strips = {n: Image.open(BRAND / f"dog-{n}.png") for n in ("jump", "run")}
+    strips = {n: Image.open(BRAND / f"dog-{n}.png") for n in ("jump", "run", "landart")}
     sheet = Image.new("RGBA", (CELL * len(LAND), CELL))
     for i, (n, c, deg) in enumerate(LAND):
         cell = strips[n].crop((c * CELL, 0, c * CELL + CELL, CELL))

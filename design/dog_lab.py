@@ -13,10 +13,10 @@ BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
 # name: (cell indexes in dog-all.png in play order, frames per second, hop height as a fraction of size)
-# cells 0-11 = jump zip frames 1-12, cells 12-17 = run frames (zip 2 frames 3,6,1,4,7,8)
+# cells 0-11 = jump zip frames 1-12, 12-17 = run frames (zip 2 frames 3,6,1,4,7,8), 18-22 = landing (dog_art.LAND)
 ANIMS = {
     "Jump up (sit, rear up, spring, leap, land)": ([7, 7, 6, 6, 9, 3, 10, 11, 11], 8, 0.55),
-    "Jump down": ([11, 3, 10, 11], 7, 0.3),
+    "Jump down (front paws land first)": ([18, 19, 20, 21, 22, 22], 6, 0),
     "Run (bounding)": ([12, 13, 14, 15, 16, 17], 14, 0.2),
     "All jump frames 1-12": (list(range(12)), 2, 0),
     "All run frames 1-6": (list(range(12, 18)), 2, 0),
@@ -32,8 +32,8 @@ button.on{background:#D9472F;color:#fff;border-color:#D9472F}
 .box h3{margin:0 0 4px;font-size:15px;color:var(--fg,#1F1A17)}.box small{color:var(--fg2,#6B625C)}
 .stage{position:relative;height:190px;overflow:hidden}
 .ground{position:absolute;left:0;right:0;bottom:20px;border-top:2px dashed rgba(0,0,0,.15)}
-.dog{position:absolute;left:50%;bottom:20px;width:150px;height:150px;margin-left:-55px;background:url(dog.png) no-repeat;
-background-size:2700px 150px;transform-origin:36.67% 83.33%}
+.dog{position:absolute;left:50%;bottom:-5px;width:150px;height:150px;margin-left:-55px;background:url(dog.png) no-repeat;
+background-size:3450px 150px;transform-origin:36.67% 83.33%}
 .info{font:12px ui-monospace,monospace;color:var(--fg2,#6B625C)}
 </style></head><body>
 <div class="bar"><b style="align-self:center">Dog lab</b>

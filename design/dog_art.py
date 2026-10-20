@@ -96,7 +96,39 @@ def build(src: Path, name: str = "jump", pick=None):
     return out, meta
 
 
-def combine(names=("jump", "run")):
+def tilt(cell: Image.Image, deg: float) -> Image.Image:
+    """Tip a packed cell nose-down (negative deg) around its FRONT paw, then drop it so the lowest
+    point touches the ground line. Used to draw landing frames where the front paws hit first."""
+    a = cell.getchannel("A")
+    x0, y0, x1, y1 = a.getbbox()
+    mid, px = (x0 + x1) // 2, a.load()
+    fy = max(y for y in range(y0, y1) for x in range(mid, x1) if px[x, y] > 128)
+    xs = [x for x in range(mid, x1) if px[x, fy] > 128]
+    r = cell.rotate(deg, resample=Image.BICUBIC, center=(sum(xs) / len(xs), fy))
+    out = Image.new("RGBA", cell.size)
+    out.paste(r, (0, ANCHOR[1] - r.getchannel("A").getbbox()[3]), r)
+    return out
+
+
+# Jump-down landing, drawn from existing art: (strip, cell in that strip, tilt degrees)
+LAND = [("jump", 11, 0),     # 1 peek over the edge
+        ("jump", 3, -14),    # 2 hop off
+        ("run", 5, -28),     # 3 falling nose-down, front legs reaching (engine keeps it in the air)
+        ("run", 5, -40),     # 4 FRONT PAWS TOUCH DOWN, back end still up
+        ("jump", 11, 0)]     # 5 back end drops, all four down in a soft crouch
+
+
+def build_land():
+    strips = {n: Image.open(BRAND / f"dog-{n}.png") for n in ("jump", "run")}
+    sheet = Image.new("RGBA", (CELL * len(LAND), CELL))
+    for i, (n, c, deg) in enumerate(LAND):
+        cell = strips[n].crop((c * CELL, 0, c * CELL + CELL, CELL))
+        sheet.paste(tilt(cell, deg) if deg else cell, (i * CELL, 0))
+    sheet.save(BRAND / "dog-land.png", optimize=True)
+    return len(LAND)
+
+
+def combine(names=("jump", "run", "land")):
     """Joins the strips side by side into brand/dog-all.png (what the site uses). Prints each strip's first cell."""
     strips = [Image.open(BRAND / f"dog-{n}.png") for n in names]
     out = Image.new("RGBA", (sum(i.width for i in strips), CELL))
@@ -111,8 +143,11 @@ def combine(names=("jump", "run")):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    if args and args[0] == "--land":
+        print(build_land(), combine())
+        sys.exit()
     if args and args[0] == "--combine":
-        print(combine(tuple(args[1:]) or ("jump", "run")))
+        print(combine(tuple(args[1:]) or ("jump", "run", "land")))
         sys.exit()
     name = args[args.index("--name") + 1] if "--name" in args else "jump"
     pick = [int(n) for n in args[args.index("--frames") + 1].split(",")] if "--frames" in args else None

@@ -347,7 +347,7 @@ def dog_html(root=""):
 # Only jump art exists so far; run/trot/skip/nap reuse jump frames as stand-ins until those rows arrive.
 DOG_JS = """<script>(()=>{const d=document.querySelector(".dog");if(!d)return;
 if(matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove();return}
-const N=18,RUN0=12,RUNN=6,FOOT=250/300,CX=110/300;
+const N=23,RUN0=12,RUNN=6,FOOT=250/300,CX=110/300;
 const STRIDE={run:[.40,.20],skip:[.55,.34]};/* bounding: one hop per stride = [seconds, hop height x size], run frames 1-6 play across each hop */
 const A={stand:[[11]],look:[[7]],sit:[[0]],paw:[[6]],sniff:[[11]],lie:[[0]],sleep:[[0]],stretch:[[9]],
 run:[[10,3,11],10],trot:[[11,7],4],skip:[[11,3],5],hop:[[11,3],6]};
@@ -364,8 +364,8 @@ const bounds=el=>{if(el){const r=el.getBoundingClientRect();return[Math.max(r.le
 const set=(s,ms)=>{st=s;t0=now();until=t0+(ms||0);d.classList.toggle("sleep",s==="sleep")};
 const walkTo=(tx,mode,then)=>{const[lo,hi]=bounds(on);goal=Math.min(hi,Math.max(lo,tx));after=then||null;set(mode)};
 /* jump: UP = sit back (8) -> rear up, front paws in the air (7) -> spring (10) -> stretch (4) -> reach (11) -> land (12)
-         DOWN = look down (12) -> hop (4) -> reach (11) -> land (12) */
-const UP=[[.20,7,0],[.26,6,0],[.12,9,.15],[.22,3,.6],[.22,10,1],[.18,11,1]],DOWN=[[.14,11,0],[.25,3,.45],[.25,10,1],[.18,11,1]];
+         DOWN = peek -> hop off -> fall nose-down -> FRONT paws land -> back end drops (land cells 18-22; phase value 2 = on the ground) */
+const UP=[[.20,7,0],[.26,6,0],[.12,9,.15],[.22,3,.6],[.22,10,1],[.18,11,2]],DOWN=[[.14,18,0],[.2,19,.4],[.2,20,1],[.16,21,2],[.24,22,2]];
 function jumpTo(el){const r=el?el.getBoundingClientRect():null,[lo,hi]=bounds(el);const tx=Math.min(hi,Math.max(lo,x+(Math.random()-.5)*S*1.5));
 if(Math.abs(tx-x)>S*3){walkTo(tx-Math.sign(tx-x)*S*1.5,"run",()=>usable(el)||!el?jumpTo(el):next());return}
 const ty=el?r.top:groundY(),upw=ty<y-4;J={el,ox:el?tx-r.left:tx,sx:x,sy:y,t:0,seq:upw?UP:DOWN};face=tx>=x?1:-1;set(upw?"up":"down")}
@@ -393,7 +393,7 @@ const tx=r?r.left+J.ox:J.ox,ty=r?r.top:groundY();J.t+=dt;const ph=frameOfJump();
 if(!ph){x=tx;y=ty;on=J.el;off=r?x-r.left:0;J=null;set("stand",500+Math.random()*700)}
 else{const[f,p,k]=ph;fr=f;const prog=Math.min(1,Math.max(0,p===0?0:p));
 /* air arc: between first lifting phase and landing */const total=J.seq.reduce((a,s)=>a+s[0],0),start=J.seq.findIndex(s=>s[2]>0);
-const ta=J.seq.slice(0,start).reduce((a,s)=>a+s[0],0),te=total-J.seq[J.seq.length-1][0];
+const ta=J.seq.slice(0,start).reduce((a,s)=>a+s[0],0),gi=J.seq.findIndex(s=>s[2]===2),te=J.seq.slice(0,gi<0?J.seq.length-1:gi).reduce((a,s)=>a+s[0],0);
 const q=Math.min(1,Math.max(0,(J.t-ta)/(te-ta))),h=S*.5+Math.max(0,J.sy-ty)*.5;
 if(J.t>=ta&&J.t<te){x=J.sx+(tx-J.sx)*q;y=J.sy+(ty-J.sy)*q-h*4*q*(1-q)}else if(J.t>=te){x=tx;y=ty}}}
 else if(goal!==null){const sp=(SPEED[st]||100)*K(),dx=goal-x;face=dx>=0?1:-1;

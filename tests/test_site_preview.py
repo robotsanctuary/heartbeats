@@ -82,3 +82,33 @@ def test_no_date_animals_grouped_last(site):
     out, _ = site
     idx = (out / "index.html").read_text()
     assert idx.index("Tomorrow") < idx.index("Needs a foster now")
+
+
+def test_share_buttons_on_animal_page(site):
+    out, _ = site
+    page = (out / "animals/A1.html").read_text()
+    for needle in ("sms:?&amp;body=", "mailto:?subject=", "facebook.com/sharer", "twitter.com/intent/tweet",
+                   "wa.me/?text=", "Copy link", "More…"):
+        assert needle in page, needle
+    # share links carry the animal's own page, never the shelter's or a bare homepage
+    assert "https%3A%2F%2Ffadingheartbeats.com%2Fanimals%2FA1.html" in page
+    assert "Rex%20needs%20a%20way%20out%20of%20the%20shelter%20by%20tomorrow" in page
+
+
+def test_share_text_matches_deadline(site):
+    out, _ = site
+    assert "foster%20home%20now" in (out / "animals/A2.html").read_text()  # no date -> foster now
+
+
+def test_link_preview_tags(site):
+    out, _ = site
+    page = (out / "animals/A1.html").read_text()
+    assert '<meta property="og:title" content="Can you help Rex?">' in page
+    assert '<meta property="og:url" content="https://fadingheartbeats.com/animals/A1.html">' in page
+    assert page.count('name="description"') == 1
+
+
+def test_share_text_is_escaped(site):
+    out, _ = site
+    page = (out / "animals/A1.html").read_text()
+    assert "<b>" not in page.split("<script>")[-1]

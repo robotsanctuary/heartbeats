@@ -21,6 +21,7 @@ Usage:
 """
 
 import html
+from urllib.parse import quote
 import os
 import shutil
 import sys
@@ -35,6 +36,9 @@ from shelters.registry import adopt_url, shelter_info  # noqa: E402
 SITE_NAME = "Fading Heartbeats"
 TAGLINE = "Every heartbeat deserves a home."
 DOMAIN = "fadingheartbeats.com"
+# Absolute base for share links + link previews. Pages swap in their real address at view time,
+# so the LAN preview still shares working links.
+SITE_URL = (os.environ.get("SITE_URL") or f"https://{DOMAIN}").rstrip("/")
 DEFAULT_TZ = ZoneInfo("America/Chicago")
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
@@ -150,6 +154,11 @@ background:var(--accent);color:#fff;font-weight:600;font-size:16px;text-decorati
 .empty{padding:22px;background:var(--quiet);border-radius:14px;color:var(--muted);margin:10px 0 24px}
 footer{margin:24px 22px 0;padding:28px 0 44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
 .draft{color:oklch(55% 0.12 300);font-size:.8em}
+.share{margin:18px 0 6px}.share .lbl{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chip{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 6px;border-radius:12px;border:1px solid var(--line);
+background:#fff;color:var(--ink);font:600 14px/1.1 "Source Sans 3",system-ui,sans-serif;text-decoration:none;cursor:pointer}
+.chip svg{width:17px;height:17px;flex:none;color:var(--accent)}.chip.more{display:none}
 .dwrap{padding-top:14px}
 @media (min-width:900px){
 .wrap.wide{max-width:1080px}
@@ -167,13 +176,13 @@ HEART = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" 
          'c2.1 0 3.6 1.1 4.3 2.4h2c.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>')
 
 
-def page(title, body, active, root="", wide=False):
+def page(title, body, active, root="", wide=False, meta=""):
     links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help"),
              ("remembered.html", "Remembered", "mem")]
     nav = "".join(f'<a href="{root}{h}" class="{"on" if k == active else ""}">{t}</a>' for h, t, k in links)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(title)}</title><meta name="description" content="{e(TAGLINE)}">
+<title>{e(title)}</title>{meta or f'<meta name="description" content="{e(TAGLINE)}">'}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body><div class="wrap{" wide" if wide else ""}">
@@ -205,6 +214,89 @@ def when(p):
 
 def blurb(text, n=150):
     return text if len(text) <= n else text[:n].rsplit(" ", 1)[0].rstrip(",;:.!?") + "…"
+
+
+# ------------------------------------------------------------------ sharing
+
+ICONS = {
+    "sms": '<path d="M4 5h16v11H8l-4 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+    "mail": '<path d="M3 6h18v12H3zM3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+    "fb": '<path fill="currentColor" d="M14 8h3V4h-3c-2.8 0-4 1.8-4 4.3V10H7v4h3v7h4v-7h3l.5-4H14V8.6c0-.4.2-.6.6-.6z"/>',
+    "x": '<path fill="currentColor" d="M17.8 3h3.1l-6.8 7.8 8 10.2h-6.3l-4.9-6.4L5.3 21H2.2l7.3-8.3L1.8 3h6.4l4.4 5.9zm-1.1 16.2h1.7L7.4 4.7H5.6z"/>',
+    "wa": '<path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.8 1.3 1.6 2 1.1 1 2 1.3 2.3 1.4.3.2.4.1.6-.1l.8-1c.2-.2.4-.2.6-.1l1.9.9c.3.1.4.2.5.3.1.2.1.8-.1 1.5z"/>',
+    "link": '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    "more": '<path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+}
+
+
+def share_text(p) -> str:
+    """One short, specific ask. Used for SMS, email, X, WhatsApp and the phone share sheet."""
+    where = f" at {p['shelter']}" + (f" in {p['city'].split(',')[0]}" if p.get("city") else "")
+    d = p["days"]
+    if d is None:
+        need = f"{p['name']} needs a foster home now{where}."
+    elif d < 0:
+        need = f"{p['name']} is past their shelter date and still waiting{where}."
+    elif d == 0:
+        need = f"{p['name']} needs a way out of the shelter today{where}."
+    elif d == 1:
+        need = f"{p['name']} needs a way out of the shelter by tomorrow{where}."
+    else:
+        need = f"{p['name']} needs a way out of the shelter by {p['deadline']:%A, %b %-d}{where}."
+    return need + " Can you foster, adopt, or share?"
+
+
+def animal_url(p) -> str:
+    return f"{SITE_URL}/animals/{quote(p['id'])}.html"
+
+
+def share_links(p) -> list:
+    """(key, label, href). Hrefs embed the canonical URL; share_js swaps in the page's real address."""
+    url, text = animal_url(p), share_text(p)
+    u, t, both = quote(url, safe=""), quote(text, safe=""), quote(f"{text} {url}", safe="")
+    subj = quote(f"Can you help {p['name']}?", safe="")
+    return [
+        ("sms", "Text", f"sms:?&body={both}"),
+        ("mail", "Email", f"mailto:?subject={subj}&body={quote(text + chr(10) + chr(10) + url, safe='')}"),
+        ("fb", "Facebook", f"https://www.facebook.com/sharer/sharer.php?u={u}"),
+        ("x", "X", f"https://twitter.com/intent/tweet?text={t}&url={u}"),
+        ("wa", "WhatsApp", f"https://wa.me/?text={both}"),
+    ]
+
+
+def share_block(p, label) -> str:
+    newtab = ' target="_blank" rel="noopener"'
+    chips = "".join(
+        f'<a class="chip" href="{e(h)}"{"" if k in ("sms", "mail") else newtab}>'
+        f'<svg viewBox="0 0 24 24" aria-hidden="true">{ICONS[k]}</svg>{e(n)}</a>' for k, n, h in share_links(p))
+    chips += (f'<button type="button" class="chip copy"><svg viewBox="0 0 24 24" aria-hidden="true">{ICONS["link"]}</svg>Copy link</button>'
+              f'<button type="button" class="chip more"><svg viewBox="0 0 24 24" aria-hidden="true">{ICONS["more"]}</svg>More…</button>')
+    return f'<div class="share"><div class="lbl">{e(label)}</div><div class="chips">{chips}</div></div>'
+
+
+def share_js(p) -> str:
+    canon = animal_url(p)
+    data = {"canon": canon, "text": share_text(p), "title": f"Can you help {p['name']}?"}
+    import json
+    return ("<script>(()=>{const d=" + json.dumps(data).replace("</", "<\\/") + r""";
+const here=location.href.split('#')[0];
+if(here!==d.canon)document.querySelectorAll('.share a.chip').forEach(a=>{a.href=a.href.split(encodeURIComponent(d.canon)).join(encodeURIComponent(here))});
+document.querySelectorAll('.share .copy').forEach(b=>b.onclick=()=>{const done=()=>{const t=b.lastChild.textContent;b.lastChild.textContent='Copied';setTimeout(()=>b.lastChild.textContent=t,1800)};
+if(navigator.clipboard&&isSecureContext)navigator.clipboard.writeText(here).then(done);else{const i=document.createElement('textarea');i.value=here;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove();done()}});
+if(navigator.share)document.querySelectorAll('.share .more').forEach(b=>{b.style.display='flex';b.onclick=()=>navigator.share({title:d.title,text:d.text,url:here}).catch(()=>{})});
+})()</script>""")
+
+
+def share_meta(p) -> str:
+    """Link previews (iMessage, Facebook, X, WhatsApp, Slack): photo + name instead of a bare link."""
+    img = f"{SITE_URL}/img/{quote(p['img'].name)}" if p["img"] else ""
+    desc = share_text(p)
+    tags = [("description", desc, "name"), ("og:type", "article", "property"), ("og:site_name", SITE_NAME, "property"),
+            ("og:title", f"Can you help {p['name']}?", "property"), ("og:description", desc, "property"),
+            ("og:url", animal_url(p), "property"), ("twitter:card", "summary_large_image" if img else "summary", "name")]
+    if img:
+        tags += [("og:image", img, "property"), ("og:image:alt", f"Photo of {p['name']}", "property")]
+    return "".join(f'<meta {attr}="{e(k)}" content="{e(v)}">' for k, v, attr in tags) + f'<link rel="canonical" href="{e(animal_url(p))}">'
 
 
 # ------------------------------------------------------------------ pages
@@ -259,12 +351,11 @@ def detail_page(p):
 <div class="detail"><span class="when">{e(("Shelter date: " + when(p)) if p["days"] is not None and p["days"] >= 0 else when(p))}</span><h1>{e(p['name'])}</h1>
 <div class="actions">{main}</div>
 <p class="small">Opens {e(p['name'])}'s page on the shelter's own site. Mention ID {e(p['id'])} when you contact them.</p>
+{share_block(p, f"Share {p['name']}")}
 <dl class="facts">{dl}</dl><div class="story">{story}</div>
 <div class="actions">{mail}</div>
-<p class="small" style="margin-top:14px">Can't take {e(p['name'])} home? Sharing this page helps too.</p>
-<div class="actions"><button class="btn soft" style="border:0;font:inherit;font-weight:600"
-onclick="navigator.share?navigator.share({{title:document.title,url:location.href}}):navigator.clipboard.writeText(location.href).then(()=>this.textContent='Link copied')">Share {e(p['name'])}'s page</button></div></div></div>"""
-    return page(f"{p['name']} · {SITE_NAME}", body, "list", root="../", wide=True)
+{share_block(p, f"Can't take {p['name']} home? Sharing helps too")}</div></div>{share_js(p)}"""
+    return page(f"{p['name']} · {SITE_NAME}", body, "list", root="../", wide=True, meta=share_meta(p))
 
 
 def help_page():

@@ -41,7 +41,6 @@ DOMAIN = "fadingheartbeats.com"
 # Launch switches. Remembered (memorial) stays hidden until it's announced: no tab, no page,
 # no pages for those animals. The shelter menu + shelter line on cards appear once 2+ shelters exist.
 SHOW_REMEMBERED = os.environ.get("SHOW_REMEMBERED") == "1"
-REEL_MAX, REEL_MIN = 20, 8  # home scroller: at most 20 tiles; top up with no-date animals below 8
 SHOW_PICKER = None  # None = automatic (2+ registered shelters); set by build()
 SITE_URL = (os.environ.get("SITE_URL") or f"https://{DOMAIN}").rstrip("/")
 DEFAULT_TZ = ZoneInfo("America/Chicago")
@@ -236,22 +235,29 @@ footer{border-top:1px solid var(--line)}
 .band h1{font-size:42px;margin-bottom:10px}
 .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.pills span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;color:var(--muted);box-shadow:var(--shadow)}.pills b{color:var(--ink)}
 .band .btn{width:auto;margin-top:20px}#list{display:block;scroll-margin-top:70px}
-.reel{padding:22px 0 26px}
-.reel .lbl{max-width:1080px;margin:0 auto 12px;padding:0 22px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
-.reel .lbl::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ping 1.8s infinite}
-.track{display:flex;gap:14px;overflow-x:auto;padding:4px 22px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
--webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent)}
-.track::-webkit-scrollbar{display:none}
-.tile{flex:none;width:136px;text-decoration:none;color:var(--ink)}
-.tile .ph{position:relative;display:block;width:136px;height:164px;border-radius:20px;overflow:hidden;border:4px solid #fff;background:var(--soft);box-shadow:0 14px 26px -16px rgba(120,60,40,.5);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-.tile img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
-.tile:hover .ph{transform:translateY(-4px) rotate(-1.5deg)}
-.tile .d{position:absolute;left:7px;bottom:7px;background:rgba(255,255,255,.92);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
-.tile .d.hot{background:var(--grad);color:#fff}
-.tile .nm{display:block;margin-top:7px;font:400 21px/1.05 "Instrument Serif",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tile .br{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media(min-width:900px){.band .in{padding:46px 22px 8px}.band h1{font-size:62px}
-.track{padding-left:max(22px,calc((100vw - 1080px)/2 + 22px))}.tile,.tile .ph{width:190px}.tile .ph{height:226px}.reel{padding-bottom:40px}}
+.band .in{display:grid;gap:26px;padding-bottom:34px}
+.spot{position:relative;width:100%;max-width:440px;justify-self:center}
+.spot .lbl{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.spot .lbl::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent);animation:ping 1.8s infinite}
+.spot .lbl span{margin-left:auto;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.sq{position:relative;aspect-ratio:1/1}
+.sq::before,.sq::after{content:"";position:absolute;inset:0;border-radius:28px;background:#fff;box-shadow:var(--shadow)}
+.sq::before{transform:rotate(-4deg) translate(-4px,4px);opacity:.7}.sq::after{transform:rotate(3deg) translate(4px,3px);opacity:.85}
+.slide{position:absolute;inset:0;z-index:1;display:block;border-radius:28px;overflow:hidden;border:6px solid #fff;background:var(--soft);
+box-shadow:0 30px 50px -24px rgba(120,60,40,.55);text-decoration:none;color:#fff;opacity:0;visibility:hidden;transform:scale(.96) rotate(-1.5deg);
+transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1),visibility 0s .8s}
+.slide.on{opacity:1;visibility:visible;transform:none;transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.slide img,.slide .noimg{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
+.slide.on img{animation:kb 9s ease-out forwards}@keyframes kb{from{transform:scale(1.12)}to{transform:scale(1)}}
+.slide .cap{position:absolute;left:0;right:0;bottom:0;padding:60px 20px 18px;background:linear-gradient(transparent,rgba(20,10,8,.78))}
+.slide .d{display:inline-block;background:var(--grad);border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.slide .nm{display:block;font:400 46px/1 "Instrument Serif",serif;margin:8px 0 3px}
+.slide .br{display:block;font-size:14px;opacity:.9}
+.slide .go{display:inline-block;margin-top:10px;font-weight:700;font-size:15px}
+.dots{display:flex;justify-content:center;gap:8px;margin-top:26px}
+.dots button{width:9px;height:9px;padding:0;border:0;border-radius:999px;background:rgba(31,26,23,.2);cursor:pointer;transition:width .3s,background .3s}
+.dots button.on{width:26px;background:var(--accent)}
+@media(min-width:900px){.band .in{grid-template-columns:1.1fr 1fr;align-items:center;gap:56px;padding:46px 22px 50px}.band h1{font-size:62px}.spot{max-width:460px}}
 /* scroll reveal (only when JS runs, so no-JS browsers still see everything) */
 .js .rv{opacity:0;transform:translateY(18px)}
 .js .rv.in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
@@ -306,18 +312,15 @@ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.t
 els.forEach((e,i)=>{e.style.transitionDelay=(i%2)*90+"ms";io.observe(e)})})()</script>"""
 
 
-REEL_JS = """<script>(()=>{const t=document.querySelector(".track");if(!t)return;
+SPOT_JS = """<script>(()=>{const sp=document.querySelector(".spot");if(!sp)return;
+const sl=[...sp.querySelectorAll(".slide")],dt=[...sp.querySelectorAll(".dots button")],n=sp.querySelector(".lbl span");if(sl.length<2)return;
+let i=0,hold=0;const go=k=>{sl[i].classList.remove("on");dt[i].classList.remove("on");i=(k+sl.length)%sl.length;
+sl[i].classList.add("on");dt[i].classList.add("on");if(n)n.textContent=(i+1)+" of "+sl.length};
+dt.forEach((b,k)=>b.onclick=()=>{go(k);hold=Date.now()+8000});
+sp.addEventListener("mouseenter",()=>hold=1e15);sp.addEventListener("mouseleave",()=>hold=0);
+sp.addEventListener("touchstart",()=>hold=Date.now()+8000,{passive:true});
 if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-const kids=[...t.children];if(kids.length<3)return;
-kids.forEach(k=>{const c=k.cloneNode(true);c.setAttribute("aria-hidden","true");c.tabIndex=-1;t.appendChild(c)});
-let pausedUntil=0,last=0,x=0;const half=()=>t.scrollWidth/2;
-const pause=ms=>{pausedUntil=performance.now()+ms;x=t.scrollLeft};
-["pointerdown","touchstart","wheel","focusin"].forEach(ev=>t.addEventListener(ev,()=>pause(4000),{passive:true}));
-t.addEventListener("mouseenter",()=>pause(1e9));t.addEventListener("mouseleave",()=>pause(600));
-t.addEventListener("scroll",()=>{if(performance.now()<pausedUntil){if(t.scrollLeft>=half())t.scrollLeft-=half();x=t.scrollLeft}},{passive:true});
-const step=now=>{const dt=Math.min(now-(last||now),50);last=now;
-if(now>=pausedUntil&&!document.hidden){x+=dt*0.035;if(x>=half())x-=half();t.scrollLeft=x}
-requestAnimationFrame(step)};requestAnimationFrame(step)})()</script>"""
+setInterval(()=>{if(Date.now()>hold&&!document.hidden)go(i+1)},4500)})()</script>"""
 
 
 def page(title, body, active, root="", wide=False, meta="", band=""):
@@ -338,7 +341,7 @@ def page(title, body, active, root="", wide=False, meta="", band=""):
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
 please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
-</div>{REVEAL_JS}{REEL_JS if band else ""}</body></html>"""
+</div>{REVEAL_JS}{SPOT_JS if band else ""}</body></html>"""
 
 
 def photo(p, root, cls=""):
@@ -504,47 +507,45 @@ def shelter_counts(pets):
     return c
 
 
-def tag(p):
-    """Short day label for a scroller tile."""
-    d = p["days"]
-    if d is None:
-        return "Foster now"
-    if d < 0:
-        return "Past date"
-    return "Today" if d == 0 else "Tomorrow" if d == 1 else f"{p['deadline']:%a %b %-d}"
+def spot_pets(pets):
+    """Who is featured in the home square: every animal whose shelter date is TODAY.
+    If nobody is due today, the next day that has anyone (so the square is never empty while dates exist).
+    Returns (animals, label)."""
+    dated = [p for p in pets if p["days"] is not None and p["days"] >= 0]
+    if not dated:
+        return [], ""
+    day = 0 if any(p["days"] == 0 for p in dated) else min(p["days"] for p in dated)
+    picks = sorted((p for p in dated if p["days"] == day), key=lambda p: (p["img"] is None, p["name"]))
+    label = "Out of time today" if day == 0 else "Out of time tomorrow" if day == 1 else f"Out of time {picks[0]['deadline']:%A}"
+    return picks, label
 
 
-def reel_pets(pets, n=REEL_MAX):
-    """Who goes in today's scroller: soonest shelter date first (past-date ones lead), photos only.
-    Tops up with no-date animals (e.g. neonates needing a foster) if fewer than REEL_MIN have dates."""
-    withimg = [p for p in pets if p["img"]]
-    dated = sorted((p for p in withimg if p["days"] is not None), key=lambda p: (p["days"], p["name"]))
-    if len(dated) < REEL_MIN:
-        dated += [p for p in withimg if p["days"] is None]
-    return dated[:n]
-
-
-def reel(pets, root=""):
-    picks = reel_pets(pets)
+def spotlight(pets, root=""):
+    picks, label = spot_pets(pets)
     if not picks:
         return ""
-    tiles = "".join(
-        f'<a class="tile" href="{root}animals/{e(p["id"])}.html"><span class="ph">'
-        f'<img src="{root}img/{e(p["img"].name)}" alt="Photo of {e(p["name"])}" loading="lazy">'
-        f'<span class="d{" hot" if p["days"] is not None and p["days"] <= 1 else ""}">{e(tag(p))}</span></span>'
-        f'<span class="nm">{e(p["name"])}</span><span class="br">{e(p["age"])} · {e(p["breed"])}</span></a>' for p in picks)
-    return (f'<div class="reel" aria-label="Animals whose shelter date is soonest"><div class="lbl">Out of time soonest</div>'
-            f'<div class="track">{tiles}</div></div>')
+    slides = "".join(
+        f'<a class="slide{" on" if k == 0 else ""}" href="{root}animals/{e(p["id"])}.html">'
+        + (f'<img src="{root}img/{e(p["img"].name)}" alt="Photo of {e(p["name"])}">' if p["img"]
+           else '<div class="noimg" role="img" aria-label="No photo yet"></div>')
+        + f'<span class="cap"><span class="d">{e(when(p))}</span><span class="nm">{e(p["name"])}</span>'
+          f'<span class="br">{e(p["age"])} · {e(p["breed"])}</span><span class="go">Meet {e(p["name"])} →</span></span></a>'
+        for k, p in enumerate(picks))
+    dots = "".join(f'<button type="button" class="{"on" if k == 0 else ""}" aria-label="Show {e(p["name"])}"></button>'
+                   for k, p in enumerate(picks)) if len(picks) > 1 else ""
+    count = f"<span>1 of {len(picks)}</span>" if len(picks) > 1 else ""
+    return (f'<div class="spot" aria-label="{e(label)}"><div class="lbl">{e(label)}{count}</div>'
+            f'<div class="sq">{slides}</div><div class="dots">{dots}</div></div>')
 
 
 def index_page(pets, saved, today):
     dated = sum(p["days"] is not None for p in pets)
     n_shelters = len({p["shelter"] for p in pets})
-    band = f"""<section class="band"><div class="in"><h1>Every heartbeat deserves a <i class="grad">home.</i></h1>
+    band = f"""<section class="band"><div class="in"><div><h1>Every heartbeat deserves a <i class="grad">home.</i></h1>
 <p class="lede">Dogs and cats at {n_shelters} shelter{"" if n_shelters == 1 else "s"} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
 <div class="pills"><span><b>{len(pets)}</b> need a way out</span><span><b>{dated}</b> have a date</span><span><b>{saved}</b> made it out recently</span></div>
 {picker("", None, shelter_counts(pets))}<a class="btn" href="#list">See who needs help today</a></div>
-{reel(pets)}</section>"""
+{spotlight(pets)}</div></section>"""
     body = f'<span id="list"></span>\n{pet_sections(pets, "", show_shelter=bool(SHOW_PICKER))}'
     return page(f"{SITE_NAME}: {TAGLINE}", body, "list", wide=True, band=band)
 

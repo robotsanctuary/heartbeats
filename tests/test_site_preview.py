@@ -168,21 +168,28 @@ def test_home_band_and_full_width_topbar(site):
     idx = (out / "index.html").read_text()
     assert idx.index('class="topbar"') < idx.index('class="band"') < idx.index('class="wrap')  # full-width, outside the column
     assert 'href="#list"' in idx and 'id="list"' in idx
-    assert 'class="track"' not in idx                 # fixture animals have no photos -> no empty scroller
     assert 'class="band"' not in (out / "help.html").read_text()
 
 
-def test_scroller_picks_soonest_dates_with_photos(site):
+def test_spotlight_features_only_todays_animals(site):
     import build_site as m
     from datetime import date as d
     img = Path(__file__)
     def pet(n, days, has_img=True):
         return {"name": n, "days": days, "img": img if has_img else None,
-                "deadline": d(2026, 10, 20) if days is not None else None}
-    pets = [pet("Later", 5), pet("Today", 0), pet("NoPhoto", 0, False), pet("Past", -1), pet("Baby", None)]
-    names = [p["name"] for p in m.reel_pets(pets)]
-    assert names[:3] == ["Past", "Today", "Later"]   # soonest first; no photo = left out
-    assert "NoPhoto" not in names
-    assert names[-1] == "Baby"                        # topped up with no-date animals when few have dates
-    many = [pet(f"P{i}", i % 4) for i in range(30)]
-    assert len(m.reel_pets(many)) == m.REEL_MAX and all(p["days"] is not None for p in m.reel_pets(many))
+                "deadline": d(2026, 10, 20 + max(days or 0, 0))}
+    pets = [pet("Later", 2), pet("Zed", 0), pet("NoPhoto", 0, False), pet("Past", -1), pet("Baby", None), pet("Amy", 0)]
+    picks, label = m.spot_pets(pets)
+    assert [p["name"] for p in picks] == ["Amy", "Zed", "NoPhoto"]   # today only, photos first
+    assert label == "Out of time today"
+    picks, label = m.spot_pets([pet("Later", 2), pet("Soon", 1), pet("Baby", None)])
+    assert [p["name"] for p in picks] == ["Soon"] and label == "Out of time tomorrow"   # nobody today -> next day
+    assert m.spot_pets([pet("Baby", None), pet("Past", -2)]) == ([], "")
+
+
+def test_home_spotlight_rendered(site):
+    out, _ = site
+    idx = (out / "index.html").read_text()
+    # fixture "today" is 2026-10-19; Rex is due 10-20 (tomorrow) and is the only one -> featured, no dots
+    assert 'class="spot"' in idx and "Out of time tomorrow" in idx and 'class="slide on" href="animals/A1.html"' in idx
+    assert 'class="spot"' not in (out / "tx/dallas/index.html").read_text()

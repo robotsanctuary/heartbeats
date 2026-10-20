@@ -24,13 +24,12 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
 - Texas expansion research: `docs/texas-shelter-survey.md`.
 
 ## Next steps
-1. **Header: DONE 2026-10-20 (option B + daily scroller).** Full-width sticky `.topbar` (logo left,
-   menu right) on every page; home page has a full-width pink `.band` (headline, stat pills, "See who
-   needs help today") and an "Out of time soonest" scroller of photo tiles (`reel_pets()`: photos only,
-   soonest date first, past-date first, max `REEL_MAX`=20, tops up with no-date animals below `REEL_MIN`=8).
-   It is rebuilt with the site, so it changes every day. Auto-drifts sideways (`REEL_JS`, loops via cloned
-   tiles), pauses on touch/hover, off under reduced motion. Old A/C mockups kept in
-   `/Volumes/Extreme/heartbeats-data/mockups/header-options/`.
+1. **Header: DONE 2026-10-20 (option B + "Out of time today" spotlight).** Full-width sticky `.topbar`
+   on every page. Home has a full-width pink `.band`: text left; on the right (below on phones) a big
+   square `.spot` that cycles through ONLY the animals whose shelter date is today (`spot_pets()`; if
+   nobody is due today it shows the next day that has anyone, labelled e.g. "Out of time tomorrow").
+   Crossfade + slow zoom every 4.5s, dots to jump, pauses on hover/touch, no auto-advance under
+   reduced motion (`SPOT_JS`). Rebuilt with the site, so it changes daily.
 2. **Scrolling dogs (owner wants it):** small subtle dog(s) that run along the bottom as the
    user scrolls and, when scrolling stops, do random actions (sit, wave, give paw, wag, nap,
    second dog/cat joins); tap = wiggle; off for reduced motion. Art source undecided:

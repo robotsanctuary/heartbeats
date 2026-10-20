@@ -34,7 +34,7 @@ def site(tmp_path, monkeypatch):
     sys.modules["build_site"] = mod
     spec.loader.exec_module(mod)
     out = tmp_path / "site"
-    res = mod.build(out, today=date(2026, 10, 19))
+    res = mod.build(out, today=date(2026, 10, 19), show_remembered=True, show_picker=True)
     return out, res
 
 
@@ -137,3 +137,18 @@ def test_detail_links_to_its_shelter_page(site):
     out, _ = site
     assert 'href="../tx/dallas/index.html"' in (out / "animals/A1.html").read_text()
     assert "tx/dallas" not in (out / "animals/B1.html").read_text()
+
+
+def test_launch_defaults_hide_remembered_and_single_shelter_menu(site, tmp_path):
+    import build_site
+    out = tmp_path / "launch"
+    res = build_site.build(out, today=date(2026, 10, 19), show_remembered=False, show_picker=None)
+    assert not (out / "remembered.html").exists()
+    assert not (out / "animals/A3.html").exists()          # memorial animals get no page either
+    for f in ("index.html", "help.html", "animals/A1.html", "tx/dallas/index.html"):
+        page = (out / f).read_text()
+        assert "remembered.html" not in page and "Remembered" not in page, f
+    idx = (out / "index.html").read_text()
+    assert "Choose your shelter" not in idx                 # only one registered shelter
+    assert 'class="where"' not in idx
+    assert (out / "tx/dallas/index.html").exists()          # shelter page itself still built

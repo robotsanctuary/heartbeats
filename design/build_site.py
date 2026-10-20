@@ -38,6 +38,10 @@ TAGLINE = "Every heartbeat deserves a home."
 DOMAIN = "fadingheartbeats.com"
 # Absolute base for share links + link previews. Pages swap in their real address at view time,
 # so the LAN preview still shares working links.
+# Launch switches. Remembered (memorial) stays hidden until it's announced: no tab, no page,
+# no pages for those animals. The shelter menu + shelter line on cards appear once 2+ shelters exist.
+SHOW_REMEMBERED = os.environ.get("SHOW_REMEMBERED") == "1"
+SHOW_PICKER = None  # None = automatic (2+ registered shelters); set by build()
 SITE_URL = (os.environ.get("SITE_URL") or f"https://{DOMAIN}").rstrip("/")
 DEFAULT_TZ = ZoneInfo("America/Chicago")
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
@@ -188,8 +192,9 @@ HEART = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" 
 
 
 def page(title, body, active, root="", wide=False, meta=""):
-    links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help"),
-             ("remembered.html", "Remembered", "mem")]
+    links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help")]
+    if SHOW_REMEMBERED:
+        links.append(("remembered.html", "Remembered", "mem"))
     nav = "".join(f'<a href="{root}{h}" class="{"on" if k == active else ""}">{t}</a>' for h, t, k in links)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -341,6 +346,8 @@ def pet_sections(pets, root="", show_shelter=True):
 
 def picker(root="", current=None, counts=None):
     """'Choose your shelter' menu, grouped by state. Plain links in <noscript> for no-JS browsers."""
+    if not SHOW_PICKER:
+        return ""
     counts = counts or {}
     opts = [f'<option value="{root}index.html"{" selected" if current is None else ""}>All shelters</option>']
     plain = []
@@ -372,7 +379,7 @@ def index_page(pets, saved, today):
 <p class="lede">Dogs and cats at {n_shelters} shelter{"" if n_shelters == 1 else "s"} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
 <p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p>
 {picker("", None, shelter_counts(pets))}</header>
-{pet_sections(pets, "", show_shelter=True)}"""
+{pet_sections(pets, "", show_shelter=bool(SHOW_PICKER))}"""
     return page(f"{SITE_NAME}: {TAGLINE}", body, "list", wide=True)
 
 
@@ -421,7 +428,7 @@ def detail_page(p):
 
 
 def help_page():
-    body = """<header><h1>How you can help</h1>
+    body = f"""<header><h1>How you can help</h1>
 <p class="lede">You don't need a big house or a lot of money. Most of these take one afternoon. <span class="draft">[draft]</span></p></header>
 <div class="prose">
 <h2>Foster</h2>
@@ -435,7 +442,7 @@ def help_page():
 <h2>How this site works</h2>
 <ol><li>Several times a day we read the public at-risk lists that shelters publish.</li>
 <li>Animals with a scheduled date are shown first, soonest on top.</li>
-<li>When an animal leaves the list we keep checking, and we never assume the worst. An animal only appears under <em>Remembered</em> after a person has confirmed it.</li></ol>
+<li>When an animal leaves the list we keep checking, and we never assume the worst. {"An animal only appears under <em>Remembered</em> after a person has confirmed it." if SHOW_REMEMBERED else "We never mark an animal as lost unless a person has confirmed it."}</li></ol>
 <p>We are volunteers, not a shelter, and we don't handle adoptions. The shelter always has the final, current answer.</p>
 <h2>Shelters we follow</h2>
 """ + "".join(f'<p><strong>{e(st)}</strong></p><ul class="shelterlist" style="list-style:none;margin-bottom:12px">'
@@ -461,7 +468,11 @@ def remembered_page(gone):
 
 # ------------------------------------------------------------------ build
 
-def build(out: Path = OUT, today: date = None):
+def build(out: Path = OUT, today: date = None, show_remembered: bool = None, show_picker: bool = None):
+    global SHOW_REMEMBERED, SHOW_PICKER
+    if show_remembered is not None:
+        SHOW_REMEMBERED = show_remembered
+    SHOW_PICKER = (len(SHELTERS) > 1) if show_picker is None else show_picker
     today = today or datetime.now(DEFAULT_TZ).date()
     pets, gone, saved = load(today)
     tmp = out.with_name(out.name + ".building")
@@ -469,6 +480,8 @@ def build(out: Path = OUT, today: date = None):
         shutil.rmtree(tmp)
     (tmp / "animals").mkdir(parents=True)
     (tmp / "img").mkdir()
+    if not SHOW_REMEMBERED:
+        gone = []
     for p in pets + gone:
         if p["img"]:
             shutil.copy2(p["img"], tmp / "img" / p["img"].name)
@@ -479,7 +492,8 @@ def build(out: Path = OUT, today: date = None):
         d.mkdir(parents=True, exist_ok=True)
         (d / "index.html").write_text(shelter_page(name, info, [p for p in pets if p["raw_shelter"] == name], pets))
     (tmp / "help.html").write_text(help_page())
-    (tmp / "remembered.html").write_text(remembered_page(gone))
+    if SHOW_REMEMBERED:
+        (tmp / "remembered.html").write_text(remembered_page(gone))
     if out.exists():
         shutil.rmtree(out)
     tmp.rename(out)

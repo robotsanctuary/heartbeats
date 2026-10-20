@@ -30,10 +30,12 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    nobody is due today it shows the next day that has anyone, labelled e.g. "Out of time tomorrow").
    Crossfade + slow zoom every 4.5s, dots to jump, pauses on hover/touch, no auto-advance under
    reduced motion (`SPOT_JS`). Rebuilt with the site, so it changes daily.
-2. **Scrolling dogs (owner wants it):** small subtle dog(s) that run along the bottom as the
-   user scrolls and, when scrolling stops, do random actions (sit, wave, give paw, wag, nap,
-   second dog/cat joins); tap = wiggle; off for reduced motion. Art source undecided:
-   recommended a custom dog in the logo's line style, one dog with 4-5 moves first.
+2. **Scrolling dog: v1 BUILT 2026-10-20 (owner reviewing).** One line-art dog in the logo's red
+   gradient (`DOG_SVG`/`DOG_JS`/dog CSS in build_site.py), on every page, fixed at the bottom. It walks
+   left/right with scroll position (0% scroll = left edge, 100% = right), faces its direction, and
+   after ~1.5s still does a random move: wag, wave (gives a paw), nap (zzz), look (heart). Tap = wiggle
+   + heart. Hidden under reduced motion and when printing. Phone 54px, laptop 80px. Ideas for later:
+   a second dog/cat, more moves, hide on phones if it gets in the way.
 3. Small polish: "More…" share button alone on its row; check nav edge on wide screens.
 4. Hosting: Cloudflare (same account as the owner's other sites). The domain stays
    at Porkbun and its nameservers point to Cloudflare. A static Worker goes to a

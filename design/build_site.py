@@ -276,7 +276,36 @@ h1{font-size:72px}
 .pet{grid-template-columns:120px 1fr;padding:16px}.pet img,.pet .noimg{width:120px;height:120px}
 .dwrap{padding:36px 22px 0}.dwrap .detail{padding:0}.detail h1{font-size:76px}
 }
-@media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}
+/* scrolling dog (2026-10-20): walks along the bottom as you scroll, does a random move when you stop, tap = wiggle */
+.dog{position:fixed;left:0;bottom:calc(12px + env(safe-area-inset-bottom));z-index:25;width:54px;pointer-events:none;display:none;will-change:transform}
+.js .dog{display:block}
+.dog svg{display:block;width:100%;height:auto;overflow:visible;pointer-events:auto;cursor:pointer;transition:transform .25s}
+.dog.left svg{transform:scaleX(-1)}
+.dog svg *{transform-box:view-box}
+.dog .lg,.dog .paw,.dog .hd,.dog .er,.dog .inner,.dog .eye,.dog .eyec{transition:transform .4s cubic-bezier(.3,1.3,.5,1),opacity .3s}
+.dog .eyec{opacity:0}
+.dog .tl{animation:wg 1.3s ease-in-out infinite alternate}@keyframes wg{from{transform:rotate(-10deg)}to{transform:rotate(12deg)}}
+.dog.walk .tl,.dog.wag .tl{animation-duration:.16s}
+.dog.walk .lg.a{animation:sw .3s ease-in-out infinite alternate}.dog.walk .lg.b{animation:sw .3s ease-in-out infinite alternate-reverse}
+@keyframes sw{from{transform:rotate(-26deg)}to{transform:rotate(26deg)}}
+.dog.walk .inner{animation:bob .15s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-2.5px)}}
+.dog.wag .hd{transform:rotate(-6deg)}.dog.wag .er{transform:rotate(14deg)}
+.dog .paw{opacity:0}.dog.wave .lgw{opacity:0}.dog.wave .paw{opacity:1;animation:wave .4s ease-in-out infinite alternate}@keyframes wave{from{transform:rotate(4deg)}to{transform:rotate(-14deg)}}
+.dog.wave .hd{transform:rotate(-10deg)}
+.dog.nap .inner{transform:translateY(25px)}.dog.nap .lg{opacity:0}.dog.nap .hd{transform:rotate(16deg)}
+.dog.nap .eye{opacity:0}.dog.nap .eyec{opacity:1}.dog.nap .tl{animation:none;transform:rotate(30deg)}
+.dog.look .hd{transform:rotate(-12deg)}
+.dog.wiggle .wgl{animation:wig .6s ease}@keyframes wig{20%{transform:rotate(-8deg)}40%{transform:rotate(7deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(3deg)}}
+.dog .ht{opacity:0}.dog.wiggle .ht,.dog.look .ht{animation:hpop 1.3s ease-out}
+@keyframes hpop{0%{opacity:0;transform:translateY(8px) scale(.4)}30%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-16px)}}
+.dog .zz{position:absolute;right:-4px;top:-10px;font:italic 700 16px/1 "Source Sans 3",sans-serif;color:#C4304F;opacity:0;pointer-events:none}
+.dog.left .zz{right:auto;left:-4px}
+.dog .zz i{font-style:inherit;display:inline-block}.dog.nap .zz{opacity:1}.dog.nap .zz i{animation:zz 2.4s ease-in-out infinite}
+.dog.nap .zz i:nth-child(2){animation-delay:.8s;font-size:.85em}.dog.nap .zz i:nth-child(3){animation-delay:1.6s;font-size:.7em}
+@keyframes zz{0%{opacity:0;transform:translate(0,6px)}40%{opacity:1}100%{opacity:0;transform:translate(6px,-12px)}}
+@media(min-width:900px){.dog{width:80px;bottom:18px}}
+@media print{.dog{display:none!important}}
+@media (prefers-reduced-motion:reduce){.dog{display:none!important}*,*::before{animation:none!important;transition:none!important}
 .beat{stroke-dashoffset:0}.toes ellipse{opacity:1}.js .rv{opacity:1;transform:none}.blip{display:none}}
 """
 
@@ -323,6 +352,59 @@ if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
 setInterval(()=>{if(Date.now()>hold&&!document.hidden)go(i+1)},4500)})()</script>"""
 
 
+DOG_ST = 'stroke="url(#dg)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"'
+
+
+def _leg(x, cls, far=False):
+    o = ' opacity=".5"' if far else ""
+    return (f'<g class="lg {cls}" style="transform-origin:{x}px 56px"{o}>'
+            f'<path d="M{x} 54V87h6" fill="none" {DOG_ST}/></g>')
+
+
+DOG_SVG = ('<div class="dog" aria-hidden="true"><span class="zz"><i>z</i><i>z</i><i>z</i></span>'
+           '<svg viewBox="0 0 132 96" fill="none"><defs><linearGradient id="dg" gradientUnits="userSpaceOnUse" x1="20" x2="130">'
+           '<stop offset="0" stop-color="#D9472F"/><stop offset="1" stop-color="#C4304F"/></linearGradient></defs>'
+           '<g class="wgl" style="transform-origin:70px 88px"><g class="inner" style="transform-origin:52px 88px">'
+           # tail
+           f'<g class="tl" style="transform-origin:40px 46px"><path d="M40 46C29 43 24 33 28 23" {DOG_ST}/></g>'
+           # far legs (behind body)
+           + _leg(58, "a", True) + _leg(78, "b lgf", True) +
+           # body
+           f'<path d="M38 49C38 40 46 36 58 36H82C92 36 97 42 97 49C97 57 92 62 82 62H52C43 62 38 57 38 49Z" fill="#fff" {DOG_ST}/>'
+           # near legs
+           '<path d="M80 37L92 30L102 44L90 52Z" fill="#fff"/>'
+           f'<path d="M82 36.5C87 35 90 33 92 30" {DOG_ST}/>'
+           f'<path d="M90 60C95 56 98 51 99 45" {DOG_ST}/>'
+           + _leg(48, "b") + _leg(88, "a lgf lgw") +
+           f'<g class="paw" style="transform-origin:88px 54px"><path d="M88 57C96 57 104 56 111 54" fill="none" {DOG_ST}/><ellipse cx="115" cy="53.5" rx="4.4" ry="3.6" fill="#C4304F"/></g>' +
+           # head
+           f'<g class="hd" style="transform-origin:94px 42px">'
+           f'<path d="M91 31C91 22 97 16 105 16C113 16 117 21 118 26L124 28C128 29 128 35 124 36L117 38C114 43 109 46 103 46C96 46 91 39 91 31Z" fill="#fff" {DOG_ST}/>'
+           '<circle cx="124.5" cy="31" r="2.8" fill="#C4304F"/>'
+           '<circle class="eye" cx="109" cy="26" r="2.3" fill="#1F1A17"/>'
+           '<path class="eyec" d="M106 27Q109 29.5 112 27" stroke="#1F1A17" stroke-width="2" stroke-linecap="round"/>'
+           f'<g class="er" style="transform-origin:100px 19px"><path d="M101 19C94 18 91 26 94 34C96 37 100 35 101 31Z" fill="#FDEBE4" {DOG_ST}/></g>'
+           '</g></g></g>'
+           '<path class="ht" d="M110 4c-2-3-7-2-7 2 0 3 7 7 7 7s7-4 7-7c0-4-5-5-7-2z" fill="#D9472F"/>'
+           '</svg></div>')
+
+DOG_JS = """<script>(()=>{const d=document.querySelector(".dog");if(!d)return;
+if(matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove();return}
+const acts={wag:2600,wave:2600,nap:7000,look:2200},names=Object.keys(acts);
+let cur=null,x=0,tx=0,actEnd=0,nextAct=performance.now()+1800,last="";
+const target=()=>{const max=document.documentElement.scrollHeight-innerHeight;const p=max>0?Math.min(1,Math.max(0,scrollY/max)):0;return 6+p*(innerWidth-d.offsetWidth-12)};
+x=tx=target();
+const set=a=>{names.forEach(n=>d.classList.remove(n));cur=a;if(a)d.classList.add(a)};
+addEventListener("scroll",()=>{tx=target()},{passive:true});addEventListener("resize",()=>{tx=target()});
+d.querySelector("svg").addEventListener("click",()=>{d.classList.remove("wiggle");void d.offsetWidth;d.classList.add("wiggle");setTimeout(()=>d.classList.remove("wiggle"),700)});
+const tick=now=>{const dx=tx-x,moving=Math.abs(dx)>.6;
+if(moving){x+=Math.sign(dx)*Math.min(Math.abs(dx),9,Math.max(1.3,Math.abs(dx)*.06));d.classList.toggle("left",dx<0);nextAct=now+1400;if(cur)set(null)}
+else if(cur&&now>actEnd){set(null);nextAct=now+3000+Math.random()*5000}
+else if(!cur&&now>nextAct&&!document.hidden){let a;do{a=names[Math.random()*names.length|0]}while(a===last);last=a;set(a);actEnd=now+acts[a]}
+d.classList.toggle("walk",moving);d.style.transform="translateX("+x.toFixed(1)+"px)";requestAnimationFrame(tick)};
+requestAnimationFrame(tick)})()</script>"""
+
+
 def page(title, body, active, root="", wide=False, meta="", band=""):
     links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help")]
     if SHOW_REMEMBERED:
@@ -341,7 +423,7 @@ def page(title, body, active, root="", wide=False, meta="", band=""):
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
 please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
-</div>{REVEAL_JS}{SPOT_JS if band else ""}</body></html>"""
+</div>{DOG_SVG}{REVEAL_JS}{SPOT_JS if band else ""}{DOG_JS}</body></html>"""
 
 
 def photo(p, root, cls=""):

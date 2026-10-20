@@ -193,3 +193,13 @@ def test_home_spotlight_rendered(site):
     # fixture "today" is 2026-10-19; Rex is due 10-20 (tomorrow) and is the only one -> featured, no dots
     assert 'class="spot"' in idx and "Out of time tomorrow" in idx and 'class="slide on" href="animals/A1.html"' in idx
     assert 'class="spot"' not in (out / "tx/dallas/index.html").read_text()
+
+
+def test_scrolling_dog_on_every_page_and_off_for_reduced_motion(site):
+    out, _ = site
+    for f in ("index.html", "help.html", "animals/A1.html", "tx/dallas/index.html"):
+        page = (out / f).read_text()
+        assert 'class="dog"' in page and 'aria-hidden="true"' in page.split('class="dog"')[1][:40], f
+    idx = (out / "index.html").read_text()
+    assert ".dog{display:none!important}" in idx.split("prefers-reduced-motion:reduce")[1][:80]  # CSS off
+    assert 'matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove()' in idx           # JS off

@@ -203,5 +203,5 @@ def test_scrolling_dog_on_every_page_and_off_for_reduced_motion(site):
     idx = (out / "index.html").read_text()
     assert ".dog{display:none!important}" in idx.split("prefers-reduced-motion:reduce")[1][:80]  # CSS off
     assert 'matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove()' in idx           # JS off
-    assert (out / "dog-sprite.png").exists() and "url(dog-sprite.png)" in idx
-    assert "url(../../dog-sprite.png)" in (out / "tx/dallas/index.html").read_text()           # path works 2 folders down
+    assert (out / "dog.png").exists() and "url(dog.png)" in idx
+    assert "url(../../dog.png)" in (out / "tx/dallas/index.html").read_text()           # path works 2 folders down

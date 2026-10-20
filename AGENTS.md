@@ -30,16 +30,14 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    nobody is due today it shows the next day that has anyone, labelled e.g. "Out of time tomorrow").
    Crossfade + slow zoom every 4.5s, dots to jump, pauses on hover/touch, no auto-advance under
    reduced motion (`SPOT_JS`). Rebuilt with the site, so it changes daily.
-2. **Site dog: sprite engine BUILT 2026-10-20 (owner testing, real art coming).** `dog_html()` + `DOG_JS`
-   in build_site.py draw frames from `design/brand/dog-sprite.png` (8 cols x 7 rows, square cells, same
-   rows as `design/sprite_template.py` ROWS: run, trot, skip, jump up, jump down, idle, rest). Placeholder
-   sheet: `python design/sprite_template.py --sheet`; template for the owner's image generator:
-   `python design/sprite_template.py`. The dog wanders by itself (run/trot+sniff/skip/sit/paw/look/nap),
-   jumps onto cards (`.pet,.sq,.facts,.empty` top edges), rides them while scrolling and hops down
-   (to a lower card or the floor) when its card reaches the top bar. Tap = happy hop + heart; scrolling
-   wakes it. Debug: `window.__dog.state()` / `__dog.jump()`. Off for reduced motion + print.
-   To drop in new art: replace dog-sprite.png keeping the grid, then tune `FOOT` (feet height in a cell)
-   and `CX` (body centre) in DOG_JS.
+2. **Site dog: owner's puppy art IN (2026-10-20).** Owner sent 12 jump frames (golden puppy,
+   transparent PNGs) -> `design/brand/dog-src-jump/`, packed by `python design/dog_art.py <folder>`
+   into `design/brand/dog-jump.png` (300px cells, hind feet anchored at x110,y250; build copies it to
+   `dog.png`). Engine `DOG_JS`: jump UP = frames 8 sit -> 7 rear up, paws in air -> 10 spring -> 4 leap
+   -> 11 reach -> 12 land, on a lower arc; jump DOWN = 12 -> 4 -> 11 -> 12. A card scrolling up from
+   below now LIFTS a dog standing on the floor. Wanders, rides cards, hops off at the top bar.
+   Run/trot/skip/nap are stand-ins built from jump frames until those rows of art arrive (owner is
+   doing animations one at a time). Old stick-dog sheet: `design/sprite_template.py` (template only).
 3. Small polish: "More…" share button alone on its row; check nav edge on wide screens.
 4. Hosting: Cloudflare (same account as the owner's other sites). The domain stays
    at Porkbun and its nameservers point to Cloudflare. A static Worker goes to a

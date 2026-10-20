@@ -278,18 +278,18 @@ h1{font-size:72px}
 }
 /* site dog (sprite engine, 2026-10-20): wanders on its own, runs/trots/skips, hops onto cards and off again.
    Frames come from dog-sprite.png (grid = design/sprite_template.py ROWS, 8 columns x 7 rows, square cells). */
-.dog{position:fixed;left:0;top:0;z-index:25;width:72px;height:72px;display:none;background-repeat:no-repeat;
-transform-origin:59% 90%;will-change:transform;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dog{position:fixed;left:0;top:0;z-index:25;width:100px;height:100px;display:none;background-repeat:no-repeat;
+transform-origin:36.67% 83.33%;will-change:transform;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .js .dog{display:block}
 .dog.left>span{transform:scaleX(-1)}
-.dog .ht{position:absolute;left:62%;top:-4px;color:#D9472F;font-size:20px;line-height:1;opacity:0;pointer-events:none}
+.dog .ht{position:absolute;left:55%;top:18%;color:#D9472F;font-size:20px;line-height:1;opacity:0;pointer-events:none}
 .dog.love .ht{animation:hpop 1.3s ease-out}
 @keyframes hpop{0%{opacity:0;translate:0 10px;scale:.4}30%{opacity:1;translate:0 0;scale:1}100%{opacity:0;translate:0 -22px}}
-.dog .zz{position:absolute;left:68%;top:-6px;font:italic 700 16px/1 "Source Sans 3",sans-serif;color:#C4304F;opacity:0;pointer-events:none}
+.dog .zz{position:absolute;left:62%;top:22%;font:italic 700 16px/1 "Source Sans 3",sans-serif;color:#C4304F;opacity:0;pointer-events:none}
 .dog.sleep .zz{opacity:1}.dog .zz i{font-style:inherit;display:inline-block;animation:zz 2.4s ease-in-out infinite}
 .dog .zz i:nth-child(2){animation-delay:.8s;font-size:.85em}.dog .zz i:nth-child(3){animation-delay:1.6s;font-size:.7em}
 @keyframes zz{0%{opacity:0;transform:translate(0,6px)}40%{opacity:1}100%{opacity:0;transform:translate(6px,-12px)}}
-@media(min-width:900px){.dog{width:96px;height:96px}}
+@media(min-width:900px){.dog{width:130px;height:130px}}
 @media print{.dog{display:none!important}}
 @media (prefers-reduced-motion:reduce){.dog{display:none!important}*,*::before{animation:none!important;transition:none!important}
 .beat{stroke-dashoffset:0}.toes ellipse{opacity:1}.js .rv{opacity:1;transform:none}.blip{display:none}}
@@ -339,65 +339,75 @@ setInterval(()=>{if(Date.now()>hold&&!document.hidden)go(i+1)},4500)})()</script
 
 
 def dog_html(root=""):
-    return (f'<div class="dog" aria-hidden="true" style="background-image:url({root}dog-sprite.png)">'
+    return (f'<div class="dog" aria-hidden="true" style="background-image:url({root}dog.png)">'
             '<span class="zz"><i>z</i><i>z</i><i>z</i></span><span class="ht">&#9829;</span></div>')
 
 
-# Sprite engine. A = animations by sheet row (must match design/sprite_template.py ROWS).
+# Dog engine (art: owner's puppy frames packed by design/dog_art.py into one strip, cell = frame number - 1).
+# Only jump art exists so far; run/trot/skip/nap reuse jump frames as stand-ins until those rows arrive.
 DOG_JS = """<script>(()=>{const d=document.querySelector(".dog");if(!d)return;
 if(matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove();return}
-const COLS=8,ROWS=7,FOOT=135.5/152,CX=.59;
-const A={run:[0,0,8,14],trot:[1,0,4,8],skip:[2,0,4,9],up:[3],down:[4],stand:[5,0],sit:[5,1],paw:[5,2],look:[5,3],sniff:[5,4],
-lie:[6,0],sleep:[6,1,2,1.4],stretch:[6,3],hop:[2,0,4,10]};
-const SPEED={run:260,trot:70,skip:120};
+const N=12,FOOT=250/300,CX=110/300;
+const A={stand:[[11]],look:[[7]],sit:[[0]],paw:[[6]],sniff:[[11]],lie:[[0]],sleep:[[0]],stretch:[[9]],
+run:[[10,3,11],10],trot:[[11,7],4],skip:[[11,3],5],hop:[[11,3],6]};
+const SPEED={run:300,trot:60,skip:130},BOB={run:.10,trot:.025,skip:.16,hop:.2};
 let S=d.offsetWidth,x=innerWidth*(.15+Math.random()*.3),y=innerHeight-10,face=1,on=null,off=0;
-let st="stand",t0=0,until=0,goal=null,after=null,plan=[],J=null,last=0;
-const now=()=>performance.now(),K=()=>S/80,R=a=>a[Math.random()*a.length|0];
-const topLimit=()=>{const tb=document.querySelector(".topbar");return(tb?tb.getBoundingClientRect().bottom:0)+S*.9};
-const groundY=()=>innerHeight-10;
+let st="stand",t0=0,until=0,goal=null,after=null,plan=[],J=null,last=0;const prevTop=new WeakMap();
+const now=()=>performance.now(),K=()=>S/110,R=a=>a[Math.random()*a.length|0];
+const topLimit=()=>{const tb=document.querySelector(".topbar");return(tb?tb.getBoundingClientRect().bottom:0)+S*.75};
+const groundY=()=>innerHeight-8;
 const perches=()=>[...document.querySelectorAll(".pet,.sq,.facts,.empty")];
 const usable=el=>{if(!el||!el.isConnected)return false;const r=el.getBoundingClientRect();
-return r.width>S*1.4&&r.top>topLimit()&&r.top<groundY()-S*.6&&r.left<innerWidth-S&&r.right>S};
-const bounds=el=>{if(el){const r=el.getBoundingClientRect();return[Math.max(r.left+S*.35,S*.4),Math.min(r.right-S*.35,innerWidth-S*.4)]}return[S*.4,innerWidth-S*.4]};
+return r.width>S*1.2&&r.top>topLimit()&&r.top<groundY()-S*.5&&r.left<innerWidth-S&&r.right>S};
+const bounds=el=>{if(el){const r=el.getBoundingClientRect();return[Math.max(r.left+S*.3,S*.4),Math.min(r.right-S*.3,innerWidth-S*.4)]}return[S*.4,innerWidth-S*.4]};
 const set=(s,ms)=>{st=s;t0=now();until=t0+(ms||0);d.classList.toggle("sleep",s==="sleep")};
 const walkTo=(tx,mode,then)=>{const[lo,hi]=bounds(on);goal=Math.min(hi,Math.max(lo,tx));after=then||null;set(mode)};
-function jumpTo(el){const r=el?el.getBoundingClientRect():null,[lo,hi]=bounds(el);const tx=Math.min(hi,Math.max(lo,x+(Math.random()-.5)*S*2));
-if(Math.abs(tx-x)>S*3){walkTo(tx-Math.sign(tx-x)*S*2,"run",()=>usable(el)||!el?jumpTo(el):next());return}
-J={el,ox:el?tx-r.left:tx,sx:x,sy:y,t:0};face=tx>=x?1:-1;set((el?r.top:groundY())<y-4?"up":"down")}
+/* jump: UP = sit back (8) -> rear up, front paws in the air (7) -> spring (10) -> stretch (4) -> reach (11) -> land (12)
+         DOWN = look down (12) -> hop (4) -> reach (11) -> land (12) */
+const UP=[[.20,7,0],[.26,6,0],[.12,9,.15],[.22,3,.6],[.22,10,1],[.18,11,1]],DOWN=[[.14,11,0],[.25,3,.45],[.25,10,1],[.18,11,1]];
+function jumpTo(el){const r=el?el.getBoundingClientRect():null,[lo,hi]=bounds(el);const tx=Math.min(hi,Math.max(lo,x+(Math.random()-.5)*S*1.5));
+if(Math.abs(tx-x)>S*3){walkTo(tx-Math.sign(tx-x)*S*1.5,"run",()=>usable(el)||!el?jumpTo(el):next());return}
+const ty=el?r.top:groundY(),upw=ty<y-4;J={el,ox:el?tx-r.left:tx,sx:x,sy:y,t:0,seq:upw?UP:DOWN};face=tx>=x?1:-1;set(upw?"up":"down")}
 function hopDown(){const below=perches().filter(e=>e!==on&&usable(e)&&(()=>{const r=e.getBoundingClientRect();return r.top>y+S*.3&&r.left<x&&r.right>x})());
 on=null;jumpTo(below.length?below[0]:null)}
 function next(){goal=null;after=null;if(plan.length){const[s,ms]=plan.shift();return set(s,ms)}
 const r=Math.random(),[lo,hi]=bounds(on),rx=()=>lo+Math.random()*(hi-lo);
-if(r<.22){const c=perches().filter(e=>e!==on&&usable(e));if(c.length)return jumpTo(R(c))}
-if(r<.30&&on)return hopDown();
-if(r<.50)return walkTo(rx(),"run");
-if(r<.65)return walkTo(rx(),"trot",()=>set("sniff",1500));
-if(r<.75)return walkTo(rx(),"skip");
-if(r<.82){plan=[["sleep",7000+Math.random()*6000],["stretch",1300]];return set("lie",1200)}
-const p=R(["sit","paw","look","sniff","stand"]);set(p,1600+Math.random()*2600)}
-function tick(){const n=now(),dt=Math.min(.05,(n-(last||n))/1000);last=n;S=d.offsetWidth;
+if(r<.25){const c=perches().filter(e=>e!==on&&usable(e));if(c.length)return jumpTo(R(c))}
+if(r<.32&&on)return hopDown();
+if(r<.52)return walkTo(rx(),"run");
+if(r<.64)return walkTo(rx(),"trot",()=>set("sniff",1500));
+if(r<.74)return walkTo(rx(),"skip");
+if(r<.80){plan=[["sleep",6000+Math.random()*6000],["stretch",900]];return set("lie",800)}
+set(R(["sit","paw","look","stand"]),1600+Math.random()*2600)}
+function frameOfJump(){let t=J.t,acc=0;for(const[dur,f,p]of J.seq){if(t<acc+dur)return[f,p,(t-acc)/dur,acc];acc+=dur}return null}
+function tick(){const n=now(),dt=Math.min(.05,(n-(last||n))/1000);last=n;S=d.offsetWidth;let fr=null,lift=0;
 if(on){if(!on.isConnected)hopDown();else{const r=on.getBoundingClientRect();
 if(r.top>groundY()){on=null}else if(r.top<topLimit()&&!J){hopDown()}else{y=r.top;x=r.left+off}}}
-if(!on&&!J)y=groundY();
-if(J){const el=J.el;if(el&&!usable(el)&&J.t<.12){J.el=null}const r=J.el?J.el.getBoundingClientRect():null;
-const tx=r?r.left+J.ox:J.ox,ty=r?r.top:groundY();J.t+=dt;const air=.5,c=.14;
-if(J.t<c){/* crouch */}else if(J.t<c+air){const p=(J.t-c)/air,h=Math.max(S*.45,J.sy-ty+S*.55);
-x=J.sx+(tx-J.sx)*p;y=J.sy+(ty-J.sy)*p-h*4*p*(1-p)}
-else{x=tx;y=ty;on=J.el;off=r?x-r.left:0;if(J.t>c+air+.16){J=null;set("stand",500+Math.random()*700)}}}
+if(!on&&!J){y=groundY();/* a card scrolling up from below lifts the dog when its top edge reaches the dog's feet */
+for(const e of perches()){const r=e.getBoundingClientRect(),pt=prevTop.get(e);prevTop.set(e,r.top);
+if(pt!==undefined&&pt>y&&r.top<=y&&r.left+S*.2<x&&r.right-S*.2>x){on=e;off=x-r.left;y=r.top;if(goal!==null){goal=null;after=null;set("stand",700)}break}}}
+else perches().forEach(e=>prevTop.set(e,e.getBoundingClientRect().top));
+if(J){if(J.el&&!usable(J.el)&&J.t<.4)J.el=null;const r=J.el?J.el.getBoundingClientRect():null;
+const tx=r?r.left+J.ox:J.ox,ty=r?r.top:groundY();J.t+=dt;const ph=frameOfJump();
+if(!ph){x=tx;y=ty;on=J.el;off=r?x-r.left:0;J=null;set("stand",500+Math.random()*700)}
+else{const[f,p,k]=ph;fr=f;const prog=Math.min(1,Math.max(0,p===0?0:p));
+/* air arc: between first lifting phase and landing */const total=J.seq.reduce((a,s)=>a+s[0],0),start=J.seq.findIndex(s=>s[2]>0);
+const ta=J.seq.slice(0,start).reduce((a,s)=>a+s[0],0),te=total-J.seq[J.seq.length-1][0];
+const q=Math.min(1,Math.max(0,(J.t-ta)/(te-ta))),h=S*.5+Math.max(0,J.sy-ty)*.5;
+if(J.t>=ta&&J.t<te){x=J.sx+(tx-J.sx)*q;y=J.sy+(ty-J.sy)*q-h*4*q*(1-q)}else if(J.t>=te){x=tx;y=ty}}}
 else if(goal!==null){const sp=(SPEED[st]||100)*K(),dx=goal-x;face=dx>=0?1:-1;
 if(Math.abs(dx)<=sp*dt){x=goal;const f=after;goal=null;after=null;f?f():set("stand",400+Math.random()*900)}else x+=Math.sign(dx)*sp*dt;
 if(on)off=x-on.getBoundingClientRect().left}
-else if(n>until&&st!=="sleep"||st==="sleep"&&n>until)next();
-let a=A[st]||A.stand,col=a[1]||0;
-if(st==="up"||st==="down"){const t=J?J.t:1;col=t<.14?0:t<.39?1:t<.64?2:3}
-else if(a[2])col=a[1]+Math.floor((n-t0)/1000*a[3])%a[2];
-d.style.backgroundSize=COLS*S+"px "+ROWS*S+"px";d.style.backgroundPosition=-col*S+"px "+-a[0]*S+"px";
-d.classList.toggle("left",face<0);
-d.style.transform="translate3d("+(x-S*CX).toFixed(1)+"px,"+(y-S*FOOT).toFixed(1)+"px,0) scaleX("+face+")";
+else if(n>until)next();
+if(fr===null){const a=A[st]||A.stand,fs=a[0],fps=a[1]||0,i=fps?Math.floor((n-t0)/1000*fps)%fs.length:0;fr=fs[i];
+if(BOB[st])lift=Math.abs(Math.sin((n-t0)/1000*(fps||5)*Math.PI/fs.length*fs.length))*BOB[st]*S}
+d.style.backgroundSize=N*S+"px "+S+"px";d.style.backgroundPosition=-fr*S+"px 0";
+d.style.transform="translate3d("+(x-S*CX).toFixed(1)+"px,"+(y-S*FOOT-lift).toFixed(1)+"px,0) scaleX("+face+")";
 requestAnimationFrame(tick)}
 d.addEventListener("click",()=>{if(J)return;plan=[];goal=null;set("hop",900);d.classList.remove("love");void d.offsetWidth;d.classList.add("love")});
-addEventListener("scroll",()=>{if(st==="sleep"||st==="lie"){plan=[];set("stretch",1100)}},{passive:true});
-window.__dog={state:()=>({st,x:Math.round(x),y:Math.round(y),on:on?on.className:null,jumping:!!J}),jump:()=>{const c=perches().filter(usable);if(c.length)jumpTo(c[0])}};
+addEventListener("scroll",()=>{if(st==="sleep"||st==="lie"){plan=[];set("stretch",700)}},{passive:true});
+window.__dog={state:()=>({st,x:Math.round(x),y:Math.round(y),on:on?on.className:null,jumping:!!J,frame:J&&frameOfJump()?frameOfJump()[0]+1:null}),
+jump:()=>{const c=perches().filter(usable);if(c.length)jumpTo(c[0])},floor:()=>{on=null;J=null;goal=null;set("stand",4000)}};
 set("stand",1200);requestAnimationFrame(tick)})()</script>"""
 
 
@@ -731,7 +741,7 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
         if p["img"]:
             shutil.copy2(p["img"], tmp / "img" / p["img"].name)
         (tmp / "animals" / f"{p['id']}.html").write_text(detail_page(p))
-    for src, dst in (("dog-sprite.png", "dog-sprite.png"), ("icon.svg", "icon.svg"), ("apple-touch-icon.png", "apple-touch-icon.png"), ("og-1200x630.png", "og.png")):
+    for src, dst in (("dog-jump.png", "dog.png"), ("icon.svg", "icon.svg"), ("apple-touch-icon.png", "apple-touch-icon.png"), ("og-1200x630.png", "og.png")):
         if (BRAND_DIR / src).exists():
             shutil.copy2(BRAND_DIR / src, tmp / dst)
     (tmp / "index.html").write_text(index_page(pets, saved, today))

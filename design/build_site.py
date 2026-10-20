@@ -31,7 +31,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import db  # noqa: E402
-from shelters.registry import adopt_url, shelter_info  # noqa: E402
+from shelters.registry import adopt_url, shelter_info, shelter_path, shelters_by_state, SHELTERS  # noqa: E402
 
 SITE_NAME = "Fading Heartbeats"
 TAGLINE = "Every heartbeat deserves a home."
@@ -78,7 +78,9 @@ def to_view(r, today: date) -> dict:
         "age": _age(r["age"]),
         "sex": _sex(r["sex"]),
         "shelter": info.get("short_name", r["shelter_name"]),
-        "city": info.get("city", ""),
+        "city": f"{info['city']}, {info['state']}" if info.get("city") else "",
+        "path": shelter_path(r["shelter_name"]),
+        "raw_shelter": r["shelter_name"],
         "contact": info.get("contact_email"),
         "adopt": adopt_url(r["shelter_name"], r["pet_id"]),
         "deadline": deadline,
@@ -154,6 +156,15 @@ background:var(--accent);color:#fff;font-weight:600;font-size:16px;text-decorati
 .empty{padding:22px;background:var(--quiet);border-radius:14px;color:var(--muted);margin:10px 0 24px}
 footer{margin:24px 22px 0;padding:28px 0 44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
 .draft{color:oklch(55% 0.12 300);font-size:.8em}
+.picker{margin-top:18px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.picker label{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.picker select{font:600 16px "Source Sans 3",system-ui,sans-serif;color:var(--ink);background:#fff;border:1px solid var(--line);
+border-radius:12px;min-height:44px;padding:8px 36px 8px 12px;width:100%;max-width:420px;appearance:none;
+background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.where{font-size:13px;color:var(--muted);margin-top:-4px;margin-bottom:6px}
+.crumb{font-size:14px;margin-bottom:10px}.crumb a{color:var(--accent);font-weight:600;text-decoration:none}
+.shelterlist li{margin-bottom:6px}.shelterlist a{color:var(--accent);font-weight:600}
 .share{margin:18px 0 6px}.share .lbl{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .chip{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 6px;border-radius:12px;border:1px solid var(--line);
@@ -301,7 +312,8 @@ def share_meta(p) -> str:
 
 # ------------------------------------------------------------------ pages
 
-def index_page(pets, saved, today):
+def pet_sections(pets, root="", show_shelter=True):
+    """Animals grouped by deadline day: past, today, tomorrow, later days, then no-date last."""
     groups: dict = {}
     for p in pets:
         d = p["days"]
@@ -319,23 +331,73 @@ def index_page(pets, saved, today):
         for p in groups[k]:
             text = blurb(p["desc"]) if p["desc"] else (
                 "Too young to stay in the shelter. Needs a foster home." if k == "nodate" else "")
-            rows.append(f"""<a class="pet" href="animals/{e(p['id'])}.html">{photo(p, "")}
-<div><div class="name">{e(p['name'])}</div><div class="meta">{e(p['age'])} · {e(p['breed'])}</div>
+            where = f'<div class="where">{e(p["shelter"])}{" · " + e(p["city"]) if p["city"] else ""}</div>' if show_shelter else ""
+            rows.append(f"""<a class="pet" href="{root}animals/{e(p['id'])}.html">{photo(p, root)}
+<div><div class="name">{e(p['name'])}</div><div class="meta">{e(p['age'])} · {e(p['breed'])}</div>{where}
 <p class="blurb">{e(text)}</p><span class="more">Meet {e(p['name'])} →</span></div></a>""")
         secs.append(f'<section><h2 class="{"now" if k in ("past", "today") else ""}">{e(labels.get(k, k))}</h2><div class="pets">{"".join(rows)}</div></section>')
+    return "".join(secs)
+
+
+def picker(root="", current=None, counts=None):
+    """'Choose your shelter' menu, grouped by state. Plain links in <noscript> for no-JS browsers."""
+    counts = counts or {}
+    opts = [f'<option value="{root}index.html"{" selected" if current is None else ""}>All shelters</option>']
+    plain = []
+    for state, items in shelters_by_state():
+        o = []
+        for name, info in items:
+            path = shelter_path(name)
+            n = counts.get(name, 0)
+            o.append(f'<option value="{root}{path}/index.html"{" selected" if name == current else ""}>'
+                     f'{e(info["short_name"] if info["city"].lower() in info["short_name"].lower() else info["city"] + " · " + info["short_name"])} ({n})</option>')
+            plain.append(f'<a href="{root}{path}/index.html">{e(info["short_name"])}</a>')
+        opts.append(f'<optgroup label="{e(state)}">{"".join(o)}</optgroup>')
+    return (f'<div class="picker"><label for="shelter-pick">Choose your shelter</label>'
+            f'<select id="shelter-pick" onchange="location.href=this.value">{"".join(opts)}</select>'
+            f'<noscript>{" · ".join(plain)}</noscript></div>')
+
+
+def shelter_counts(pets):
+    c: dict = {}
+    for p in pets:
+        c[p["raw_shelter"]] = c.get(p["raw_shelter"], 0) + 1
+    return c
+
+
+def index_page(pets, saved, today):
     dated = sum(p["days"] is not None for p in pets)
-    shelters = sorted({p["shelter"] for p in pets})
+    n_shelters = len({p["shelter"] for p in pets})
     body = f"""<header><h1>{e(TAGLINE)}</h1>
-<p class="lede">Dogs and cats at {e(", ".join(shelters))} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
-<p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p></header>
-{"".join(secs)}"""
+<p class="lede">Dogs and cats at {n_shelters} shelter{"" if n_shelters == 1 else "s"} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
+<p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p>
+{picker("", None, shelter_counts(pets))}</header>
+{pet_sections(pets, "", show_shelter=True)}"""
     return page(f"{SITE_NAME}: {TAGLINE}", body, "list", wide=True)
+
+
+def shelter_page(name, info, pets, all_pets):
+    root = "../../"
+    dated = sum(p["days"] is not None for p in pets)
+    site = f' · <a href="{e(info["website"])}" rel="noopener" style="white-space:nowrap">Shelter website</a>' if info.get("website") else ""
+    listing = pet_sections(pets, root, show_shelter=False) if pets else (
+        '<section><div class="empty">No animals from this shelter are on an at-risk list right now. '
+        'That can change quickly, so check back.</div></section>')
+    body = f"""<header><p class="crumb"><a href="{root}index.html">← All shelters</a></p>
+<h1>{e(info["short_name"])}</h1>
+<p class="lede">{e(info.get("address") or f"{info['city']}, {info['state']}")}{site}</p>
+<p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date</p>
+{picker(root, name, shelter_counts(all_pets))}</header>
+{listing}"""
+    return page(f"{info['short_name']} · {SITE_NAME}", body, "list", root=root, wide=True)
 
 
 def detail_page(p):
     facts = [("Age", p["age"]), ("Sex", p["sex"]), ("Breed", p["breed"]),
              ("Shelter", f"{p['shelter']}, {p['city']}" if p["city"] else p["shelter"]), ("Animal ID", p["id"])]
     dl = "".join(f"<dt>{e(k)}</dt><dd>{e(v)}</dd>" for k, v in facts if v)
+    if p["path"]:
+        dl += f'<dt></dt><dd><a href="../{e(p["path"])}/index.html" style="color:var(--accent);font-weight:600">More animals at {e(p["shelter"])} →</a></dd>'
     paras = [x.strip() for x in p["desc"].replace("\r", "").split("\n") if x.strip()] or [
         f"The shelter hasn't written {p['name']}'s story yet. "
         + ("Very young animals like this one can't stay in the shelter and need a foster home right away."
@@ -376,7 +438,9 @@ def help_page():
 <li>When an animal leaves the list we keep checking, and we never assume the worst. An animal only appears under <em>Remembered</em> after a person has confirmed it.</li></ol>
 <p>We are volunteers, not a shelter, and we don't handle adoptions. The shelter always has the final, current answer.</p>
 <h2>Shelters we follow</h2>
-<p>Dallas Animal Services, Dallas, TX. More soon.</p>
+""" + "".join(f'<p><strong>{e(st)}</strong></p><ul class="shelterlist" style="list-style:none;margin-bottom:12px">'
+              + "".join(f'<li><a href="{shelter_path(n)}/index.html">{e(i["short_name"])}</a> · {e(i["city"])}</li>' for n, i in items)
+              + "</ul>" for st, items in shelters_by_state()) + """<p>More soon.</p>
 </div>"""
     return page(f"How to help · {SITE_NAME}", body, "help")
 
@@ -410,13 +474,17 @@ def build(out: Path = OUT, today: date = None):
             shutil.copy2(p["img"], tmp / "img" / p["img"].name)
         (tmp / "animals" / f"{p['id']}.html").write_text(detail_page(p))
     (tmp / "index.html").write_text(index_page(pets, saved, today))
+    for name, info in SHELTERS.items():
+        d = tmp / shelter_path(name)
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "index.html").write_text(shelter_page(name, info, [p for p in pets if p["raw_shelter"] == name], pets))
     (tmp / "help.html").write_text(help_page())
     (tmp / "remembered.html").write_text(remembered_page(gone))
     if out.exists():
         shutil.rmtree(out)
     tmp.rename(out)
     return {"out": str(out), "at_risk": len(pets), "remembered": len(gone),
-            "no_adopt_link": sum(not p["adopt"] for p in pets)}
+            "no_adopt_link": sum(not p["adopt"] for p in pets), "shelter_pages": len(SHELTERS)}
 
 
 if __name__ == "__main__":

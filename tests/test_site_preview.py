@@ -112,3 +112,28 @@ def test_share_text_is_escaped(site):
     out, _ = site
     page = (out / "animals/A1.html").read_text()
     assert "<b>" not in page.split("<script>")[-1]
+
+
+def test_shelter_page_lists_only_that_shelters_animals(site):
+    out, res = site
+    page = (out / "tx/dallas/index.html").read_text()
+    assert ">Rex<" in page and ">Pup<" in page
+    assert ">Else<" not in page                     # unregistered shelter's animal
+    assert ">Gone<" not in page and ">Limbo<" not in page
+    assert 'href="../../animals/A1.html"' in page   # links work from two folders down
+    assert 'src="../../img/' in page or "noimg" in page
+    assert res["shelter_pages"] >= 1
+
+
+def test_main_list_has_shelter_picker_and_keeps_everyone(site):
+    out, _ = site
+    idx = (out / "index.html").read_text()
+    assert 'value="tx/dallas/index.html"' in idx and 'optgroup label="Texas"' in idx
+    assert ">Else<" in idx                          # unregistered shelters still listed on the main page
+    assert "Dallas Animal Services" in idx          # shelter shown on each card
+
+
+def test_detail_links_to_its_shelter_page(site):
+    out, _ = site
+    assert 'href="../tx/dallas/index.html"' in (out / "animals/A1.html").read_text()
+    assert "tx/dallas" not in (out / "animals/B1.html").read_text()

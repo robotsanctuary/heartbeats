@@ -755,6 +755,9 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
     (tmp / "help.html").write_text(help_page())
     if SHOW_REMEMBERED:
         (tmp / "remembered.html").write_text(remembered_page(gone))
+    import importlib.util as _u  # dog animation test page (not linked from the site)
+    _spec = _u.spec_from_file_location("dog_lab", Path(__file__).resolve().parent / "dog_lab.py")
+    _lab = _u.module_from_spec(_spec); _spec.loader.exec_module(_lab); _lab.build(tmp)
     if out.exists():
         shutil.rmtree(out)
     tmp.rename(out)

@@ -19,12 +19,50 @@ CELL = 300          # px per square cell (native frames are ~150-185 px wide)
 ANCHOR = (110, 250)  # where the hind feet land inside each cell (x, y)
 
 
-def clean(im: Image.Image) -> Image.Image:
-    """Trim the 1px halo left by background removal (white/black fringes)."""
+def clean(im: Image.Image, max_depth: int = 14) -> Image.Image:
+    """Make the background fully transparent and strip the generator's white "sticker" border.
+    The border is removed by flooding inward from the transparent area through near-white pixels only,
+    at most max_depth px deep. The dog's dark outline stops the flood, so cream muzzle/paws inside it stay."""
     im = im.convert("RGBA")
-    a = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).filter(ImageFilter.MinFilter(3))
-    im.putalpha(a)
-    return im.crop(a.getbbox())
+    w, h = im.size
+    px = im.load()
+    whitish = lambda c: c[3] > 0 and min(c[:3]) > 180 and max(c[:3]) - min(c[:3]) < 45
+    frontier = [(x, y) for y in range(h) for x in range(w) if px[x, y][3] <= 40]
+    for x, y in frontier:
+        px[x, y] = (0, 0, 0, 0)
+    for _ in range(max_depth):
+        nxt = []
+        for x, y in frontier:
+            for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if 0 <= nx < w and 0 <= ny < h and whitish(px[nx, ny]):
+                    px[nx, ny] = (0, 0, 0, 0)
+                    nxt.append((nx, ny))
+        frontier = nxt
+        if not frontier:
+            break
+    # 2nd pass: enclosed pockets (between legs, under chin) the flood can't reach. Pure, colourless white
+    # patches bigger than an eye highlight are background; the puppy's cream fur is warm (blue well below red).
+    pure = lambda c: c[3] > 0 and min(c[:3]) > 215 and max(c[:3]) - min(c[:3]) < 22
+    seen = set()
+    for y0 in range(h):
+        for x0 in range(w):
+            if (x0, y0) in seen or not pure(px[x0, y0]):
+                continue
+            comp, stack = [], [(x0, y0)]
+            seen.add((x0, y0))
+            while stack:
+                x, y = stack.pop()
+                comp.append((x, y))
+                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                    if 0 <= nx < w and 0 <= ny < h and (nx, ny) not in seen and pure(px[nx, ny]):
+                        seen.add((nx, ny))
+                        stack.append((nx, ny))
+            if len(comp) >= 18:
+                for x, y in comp:
+                    px[x, y] = (0, 0, 0, 0)
+    a = im.getchannel("A").filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))  # drop lone specks
+    im.putalpha(Image.eval(a, lambda v: 255 if v > 40 else 0))
+    return im.crop(im.getchannel("A").getbbox())
 
 
 def hind_foot_x(im: Image.Image) -> float:

@@ -108,7 +108,7 @@ CSS = """
 --accent:oklch(52% 0.11 35);--soft:oklch(93% 0.03 50);--quiet:oklch(94% 0.008 75)}
 body{background:var(--paper);color:var(--ink);font:16px/1.55 "Source Sans 3",system-ui,sans-serif;-webkit-text-size-adjust:100%}
 .wrap{max-width:640px;margin:0 auto}
-nav{padding:14px 22px 0;border-bottom:1px solid var(--line)}
+nav{margin:0 22px;padding:14px 0 0;border-bottom:1px solid var(--line)}
 .brand{font:600 17px/1 "Fraunces",serif;color:var(--accent);text-decoration:none;display:flex;gap:7px;align-items:center}
 .brand svg{width:16px;height:16px}
 nav .links{display:flex;gap:20px;font-size:15px;margin-top:6px}
@@ -116,13 +116,13 @@ nav .links a{text-decoration:none;color:var(--muted);padding:10px 0 12px;white-s
 nav .links a.on{color:var(--ink);font-weight:600;border-color:var(--accent)}
 header{padding:30px 22px 18px}
 h1{font:400 36px/1.08 "Fraunces",serif;letter-spacing:-.01em;margin-bottom:12px}
-.lede{color:var(--muted);max-width:34ch}
+.lede{color:var(--muted);max-width:56ch}
 .stats{margin-top:16px;font-size:14px;color:var(--muted)}.stats b{color:var(--ink);font-weight:600}
 section{padding:4px 22px}
 h2{font:500 13px/1 "Source Sans 3";text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:24px 0 12px;border-top:1px solid var(--line)}
 h2.now{color:var(--accent)}
 .pet{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:12px 0 18px;text-decoration:none}
-.pet img,.pet .noimg{width:96px;height:96px;object-fit:cover;border-radius:50%;background:var(--soft)}
+.pet img,.pet .noimg{width:96px;height:96px;object-fit:cover;object-position:50% 25%;border-radius:50%;background:var(--soft)}
 .name{font:500 22px/1.15 "Fraunces",serif}
 .meta{font-size:14px;color:var(--muted);margin:2px 0 6px}
 .blurb{font-size:14.5px;line-height:1.45;color:oklch(35% 0.02 50)}
@@ -148,15 +148,26 @@ background:var(--accent);color:#fff;font-weight:600;font-size:16px;text-decorati
 .mem figcaption{margin-top:8px;font:500 19px/1.2 "Fraunces",serif}
 .mem small{display:block;font:13px/1.4 "Source Sans 3";color:var(--muted)}
 .empty{padding:22px;background:var(--quiet);border-radius:14px;color:var(--muted);margin:10px 0 24px}
-footer{padding:28px 22px 44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:24px}
+footer{margin:24px 22px 0;padding:28px 0 44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
 .draft{color:oklch(55% 0.12 300);font-size:.8em}
+.dwrap{padding-top:14px}
+@media (min-width:900px){
+.wrap.wide{max-width:1080px}
+h1{font-size:44px}
+.pets{display:grid;grid-template-columns:1fr 1fr;gap:0 44px}
+.mem{grid-template-columns:repeat(4,1fr);gap:28px 24px}
+.dwrap{display:grid;grid-template-columns:minmax(0,11fr) minmax(0,10fr);gap:44px;align-items:start;padding:32px 22px 0}
+.dwrap .hero{border-radius:20px;position:sticky;top:24px}
+.dwrap .detail{padding:0}
+.dwrap .actions{max-width:420px}
+}
 """
 
 HEART = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.7 4.5'
          'c2.1 0 3.6 1.1 4.3 2.4h2c.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>')
 
 
-def page(title, body, active, root=""):
+def page(title, body, active, root="", wide=False):
     links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help"),
              ("remembered.html", "Remembered", "mem")]
     nav = "".join(f'<a href="{root}{h}" class="{"on" if k == active else ""}">{t}</a>' for h, t, k in links)
@@ -165,7 +176,7 @@ def page(title, body, active, root=""):
 <title>{e(title)}</title><meta name="description" content="{e(TAGLINE)}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><div class="wrap">
+<style>{CSS}</style></head><body><div class="wrap{" wide" if wide else ""}">
 <nav><a class="brand" href="{root}index.html">{HEART}{e(SITE_NAME)}</a><div class="links">{nav}</div></nav>
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
@@ -219,14 +230,14 @@ def index_page(pets, saved, today):
             rows.append(f"""<a class="pet" href="animals/{e(p['id'])}.html">{photo(p, "")}
 <div><div class="name">{e(p['name'])}</div><div class="meta">{e(p['age'])} · {e(p['breed'])}</div>
 <p class="blurb">{e(text)}</p><span class="more">Meet {e(p['name'])} →</span></div></a>""")
-        secs.append(f'<section><h2 class="{"now" if k in ("past", "today") else ""}">{e(labels.get(k, k))}</h2>{"".join(rows)}</section>')
+        secs.append(f'<section><h2 class="{"now" if k in ("past", "today") else ""}">{e(labels.get(k, k))}</h2><div class="pets">{"".join(rows)}</div></section>')
     dated = sum(p["days"] is not None for p in pets)
     shelters = sorted({p["shelter"] for p in pets})
     body = f"""<header><h1>{e(TAGLINE)}</h1>
 <p class="lede">Dogs and cats at {e(", ".join(shelters))} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
 <p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p></header>
 {"".join(secs)}"""
-    return page(f"{SITE_NAME}: {TAGLINE}", body, "list")
+    return page(f"{SITE_NAME}: {TAGLINE}", body, "list", wide=True)
 
 
 def detail_page(p):
@@ -244,7 +255,7 @@ def detail_page(p):
         main = '<p class="small">No direct link to this shelter yet.</p>'
     mail = (f'<a class="btn soft" href="mailto:{e(p["contact"])}?subject={e(p["id"])}%20{e(p["name"])}">'
             f'Email the shelter about {e(p["name"])}</a>') if p["contact"] else ""
-    body = f"""{photo(p, "../", "hero")}
+    body = f"""<div class="dwrap">{photo(p, "../", "hero")}
 <div class="detail"><span class="when">{e(("Shelter date: " + when(p)) if p["days"] is not None and p["days"] >= 0 else when(p))}</span><h1>{e(p['name'])}</h1>
 <div class="actions">{main}</div>
 <p class="small">Opens {e(p['name'])}'s page on the shelter's own site. Mention ID {e(p['id'])} when you contact them.</p>
@@ -252,8 +263,8 @@ def detail_page(p):
 <div class="actions">{mail}</div>
 <p class="small" style="margin-top:14px">Can't take {e(p['name'])} home? Sharing this page helps too.</p>
 <div class="actions"><button class="btn soft" style="border:0;font:inherit;font-weight:600"
-onclick="navigator.share?navigator.share({{title:document.title,url:location.href}}):navigator.clipboard.writeText(location.href).then(()=>this.textContent='Link copied')">Share {e(p['name'])}'s page</button></div></div>"""
-    return page(f"{p['name']} · {SITE_NAME}", body, "list", root="../")
+onclick="navigator.share?navigator.share({{title:document.title,url:location.href}}):navigator.clipboard.writeText(location.href).then(()=>this.textContent='Link copied')">Share {e(p['name'])}'s page</button></div></div></div>"""
+    return page(f"{p['name']} · {SITE_NAME}", body, "list", root="../", wide=True)
 
 
 def help_page():
@@ -290,7 +301,7 @@ def remembered_page(gone):
     body = f"""<header><h1>Remembered</h1>
 <p class="lede">For the ones who ran out of time. They were here, they had names, and they mattered. <span class="draft">[draft]</span></p></header>
 <section>{grid}</section>"""
-    return page(f"Remembered · {SITE_NAME}", body, "mem")
+    return page(f"Remembered · {SITE_NAME}", body, "mem", wide=True)
 
 
 # ------------------------------------------------------------------ build

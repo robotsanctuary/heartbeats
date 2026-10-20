@@ -1,0 +1,321 @@
+"""
+design/build_site.py
+
+Static PREVIEW of the public site (direction A "Gentle", chosen
+2026-10-19), rendered from the real local DB. Not published anywhere:
+hosting is still undecided. Output lives with the data, not in git,
+because it contains animal photos.
+
+Pages:
+    index.html               at-risk list, grouped by deadline day, plus
+                             "needs a foster now" (no fixed date, e.g. neonates)
+    animals/<pet_id>.html    one animal: big photo, facts, full description,
+                             "Foster or adopt" -> that animal's page AT ITS SHELTER
+    help.html                about / how to help
+    remembered.html          memorial: only status EUTHANIZED, which only a
+                             human ever sets (see schema.sql)
+
+Usage:
+    ../heartbeats-venv/bin/python design/build_site.py
+    SITE_PREVIEW_DIR=/some/dir ../heartbeats-venv/bin/python design/build_site.py
+"""
+
+import html
+import os
+import shutil
+import sys
+from datetime import date, datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import db  # noqa: E402
+from shelters.registry import adopt_url, shelter_info  # noqa: E402
+
+SITE_NAME = "Fading Heartbeats"
+TAGLINE = "Every heartbeat deserves a home."
+DOMAIN = "fadingheartbeats.com"
+DEFAULT_TZ = ZoneInfo("America/Chicago")
+OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
+
+
+def e(s) -> str:
+    return html.escape("" if s is None else str(s))
+
+
+# ------------------------------------------------------------------ data
+
+def _age(a):
+    if not a:
+        return ""
+    a = a.lower()
+    for long, short in (("years", "yrs"), ("year", "yr"), ("months", "mo"), ("month", "mo"),
+                        ("weeks", "wks"), ("week", "wk")):
+        a = a.replace(long, short)
+    return a
+
+
+def _sex(s):
+    s = (s or "").lower()
+    return {"neutered": "Male, neutered", "spayed": "Female, spayed"}.get(s, s.capitalize())
+
+
+def to_view(r, today: date) -> dict:
+    info = shelter_info(r["shelter_name"]) or {}
+    tz = ZoneInfo(info.get("timezone", "America/Chicago"))
+    deadline = db.parse_ts(r["deadline_timestamp"]).astimezone(tz).date() if r["deadline_timestamp"] else None
+    gone = db.parse_ts(r["euthanized_at"]).astimezone(tz).date() if r.get("euthanized_at") else None
+    img = Path(r["local_image_path"]) if r["local_image_path"] else None
+    return {
+        "id": r["pet_id"],
+        "name": (r["name"] or "No name yet").title(),
+        "species": r["species"],
+        "breed": r["breed"] or "Mixed / unknown breed",
+        "age": _age(r["age"]),
+        "sex": _sex(r["sex"]),
+        "shelter": info.get("short_name", r["shelter_name"]),
+        "city": info.get("city", ""),
+        "contact": info.get("contact_email"),
+        "adopt": adopt_url(r["shelter_name"], r["pet_id"]),
+        "deadline": deadline,
+        "days": (deadline - today).days if deadline else None,
+        "gone": gone,
+        "img": img if img and img.exists() else None,
+        "desc": r["description"] or "",
+    }
+
+
+def load(today: date):
+    with db.session() as c:
+        at_risk = c.execute(
+            """SELECT * FROM pets WHERE status='AT_RISK'
+               ORDER BY deadline_timestamp IS NULL, deadline_timestamp, name, pet_id""").fetchall()
+        remembered = c.execute(
+            """SELECT * FROM pets WHERE status='EUTHANIZED'
+               ORDER BY euthanized_at DESC, pet_id""").fetchall()
+        saved = c.execute(
+            "SELECT count(*) n FROM pets WHERE status IN ('ADOPTED','SAFE','TRANSFERRED')").fetchone()["n"]
+    return ([to_view(r, today) for r in at_risk],
+            [to_view(r, today) for r in remembered],
+            saved)
+
+
+# ------------------------------------------------------------------ chrome
+
+CSS = """
+*{box-sizing:border-box;margin:0;padding:0}img{display:block;max-width:100%}a{color:inherit}
+:root{--paper:oklch(97.5% 0.012 75);--ink:oklch(25% 0.02 50);--muted:oklch(50% 0.02 55);--line:oklch(89% 0.015 70);
+--accent:oklch(52% 0.11 35);--soft:oklch(93% 0.03 50);--quiet:oklch(94% 0.008 75)}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 "Source Sans 3",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto}
+nav{padding:14px 22px 0;border-bottom:1px solid var(--line)}
+.brand{font:600 17px/1 "Fraunces",serif;color:var(--accent);text-decoration:none;display:flex;gap:7px;align-items:center}
+.brand svg{width:16px;height:16px}
+nav .links{display:flex;gap:20px;font-size:15px;margin-top:6px}
+nav .links a{text-decoration:none;color:var(--muted);padding:10px 0 12px;white-space:nowrap;border-bottom:2px solid transparent}
+nav .links a.on{color:var(--ink);font-weight:600;border-color:var(--accent)}
+header{padding:30px 22px 18px}
+h1{font:400 36px/1.08 "Fraunces",serif;letter-spacing:-.01em;margin-bottom:12px}
+.lede{color:var(--muted);max-width:34ch}
+.stats{margin-top:16px;font-size:14px;color:var(--muted)}.stats b{color:var(--ink);font-weight:600}
+section{padding:4px 22px}
+h2{font:500 13px/1 "Source Sans 3";text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:24px 0 12px;border-top:1px solid var(--line)}
+h2.now{color:var(--accent)}
+.pet{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:12px 0 18px;text-decoration:none}
+.pet img,.pet .noimg{width:96px;height:96px;object-fit:cover;border-radius:50%;background:var(--soft)}
+.name{font:500 22px/1.15 "Fraunces",serif}
+.meta{font-size:14px;color:var(--muted);margin:2px 0 6px}
+.blurb{font-size:14.5px;line-height:1.45;color:oklch(35% 0.02 50)}
+.more{display:inline-block;margin-top:8px;font-size:14px;font-weight:600;color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;border-radius:999px;
+background:var(--accent);color:#fff;font-weight:600;font-size:16px;text-decoration:none;width:100%}
+.btn.soft{background:var(--soft);color:var(--accent)}
+.hero{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--soft)}
+.detail{padding:20px 22px}
+.detail h1{margin:6px 0 4px}
+.when{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:18px 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:15px}
+.facts dt{color:var(--muted)}
+.story p{margin-bottom:12px}
+.actions{display:grid;gap:10px;margin:22px 0 8px}
+.small{font-size:13px;color:var(--muted)}
+.prose{padding:8px 22px 10px}.prose h2{margin-top:10px}
+.prose p,.prose li{margin-bottom:10px}.prose ol{padding-left:20px}
+.prose strong{font-weight:600}
+.mem{display:grid;grid-template-columns:repeat(2,1fr);gap:22px 16px;padding:8px 0 20px}
+.mem figure{text-align:center}
+.mem img,.mem .noimg{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:50%;filter:grayscale(.35) sepia(.15);background:var(--quiet)}
+.mem figcaption{margin-top:8px;font:500 19px/1.2 "Fraunces",serif}
+.mem small{display:block;font:13px/1.4 "Source Sans 3";color:var(--muted)}
+.empty{padding:22px;background:var(--quiet);border-radius:14px;color:var(--muted);margin:10px 0 24px}
+footer{padding:28px 22px 44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:24px}
+.draft{color:oklch(55% 0.12 300);font-size:.8em}
+"""
+
+HEART = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.7 4.5'
+         'c2.1 0 3.6 1.1 4.3 2.4h2c.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>')
+
+
+def page(title, body, active, root=""):
+    links = [("index.html", "Animals", "list"), ("help.html", "How to help", "help"),
+             ("remembered.html", "Remembered", "mem")]
+    nav = "".join(f'<a href="{root}{h}" class="{"on" if k == active else ""}">{t}</a>' for h, t, k in links)
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{e(title)}</title><meta name="description" content="{e(TAGLINE)}">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>{CSS}</style></head><body><div class="wrap">
+<nav><a class="brand" href="{root}index.html">{HEART}{e(SITE_NAME)}</a><div class="links">{nav}</div></nav>
+{body}
+<footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
+please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
+</div></body></html>"""
+
+
+def photo(p, root, cls=""):
+    if p["img"]:
+        return f'<img class="{cls}" src="{root}img/{e(p["img"].name)}" alt="Photo of {e(p["name"])}" loading="lazy">'
+    return f'<div class="noimg {cls}" role="img" aria-label="No photo yet"></div>'
+
+
+def when(p):
+    d = p["days"]
+    if d is None:
+        return "Needs a foster now"
+    if d < 0:
+        return f"Date passed ({p['deadline']:%b %-d}), still listed"
+    if d == 0:
+        return "Today"
+    if d == 1:
+        return "Tomorrow"
+    return f"By {p['deadline']:%A, %b %-d}"
+
+
+def blurb(text, n=150):
+    return text if len(text) <= n else text[:n].rsplit(" ", 1)[0].rstrip(",;:.!?") + "…"
+
+
+# ------------------------------------------------------------------ pages
+
+def index_page(pets, saved, today):
+    groups: dict = {}
+    for p in pets:
+        d = p["days"]
+        key = ("nodate" if d is None else "past" if d < 0 else "today" if d == 0
+               else "tomorrow" if d == 1 else f"{p['deadline']:%A, %b %-d}")
+        groups.setdefault(key, []).append(p)
+    order = ["past", "today", "tomorrow"]
+    keys = [k for k in order if k in groups] + [k for k in groups if k not in order + ["nodate"]]
+    keys += ["nodate"] if "nodate" in groups else []
+    labels = {"past": "Past their date, still listed", "today": "Today", "tomorrow": "Tomorrow",
+              "nodate": "Needs a foster now · no fixed date"}
+    secs = []
+    for k in keys:
+        rows = []
+        for p in groups[k]:
+            text = blurb(p["desc"]) if p["desc"] else (
+                "Too young to stay in the shelter. Needs a foster home." if k == "nodate" else "")
+            rows.append(f"""<a class="pet" href="animals/{e(p['id'])}.html">{photo(p, "")}
+<div><div class="name">{e(p['name'])}</div><div class="meta">{e(p['age'])} · {e(p['breed'])}</div>
+<p class="blurb">{e(text)}</p><span class="more">Meet {e(p['name'])} →</span></div></a>""")
+        secs.append(f'<section><h2 class="{"now" if k in ("past", "today") else ""}">{e(labels.get(k, k))}</h2>{"".join(rows)}</section>')
+    dated = sum(p["days"] is not None for p in pets)
+    shelters = sorted({p["shelter"] for p in pets})
+    body = f"""<header><h1>{e(TAGLINE)}</h1>
+<p class="lede">Dogs and cats at {e(", ".join(shelters))} who are out of time or close to it. Fostering even for two weeks saves a life.</p>
+<p class="stats"><b>{len(pets)}</b> need a way out · <b>{dated}</b> have a date · <b>{saved}</b> made it out recently</p></header>
+{"".join(secs)}"""
+    return page(f"{SITE_NAME}: {TAGLINE}", body, "list")
+
+
+def detail_page(p):
+    facts = [("Age", p["age"]), ("Sex", p["sex"]), ("Breed", p["breed"]),
+             ("Shelter", f"{p['shelter']}, {p['city']}" if p["city"] else p["shelter"]), ("Animal ID", p["id"])]
+    dl = "".join(f"<dt>{e(k)}</dt><dd>{e(v)}</dd>" for k, v in facts if v)
+    paras = [x.strip() for x in p["desc"].replace("\r", "").split("\n") if x.strip()] or [
+        f"The shelter hasn't written {p['name']}'s story yet. "
+        + ("Very young animals like this one can't stay in the shelter and need a foster home right away."
+           if p["days"] is None else "The best way to learn more is to ask the shelter directly.")]
+    story = "".join(f"<p>{e(x)}</p>" for x in paras)
+    if p["adopt"]:
+        main = f'<a class="btn" href="{e(p["adopt"])}" rel="noopener">Foster or adopt {e(p["name"])}</a>'
+    else:
+        main = '<p class="small">No direct link to this shelter yet.</p>'
+    mail = (f'<a class="btn soft" href="mailto:{e(p["contact"])}?subject={e(p["id"])}%20{e(p["name"])}">'
+            f'Email the shelter about {e(p["name"])}</a>') if p["contact"] else ""
+    body = f"""{photo(p, "../", "hero")}
+<div class="detail"><span class="when">{e(("Shelter date: " + when(p)) if p["days"] is not None and p["days"] >= 0 else when(p))}</span><h1>{e(p['name'])}</h1>
+<div class="actions">{main}</div>
+<p class="small">Opens {e(p['name'])}'s page on the shelter's own site. Mention ID {e(p['id'])} when you contact them.</p>
+<dl class="facts">{dl}</dl><div class="story">{story}</div>
+<div class="actions">{mail}</div>
+<p class="small" style="margin-top:14px">Can't take {e(p['name'])} home? Sharing this page helps too.</p>
+<div class="actions"><button class="btn soft" style="border:0;font:inherit;font-weight:600"
+onclick="navigator.share?navigator.share({{title:document.title,url:location.href}}):navigator.clipboard.writeText(location.href).then(()=>this.textContent='Link copied')">Share {e(p['name'])}'s page</button></div></div>"""
+    return page(f"{p['name']} · {SITE_NAME}", body, "list", root="../")
+
+
+def help_page():
+    body = """<header><h1>How you can help</h1>
+<p class="lede">You don't need a big house or a lot of money. Most of these take one afternoon. <span class="draft">[draft]</span></p></header>
+<div class="prose">
+<h2>Foster</h2>
+<p>Fostering means taking an animal home for a while, often two to four weeks. The shelter usually pays for food and vet care. It frees a kennel and is often the difference between a date and a future.</p>
+<h2>Adopt</h2>
+<p>If one of these animals is yours, tap <strong>Foster or adopt</strong> on their page. It opens that animal's page at the shelter that has them, with the shelter's own steps.</p>
+<h2>Pull as a rescue</h2>
+<p>Registered rescue groups can pull animals directly. Contact the shelter's rescue coordinator with the animal ID.</p>
+<h2>Share</h2>
+<p>Many animals are saved by someone who saw a post from a friend. Every animal has its own page you can share.</p>
+<h2>How this site works</h2>
+<ol><li>Several times a day we read the public at-risk lists that shelters publish.</li>
+<li>Animals with a scheduled date are shown first, soonest on top.</li>
+<li>When an animal leaves the list we keep checking, and we never assume the worst. An animal only appears under <em>Remembered</em> after a person has confirmed it.</li></ol>
+<p>We are volunteers, not a shelter, and we don't handle adoptions. The shelter always has the final, current answer.</p>
+<h2>Shelters we follow</h2>
+<p>Dallas Animal Services, Dallas, TX. More soon.</p>
+</div>"""
+    return page(f"How to help · {SITE_NAME}", body, "help")
+
+
+def remembered_page(gone):
+    if gone:
+        figs = "".join(f"""<figure>{photo(p, "")}<figcaption>{e(p['name'])}
+<small>{e(p['age'])} · {e(p['shelter'])}{f" · {p['gone']:%b %-d, %Y}" if p['gone'] else ""}</small></figcaption></figure>""" for p in gone)
+        grid = f'<div class="mem">{figs}</div>'
+    else:
+        grid = ('<div class="empty">No one is listed here yet. Names only appear after a person has confirmed '
+                'what happened. We never guess from an animal leaving a list.</div>')
+    body = f"""<header><h1>Remembered</h1>
+<p class="lede">For the ones who ran out of time. They were here, they had names, and they mattered. <span class="draft">[draft]</span></p></header>
+<section>{grid}</section>"""
+    return page(f"Remembered · {SITE_NAME}", body, "mem")
+
+
+# ------------------------------------------------------------------ build
+
+def build(out: Path = OUT, today: date = None):
+    today = today or datetime.now(DEFAULT_TZ).date()
+    pets, gone, saved = load(today)
+    tmp = out.with_name(out.name + ".building")
+    if tmp.exists():
+        shutil.rmtree(tmp)
+    (tmp / "animals").mkdir(parents=True)
+    (tmp / "img").mkdir()
+    for p in pets + gone:
+        if p["img"]:
+            shutil.copy2(p["img"], tmp / "img" / p["img"].name)
+        (tmp / "animals" / f"{p['id']}.html").write_text(detail_page(p))
+    (tmp / "index.html").write_text(index_page(pets, saved, today))
+    (tmp / "help.html").write_text(help_page())
+    (tmp / "remembered.html").write_text(remembered_page(gone))
+    if out.exists():
+        shutil.rmtree(out)
+    tmp.rename(out)
+    return {"out": str(out), "at_risk": len(pets), "remembered": len(gone),
+            "no_adopt_link": sum(not p["adopt"] for p in pets)}
+
+
+if __name__ == "__main__":
+    print(build())

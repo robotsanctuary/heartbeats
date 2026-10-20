@@ -11,6 +11,16 @@ pulling two live, validated data feeds directly from their shelter
 software. Everything downstream of that -- local review, the remote
 database, the public website -- is designed but not yet running.
 
+Public site: **Fading Heartbeats** (fadingheartbeats.com, domain bought;
+tagline "Every heartbeat deserves a home."). Hosting not chosen yet, so
+nothing is published. A local static preview is built from the real DB:
+
+    python design/build_site.py      # -> SITE_PREVIEW_DIR (default /Volumes/Extreme/heartbeats-data/site-preview)
+    design/shoot.sh index.html 1-list 1500   # phone-width JPG screenshots
+
+Pages: animal list (grouped by deadline day), animal detail, how to help,
+and Remembered (status EUTHANIZED only, which only a human sets).
+
 ## Setup
 
 Short version:
@@ -63,4 +73,7 @@ gateway is running.
 | `publish.py` | Pushes vetted data from local to remote |
 | `moderate.py` | Reviews public comments/submissions (remote) |
 | `run_scheduled.py` | Scheduled entry point: runs scrapers, logs each run, prints failure alerts / the daily summary |
+| `shelters/registry.py` | Per-shelter site facts: verified "Foster or adopt" link template, contact, timezone |
+| `design/build_site.py` | Local static preview of the public site (direction A "Gentle") |
+| `design/build_mockups.py` | The original three throwaway design directions |
 | `tests/` | Offline test suite (`python -m pytest`) |

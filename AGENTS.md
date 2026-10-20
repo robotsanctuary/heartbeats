@@ -30,12 +30,16 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    nobody is due today it shows the next day that has anyone, labelled e.g. "Out of time tomorrow").
    Crossfade + slow zoom every 4.5s, dots to jump, pauses on hover/touch, no auto-advance under
    reduced motion (`SPOT_JS`). Rebuilt with the site, so it changes daily.
-2. **Scrolling dog: v1 BUILT 2026-10-20 (owner reviewing).** One line-art dog in the logo's red
-   gradient (`DOG_SVG`/`DOG_JS`/dog CSS in build_site.py), on every page, fixed at the bottom. It walks
-   left/right with scroll position (0% scroll = left edge, 100% = right), faces its direction, and
-   after ~1.5s still does a random move: wag, wave (gives a paw), nap (zzz), look (heart). Tap = wiggle
-   + heart. Hidden under reduced motion and when printing. Phone 54px, laptop 80px. Ideas for later:
-   a second dog/cat, more moves, hide on phones if it gets in the way.
+2. **Site dog: sprite engine BUILT 2026-10-20 (owner testing, real art coming).** `dog_html()` + `DOG_JS`
+   in build_site.py draw frames from `design/brand/dog-sprite.png` (8 cols x 7 rows, square cells, same
+   rows as `design/sprite_template.py` ROWS: run, trot, skip, jump up, jump down, idle, rest). Placeholder
+   sheet: `python design/sprite_template.py --sheet`; template for the owner's image generator:
+   `python design/sprite_template.py`. The dog wanders by itself (run/trot+sniff/skip/sit/paw/look/nap),
+   jumps onto cards (`.pet,.sq,.facts,.empty` top edges), rides them while scrolling and hops down
+   (to a lower card or the floor) when its card reaches the top bar. Tap = happy hop + heart; scrolling
+   wakes it. Debug: `window.__dog.state()` / `__dog.jump()`. Off for reduced motion + print.
+   To drop in new art: replace dog-sprite.png keeping the grid, then tune `FOOT` (feet height in a cell)
+   and `CX` (body centre) in DOG_JS.
 3. Small polish: "More…" share button alone on its row; check nav edge on wide screens.
 4. Hosting: Cloudflare (same account as the owner's other sites). The domain stays
    at Porkbun and its nameservers point to Cloudflare. A static Worker goes to a

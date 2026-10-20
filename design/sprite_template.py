@@ -9,7 +9,7 @@ ST = 'stroke="#C4304F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin
 CELL, LABEL_W = 200, 170
 
 
-def dog(rl=0, rf=0, fl=0, ff=0, tilt=0, dy=0, head=0, tail=0, eyes=True, fold_rear=False, legs=True, paw=False):
+def dog(rl=0, rf=0, fl=0, ff=0, tilt=0, dy=0, head=0, tail=0, eyes=True, fold_rear=False, legs=True, paw=False, sheet=False, size=None):
     """rl/rf = near/far rear leg angle, fl/ff = near/far front leg angle (deg; negative = swings forward)."""
     def leg(x, a, far=False, fold=False):
         o = ' opacity=".45"' if far else ""
@@ -20,7 +20,9 @@ def dog(rl=0, rf=0, fl=0, ff=0, tilt=0, dy=0, head=0, tail=0, eyes=True, fold_re
                   if paw else lg(88, fl))
     eye = ('<circle cx="109" cy="26" r="2.3" fill="#1F1A17"/>' if eyes
            else '<path d="M106 27Q109 29.5 112 27" stroke="#1F1A17" stroke-width="2" stroke-linecap="round"/>')
-    return (f'<svg viewBox="-10 -14 152 112" width="{CELL - 16}" fill="none">'
+    vb, dims = ("-10 -46 152 152", f'width="{size}" height="{size}"') if sheet else ("-10 -14 152 112", f'width="{CELL - 16}"')
+    ground = "" if sheet else '<line x1="-10" y1="91" x2="142" y2="91" stroke="#bbb" stroke-dasharray="3 3"/>'
+    return (f'<svg viewBox="{vb}" {dims} fill="none">'
             f'<g transform="translate(0 {dy}) rotate({tilt} 66 62)">'
             f'<g transform="rotate({tail} 40 46)"><path d="M40 46C29 43 24 33 28 23" {ST}/></g>'
             + lg(58, rl + (0 if not fold_rear else -10), True, fold_rear) + lg(78, ff, True) +
@@ -32,7 +34,7 @@ def dog(rl=0, rf=0, fl=0, ff=0, tilt=0, dy=0, head=0, tail=0, eyes=True, fold_re
             f'<path d="M91 31C91 22 97 16 105 16C113 16 117 21 118 26L124 28C128 29 128 35 124 36L117 38C114 43 109 46 103 46C96 46 91 39 91 31Z" fill="#fff" {ST}/>'
             f'<circle cx="124.5" cy="31" r="2.8" fill="#C4304F"/>{eye}'
             f'<path d="M101 19C94 18 91 26 94 34C96 37 100 35 101 31Z" fill="#FDEBE4" {ST}/></g></g>'
-            '<line x1="-10" y1="91" x2="142" y2="91" stroke="#bbb" stroke-dasharray="3 3"/></svg>')
+            f'{ground}</svg>')
 
 
 G = dict  # frame spec shorthand
@@ -99,5 +101,33 @@ Grey hatched cells = not needed.</p>{"".join(rows)}</body></html>"""
     return p, w, 120 + len(ROWS) * (CELL - 40)
 
 
+SHEET_CELL = 160          # px per frame in the site's sprite sheet
+SHEET_FOOT = (89.5 + 46) / 152  # where the feet touch height as a fraction of the cell (feet sit here)
+BRAND = Path(__file__).resolve().parent / "brand"
+
+
+def build_sheet(cell=SHEET_CELL):
+    """Placeholder sprite sheet for the site: same grid as the template, no labels, transparent PNG."""
+    import subprocess
+    cols = max(len(f) for _, _, f in ROWS)
+    cells = []
+    for _, _, frames in ROWS:
+        for i in range(cols):
+            inner = dog(**frames[i], sheet=True, size=cell) if i < len(frames) else ""
+            cells.append(f'<div style="width:{cell}px;height:{cell}px">{inner}</div>')
+    w, h = cols * cell, len(ROWS) * cell
+    html = (f'<!doctype html><html style="background:transparent"><body style="margin:0;background:transparent;'
+            f'display:grid;grid-template-columns:repeat({cols},{cell}px)">{"".join(cells)}</body></html>')
+    OUT.mkdir(parents=True, exist_ok=True)
+    src = OUT / "_sheet.html"
+    src.write_text(html)
+    dst = BRAND / "dog-sprite.png"
+    subprocess.run(["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--headless=new", "--disable-gpu",
+                    "--hide-scrollbars", "--default-background-color=00000000", f"--window-size={w},{h}",
+                    f"--screenshot={dst}", f"file://{src}"], check=True, capture_output=True)
+    return dst, w, h
+
+
 if __name__ == "__main__":
-    print(build())
+    import sys
+    print(build_sheet() if "--sheet" in sys.argv else build())

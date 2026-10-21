@@ -93,6 +93,29 @@ items.forEach(it=>{it.acc=0;adv(it)})};
 document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".box").forEach(x=>{x.style.setProperty("--bg",b.dataset.bg);const dk=b.dataset.bg==="#2a2020";x.style.setProperty("--fg",dk?"#fff":"#1F1A17");x.style.setProperty("--fg2",dk?"#d8cfc9":"#6B625C")});
 document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x===b))});
 document.querySelectorAll(".box").forEach(x=>x.style.setProperty("--bg","#FBF7F3"));
+/* ---- interactive pitbull: walks; hover/tap the dog -> sits, gives paw, holds (tail wag + blink); leave -> stands, walks on ---- */
+(()=>{const WALK=[...Array(12).keys()].map(i=>47+i),SIT=[69,70,71,72,73,74],PAW=[75,76,77,78,79,80,81,82,83],HOLD=[84,85,86,87,88,89];
+const b=document.createElement("div");b.className="box";
+b.innerHTML=`<h3>PITBULL: hover or tap the dog</h3><small>walks → (hover/tap) sits → paw up → holds while you stay → stands and walks on</small><div class="stage"><div class="ground"></div><div class="dog" style="cursor:pointer"></div></div><div class="info"></div>`;
+boxes.prepend(b);b.style.setProperty("--bg",getComputedStyle(document.querySelector(".box:not(:first-child)")||b).getPropertyValue("--bg")||"#FBF7F3");
+const st=b.querySelector(".stage"),dog=b.querySelector(".dog"),info=b.querySelector(".info");
+let mode="walk",i=0,acc=0,x=.1,held=false,tapUntil=0,last=performance.now();
+const seq={walk:[WALK,10],sit:[SIT,9],paw:[PAW,9],hold:[HOLD,5],stand:[SIT.slice().reverse(),12]};
+const go=m=>{mode=m;i=0;acc=0};
+const want=()=>held||performance.now()<tapUntil;
+dog.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse"){held=true;if(mode==="walk"||mode==="stand")go("sit")}});
+dog.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")held=false});
+dog.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"){tapUntil=performance.now()+4000;if(mode==="walk"||mode==="stand")go("sit")}});
+(function tick(t){const dt=Math.min(.05,(t-last)/1000)*speed;last=t;const[fr,fps]=seq[mode];
+if(!stepping){acc+=dt*fps;while(acc>=1){acc--;i++;
+ if(i>=fr.length){if(mode==="walk"||mode==="hold")i=0;
+  else if(mode==="sit")go("paw");else if(mode==="paw")go("hold");else if(mode==="stand")go("walk")}}}
+if(mode==="hold"&&!want())go("stand");
+if(mode==="walk"&&!stepping){x+=dt*.12;if(x>1.1)x=-.1}
+const W=st.clientWidth,cell=seq[mode][0][Math.min(i,seq[mode][0].length-1)];
+dog.style.backgroundPosition=-cell*150+"px 0";dog.style.transform=`translate(${(x*W-AX).toFixed(1)}px,0)`;
+info.textContent=`${mode} · frame ${i+1}/${seq[mode][0].length} · art cell ${cell+1}`;requestAnimationFrame(tick)})(last)})();
+
 </script></body></html>"""
 
 

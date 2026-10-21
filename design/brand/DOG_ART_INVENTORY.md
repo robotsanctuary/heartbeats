@@ -22,3 +22,10 @@ Prompts for the gaps are in the chat of 2026-10-21; base image = F1 (standing, J
 Packed with `dog_art.build_travel(..., scale=149/399, top_y=331, floor_y=633, on_top=10, on_floor=19)` -> `dog-pitbulljumpdown.png/.json`
 (dx/up/hind per frame; the lab replays the motion). Timing from `orig/dog_jumpdown.css` (5.168s).
 Vision notes: ears look pointier in 11-16 (dive); frame 21 turns toward the viewer (3/4 view) — may "pop" when joining the walk.
+
+## Pitbull lie-down (owner zip, 2026-10-21) — cells 132-158 (L1-27) + 159-164 (idle I1-6)
+880x361 canvas with travel, ground y=345. L1-11 walk in, L12-16 slow/stop, L17-21 front lowers (bow), L22-23 rear lowers
+(eyes squint), L24-27 lying sphinx pose, head up, panting. Idle = lying pant loop (eyes open, 0.5s/6 frames).
+Packed with `dog_art.build_travel(..., scale=149/399, top_y=0, floor_y=345, on_top=0, on_floor=1)` (all floor frames).
+Vision notes: L23->L24 pops (tail upright->flat, eyes closed->open, head a bit bigger). No sleep (eyes closed / head
+on paws) and no get-up frames yet.

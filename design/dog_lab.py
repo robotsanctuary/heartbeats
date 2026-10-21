@@ -12,7 +12,7 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept), 111-131 pitbull jump-down (travel set, dx/up/hind in dog-pitbulljumpdown.json).
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept), 111-131 pitbull jump-down (travel set, dx/up/hind in dog-pitbulljumpdown.json), 132-158 pitbull lie-down L1-27, 159-164 lying idle I1-6 (travel set).
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
@@ -21,6 +21,7 @@ LEDGE_H = 80
 ANIMS = {
     "PITBULL jump, travelling (sit back, rear up, leap, front paws land)": {"mode": "path", "fps": 12, "keys": [[90, 0.12, 0], [90, 0.12, 0], [90, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [93, 0.12, 0], [93, 0.12, 0], [94, 0.12, 0], [95, 0.12, 0], [96, 0.12, 0], [97, 0.12, 0], [98, 0.12, 0], [99, 0.148, 0], [99, 0.176, 0], [100, 0.203, 0], [100, 0.231, 0], [101, 0.259, 0], [101, 0.287, 0], [101, 0.314, 0], [102, 0.342, 0], [102, 0.37, 0], [102, 0.398, 0], [103, 0.426, 0], [103, 0.453, 0], [103, 0.481, 0], [104, 0.509, 0], [104, 0.537, 0], [105, 0.564, 0], [106, 0.592, 0], [107, 0.62, 0], [108, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0]]},
     "PITBULL jump in place (your timing)": {"mode": "still", "frames": [90, 90, 90, 91, 91, 91, 91, 91, 91, 91, 91, 91, 92, 92, 92, 92, 92, 92, 93, 93, 94, 95, 96, 97, 98, 99, 99, 100, 100, 101, 101, 101, 102, 102, 102, 103, 103, 103, 104, 104, 105, 106, 107, 108, 109, 109, 109, 109, 109, 109, 110, 110, 110, 110, 110, 110], "fps": 12},
+    "PITBULL NEW lie-down frames 1-27 + idle 1-6 (in place, slow)": {"mode": "still", "frames": list(range(132, 165)), "fps": 2},
     "PITBULL NEW jump-down frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(111, 132)), "fps": 2},
     "PITBULL jump frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(90, 111)), "fps": 2},
     "PITBULL sit down (frames 1-6, then holds)": {"mode": "still", "frames": [69, 70, 71, 72, 73, 74, 74, 74, 74, 74], "fps": 5},
@@ -97,6 +98,21 @@ items.forEach(it=>{it.acc=0;adv(it)})};
 document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".box").forEach(x=>{x.style.setProperty("--bg",b.dataset.bg);const dk=b.dataset.bg==="#2a2020";x.style.setProperty("--fg",dk?"#fff":"#1F1A17");x.style.setProperty("--fg2",dk?"#d8cfc9":"#6B625C")});
 document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x===b))});
 document.querySelectorAll(".box").forEach(x=>x.style.setProperty("--bg","#FBF7F3"));
+/* ---- pitbull lie-down (27 frames, owner's timing) then idle loop (6 frames, 0.5s) ---- */
+(()=>{const LD=__LDN__,S=150,k=S/300,IDLE_T=4,tot=LD.t.reduce((a,b)=>a+b,0)+IDLE_T;
+const b=document.createElement("div");b.className="box";
+b.innerHTML=`<h3>PITBULL: NEW lie down (your 27 frames, your timing) → resting loop</h3><small>walks in, stops, bows, lies down, pants for ${IDLE_T}s, then repeats (no get-up frames yet)</small><div class="stage"><div class="ground"></div><div class="dog"></div></div><div class="info"></div>`;
+boxes.prepend(b);b.style.setProperty("--bg","#FBF7F3");
+const st=b.querySelector(".stage"),dog=b.querySelector(".dog"),info=b.querySelector(".info");
+let t=0,si=0,last=performance.now();
+document.getElementById("step").addEventListener("click",()=>{si=(si+1)%33});
+(function tick(n){const dt=Math.min(.05,(n-last)/1000)*speed;last=n;if(!stepping)t=(t+dt)%tot;
+ const W=st.clientWidth,x0=W*.5-LD.dx[26]*k/2-S/2;let i,u=t,lab;
+ if(stepping)i=si;else{i=-1;for(let j=0;j<27;j++){if(u<LD.t[j]){i=j;break}u-=LD.t[j]}
+  if(i<0)i=27+Math.floor(u/(0.5/6))%6}
+ lab=i<27?`lie down · frame ${i+1}/27`:`resting loop · frame ${i-26}/6`;
+ dog.style.backgroundPosition=-(LD.start+i)*S+"px 0";dog.style.transform=`translate(${(x0+LD.dx[i]*k).toFixed(1)}px,0)`;
+ info.textContent=lab+` · art cell ${LD.start+i+1}`;requestAnimationFrame(tick)})(last)})();
 /* ---- pitbull NEW jump-down set (21 frames, owner's timing): walks to the edge, crouches, dives, front paws land ---- */
 (()=>{const JDN=__JDN__,S=150,k=S/300,H=Math.round(302*149/399),tot=sum0(JDN.t)+1.2;
 function sum0(a){return a.reduce((x,y)=>x+y,0)}
@@ -180,7 +196,11 @@ def build(out: Path = OUT):
     pct = [float(x) for x in re.findall(r"([\d.]+)% \{ background-position", css)]
     jdn = {"start": starts["pitbulljumpdown"], "dx": jd["dx"], "up": jd["up"], "hind": jd["hind"], "edge": round((439 - 202) * 149 / 399 + 150 - jd["hind"][0], 1),
            "t": [round((b - a) / 100 * 5.168, 3) for a, b in zip(pct, pct[1:])] + [0.4]}
-    page.write_text(PAGE.replace("__JDN__", json.dumps(jdn)).replace("__ANIMS__", json.dumps(ANIMS)).replace("__BGW__", str(cells * 150)))
+    ld = json.loads((BRAND / "dog-pitbullliedown.json").read_text())
+    css = (BRAND / "dog-src-pitbull-liedown/orig/dog_liedown.css").read_text().split("Multi-row")[0]
+    pct = [float(x) for x in re.findall(r"([\d.]+)% \{ background-position", css)]
+    ldn = {"start": 132, "dx": ld["dx"], "t": [round((b - a) / 100 * 4.631, 3) for a, b in zip(pct, pct[1:])] + [0.25]}
+    page.write_text(PAGE.replace("__LDN__", json.dumps(ldn)).replace("__JDN__", json.dumps(jdn)).replace("__ANIMS__", json.dumps(ANIMS)).replace("__BGW__", str(cells * 150)))
     return page
 
 

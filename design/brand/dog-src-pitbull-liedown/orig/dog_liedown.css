@@ -1,0 +1,68 @@
+/* Pitbull lie-down: 27 frames, 4.631s, plays once and holds the last frame. Frame 880x361, ground line 345px from top (15px below). */
+.dog-liedown { width:880px; height:361px; background:url(dog_liedown_sheet.png) 0 0 no-repeat; animation: dogliedown 4.631s step-end 1 forwards; }
+@keyframes dogliedown {
+  0.00% { background-position: -0px -0px; }
+  3.61% { background-position: -880px -0px; }
+  7.21% { background-position: -1760px -0px; }
+  10.82% { background-position: -2640px -0px; }
+  14.42% { background-position: -3520px -0px; }
+  18.03% { background-position: -4400px -0px; }
+  21.64% { background-position: -5280px -0px; }
+  25.24% { background-position: -6160px -0px; }
+  28.85% { background-position: -7040px -0px; }
+  32.46% { background-position: -7920px -0px; }
+  36.06% { background-position: -8800px -0px; }
+  39.67% { background-position: -9680px -0px; }
+  43.27% { background-position: -10560px -0px; }
+  46.88% { background-position: -11440px -0px; }
+  54.07% { background-position: -12320px -0px; }
+  61.26% { background-position: -13200px -0px; }
+  64.87% { background-position: -14080px -0px; }
+  68.47% { background-position: -14960px -0px; }
+  72.08% { background-position: -15840px -0px; }
+  75.69% { background-position: -16720px -0px; }
+  79.29% { background-position: -17600px -0px; }
+  82.90% { background-position: -18480px -0px; }
+  86.50% { background-position: -19360px -0px; }
+  89.20% { background-position: -20240px -0px; }
+  91.90% { background-position: -21120px -0px; }
+  94.60% { background-position: -22000px -0px; }
+  100.00% { background-position: -22880px -0px; }
+}
+
+/* Multi-row sheet (14 per row x 2 rows) */
+.dog-liedown-rows { width:880px; height:361px; background:url(dog_liedown_sheet_rows.png) 0 0 no-repeat; animation: dogliedownrows 4.631s step-end 1 forwards; }
+@keyframes dogliedownrows {
+  0.00% { background-position: -0px -0px; }
+  3.61% { background-position: -880px -0px; }
+  7.21% { background-position: -1760px -0px; }
+  10.82% { background-position: -2640px -0px; }
+  14.42% { background-position: -3520px -0px; }
+  18.03% { background-position: -4400px -0px; }
+  21.64% { background-position: -5280px -0px; }
+  25.24% { background-position: -6160px -0px; }
+  28.85% { background-position: -7040px -0px; }
+  32.46% { background-position: -7920px -0px; }
+  36.06% { background-position: -8800px -0px; }
+  39.67% { background-position: -9680px -0px; }
+  43.27% { background-position: -10560px -0px; }
+  46.88% { background-position: -11440px -0px; }
+  54.07% { background-position: -0px -361px; }
+  61.26% { background-position: -880px -361px; }
+  64.87% { background-position: -1760px -361px; }
+  68.47% { background-position: -2640px -361px; }
+  72.08% { background-position: -3520px -361px; }
+  75.69% { background-position: -4400px -361px; }
+  79.29% { background-position: -5280px -361px; }
+  82.90% { background-position: -6160px -361px; }
+  86.50% { background-position: -7040px -361px; }
+  89.20% { background-position: -7920px -361px; }
+  91.90% { background-position: -8800px -361px; }
+  94.60% { background-position: -9680px -361px; }
+  100.00% { background-position: -10560px -361px; }
+}
+
+/* Idle loop while lying (pant + tail thump), 6 frames, 0.5s */
+.dog-liedown-idle { width:880px; height:361px; background:url(dog_liedown_idle_sheet.png) 0 0 no-repeat; animation: dogliedownidle 0.5s steps(6) infinite; }
+@keyframes dogliedownidle { to { background-position: -5280px 0; } }
+/* Chain: .dog-liedown then swap to .dog-liedown-idle on animationend. */

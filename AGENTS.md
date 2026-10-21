@@ -40,6 +40,7 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    `python design/dog_art.py --combine jump run` -> `dog-all.png` (cells 0-11 jump, 12-17 run; build
    copies it to `dog.png`). Landing art (owner, 3 frames on one white JPG) in `dog-src-land/`: background + white border flooded out, cut into 3, scaled 0.6, packed as `landart` (anchored on FRONT paws), used as land cells 3-5. Run/skip play run frames over a bounding hop (`STRIDE`). Weakness: the run
    frames are all stretched-leap poses (no gathered-legs frame), so it reads as bounding, not galloping.
+   WALK is code-rigged (`design/dog_rig.py`): legs of standing frame walk-8 cut below y86 and swung one at a time (lateral 4-beat), fixed body, 2px bob; writes dog-walk.png directly, then `dog_art.py --combine jump run land walk frolic`.
    Trot/nap/sit still use jump frames as stand-ins (owner is doing animations one at a time). Old stick-dog sheet: `design/sprite_template.py` (template only).
 3. Small polish: "More…" share button alone on its row; check nav edge on wide screens.
 4. Hosting: Cloudflare (same account as the owner's other sites). The domain stays

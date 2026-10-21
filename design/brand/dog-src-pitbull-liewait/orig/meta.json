@@ -1,0 +1,268 @@
+{
+ "video": "liewait_v1.mp4",
+ "sequence": [
+  {
+   "frame": 1,
+   "video_frame": 1,
+   "eyes_open_composite": false,
+   "ms": 250,
+   "note": "start = liedown f27 pose"
+  },
+  {
+   "frame": 2,
+   "video_frame": 20,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 3,
+   "video_frame": 22,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 4,
+   "video_frame": 24,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 5,
+   "video_frame": 26,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 6,
+   "video_frame": 28,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 7,
+   "video_frame": 30,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 8,
+   "video_frame": 32,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 9,
+   "video_frame": 34,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 10,
+   "video_frame": 36,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 11,
+   "video_frame": 38,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 12,
+   "video_frame": 40,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 13,
+   "video_frame": 42,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 14,
+   "video_frame": 44,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "head lowers"
+  },
+  {
+   "frame": 15,
+   "video_frame": 46,
+   "eyes_open_composite": false,
+   "ms": 125,
+   "note": "settle"
+  },
+  {
+   "frame": 16,
+   "video_frame": 50,
+   "eyes_open_composite": false,
+   "ms": 1300,
+   "note": "HOLD (waiting)"
+  },
+  {
+   "frame": 17,
+   "video_frame": 60,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "blink"
+  },
+  {
+   "frame": 18,
+   "video_frame": 62,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "blink"
+  },
+  {
+   "frame": 19,
+   "video_frame": 64,
+   "eyes_open_composite": false,
+   "ms": 125,
+   "note": "blink"
+  },
+  {
+   "frame": 20,
+   "video_frame": 62,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "blink"
+  },
+  {
+   "frame": 21,
+   "video_frame": 60,
+   "eyes_open_composite": false,
+   "ms": 83,
+   "note": "blink"
+  },
+  {
+   "frame": 22,
+   "video_frame": 58,
+   "eyes_open_composite": false,
+   "ms": 1000,
+   "note": "HOLD (waiting)"
+  },
+  {
+   "frame": 23,
+   "video_frame": 84,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 24,
+   "video_frame": 86,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 25,
+   "video_frame": 88,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 26,
+   "video_frame": 90,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 27,
+   "video_frame": 92,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 28,
+   "video_frame": 94,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 29,
+   "video_frame": 96,
+   "eyes_open_composite": true,
+   "ms": 83,
+   "note": "tail starts wagging"
+  },
+  {
+   "frame": 30,
+   "video_frame": 98,
+   "eyes_open_composite": true,
+   "ms": null,
+   "note": "end -> hand off to wag loop"
+  }
+ ],
+ "total_ms": 4792,
+ "wag_loop_frames": [
+  100,
+  102,
+  104,
+  106,
+  108,
+  110,
+  112,
+  114,
+  116,
+  118,
+  120,
+  122,
+  124
+ ],
+ "wag_ms_per_frame": 83,
+ "wag_loop_eyes_open_composite": true,
+ "eye_source_video_frame": 58,
+ "blink_loop": [
+  {
+   "video_frame": 58,
+   "ms": 2500
+  },
+  {
+   "video_frame": 62,
+   "ms": 83
+  },
+  {
+   "video_frame": 64,
+   "ms": 125
+  },
+  {
+   "video_frame": 62,
+   "ms": 83
+  }
+ ],
+ "size": [
+  880,
+  361
+ ],
+ "ground_y": 345,
+ "rows": 3,
+ "per_row": 10,
+ "scale_correction": 1.0,
+ "crop_in_video": [
+  40,
+  256,
+  920,
+  617
+ ],
+ "chains_from": "/workspace/dog-liedown/out/frames/frame_27.png",
+ "seam_outline_diff_vs_f27": 0.0131
+}

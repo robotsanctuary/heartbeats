@@ -41,3 +41,9 @@ Vision notes: B21->B22 belly colour/pose pop; leg tangles in some on-back frames
 Seamless 12-frame loop, 0.5s (41.7 ms/frame), same 880x361 canvas as lie-down; G1 matches lie-down L27.
 Packed with `dog_art.build_travel(..., scale=149/399, top_y=0, floor_y=345, on_top=0, on_floor=1)`.
 Lab: lie down -> tail wag 2.5s -> panting loop.
+
+## Pitbull lie-wait (owner zip, 2026-10-21) — cells 227-256 (F1-30) + 257-269 (head-down wag 1-13) + 270-273 (wait blink 1-4)
+Same 880x361 canvas as lie-down; F1 = lie-down L27. F1-15 mouth closes + head lowers to chin-on-paws, F16 hold, F17-21 blink,
+F22 hold, F23-30 tail starts wagging -> head-down wag loop (83 ms/frame) or waiting blink loop (2.5s still + blink).
+Per-frame timing in orig/meta.json `sequence[].ms`. Eyes open in the hold (it waits, not asleep).
+Packed with `dog_art.build_travel(..., scale=149/399, top_y=0, floor_y=345, on_top=0, on_floor=1)`.

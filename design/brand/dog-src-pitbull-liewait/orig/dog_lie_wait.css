@@ -1,0 +1,107 @@
+/* Pitbull lie-down -> chin-on-paws WAIT. Canvas 880x361 (same as dog_liedown.css / dog_lie_wag.css), ground line 345px from top (15px above bottom).
+   Chain on the website:  .dog-liedown  --animationend-->  .dog-lie-wait  --animationend-->  .dog-lie-wait-wag (infinite)
+     const el=document.querySelector('.dog'); el.className='dog dog-liedown';
+     el.addEventListener('animationend', function step(){ if(el.classList.contains('dog-liedown')) el.className='dog dog-lie-wait';
+        else { el.className='dog dog-lie-wait-wag'; el.removeEventListener('animationend',step); } });
+   Frame 1 of .dog-lie-wait is the liedown frame_27 pose (outline difference 1.3%). Its last frame hands off to frame 1 of the wag loop with no jump.
+   Optional: .dog-lie-wait-blink is a head-down waiting idle (long still + blink), use it instead of the wag loop if you want the dog to keep waiting. */
+.dog-lie-wait { width:880px; height:361px; background:url(dog_lie_wait_sheet.png) 0 0 no-repeat; animation: doglieWait 4.792s step-end 1 forwards; }
+@keyframes doglieWait {
+  0.00% { background-position: -0px -0px; }
+  5.22% { background-position: -880px -0px; }
+  6.95% { background-position: -1760px -0px; }
+  8.68% { background-position: -2640px -0px; }
+  10.41% { background-position: -3520px -0px; }
+  12.15% { background-position: -4400px -0px; }
+  13.88% { background-position: -5280px -0px; }
+  15.61% { background-position: -6160px -0px; }
+  17.34% { background-position: -7040px -0px; }
+  19.07% { background-position: -7920px -0px; }
+  20.81% { background-position: -8800px -0px; }
+  22.54% { background-position: -9680px -0px; }
+  24.27% { background-position: -10560px -0px; }
+  26.00% { background-position: -11440px -0px; }
+  27.73% { background-position: -12320px -0px; }
+  30.34% { background-position: -13200px -0px; }
+  57.47% { background-position: -14080px -0px; }
+  59.20% { background-position: -14960px -0px; }
+  60.93% { background-position: -15840px -0px; }
+  63.54% { background-position: -16720px -0px; }
+  65.28% { background-position: -17600px -0px; }
+  67.01% { background-position: -18480px -0px; }
+  87.88% { background-position: -19360px -0px; }
+  89.61% { background-position: -20240px -0px; }
+  91.34% { background-position: -21120px -0px; }
+  93.07% { background-position: -22000px -0px; }
+  94.80% { background-position: -22880px -0px; }
+  96.54% { background-position: -23760px -0px; }
+  98.27% { background-position: -24640px -0px; }
+  100.00% { background-position: -25520px -0px; }
+}
+
+/* Multi-row sheet (10 per row x 3 rows) */
+.dog-lie-wait-rows { width:880px; height:361px; background:url(dog_lie_wait_sheet_rows.png) 0 0 no-repeat; animation: doglieWaitRows 4.792s step-end 1 forwards; }
+@keyframes doglieWaitRows {
+  0.00% { background-position: -0px -0px; }
+  5.22% { background-position: -880px -0px; }
+  6.95% { background-position: -1760px -0px; }
+  8.68% { background-position: -2640px -0px; }
+  10.41% { background-position: -3520px -0px; }
+  12.15% { background-position: -4400px -0px; }
+  13.88% { background-position: -5280px -0px; }
+  15.61% { background-position: -6160px -0px; }
+  17.34% { background-position: -7040px -0px; }
+  19.07% { background-position: -7920px -0px; }
+  20.81% { background-position: -0px -361px; }
+  22.54% { background-position: -880px -361px; }
+  24.27% { background-position: -1760px -361px; }
+  26.00% { background-position: -2640px -361px; }
+  27.73% { background-position: -3520px -361px; }
+  30.34% { background-position: -4400px -361px; }
+  57.47% { background-position: -5280px -361px; }
+  59.20% { background-position: -6160px -361px; }
+  60.93% { background-position: -7040px -361px; }
+  63.54% { background-position: -7920px -361px; }
+  65.28% { background-position: -0px -722px; }
+  67.01% { background-position: -880px -722px; }
+  87.88% { background-position: -1760px -722px; }
+  89.61% { background-position: -2640px -722px; }
+  91.34% { background-position: -3520px -722px; }
+  93.07% { background-position: -4400px -722px; }
+  94.80% { background-position: -5280px -722px; }
+  96.54% { background-position: -6160px -722px; }
+  98.27% { background-position: -7040px -722px; }
+  100.00% { background-position: -7920px -722px; }
+}
+
+/* Head-down tail-wag LOOP: 13 frames, 1.079s, seamless. */
+.dog-lie-wait-wag { width:880px; height:361px; background:url(dog_lie_wait_wag_sheet.png) 0 0 no-repeat; animation: doglieWaitWag 1.079s steps(13) infinite; }
+@keyframes doglieWaitWag { to { background-position: -11440px 0; } }
+/* Wag loop, 2-row sheet (7 per row) */
+.dog-lie-wait-wag-rows { width:880px; height:361px; background:url(dog_lie_wait_wag_sheet_rows.png) 0 0 no-repeat; animation: doglieWaitWagRows 1.079s step-end infinite; }
+@keyframes doglieWaitWagRows {
+  0.00% { background-position: -0px -0px; }
+  7.69% { background-position: -880px -0px; }
+  15.38% { background-position: -1760px -0px; }
+  23.08% { background-position: -2640px -0px; }
+  30.77% { background-position: -3520px -0px; }
+  38.46% { background-position: -4400px -0px; }
+  46.15% { background-position: -5280px -0px; }
+  53.85% { background-position: -0px -361px; }
+  61.54% { background-position: -880px -361px; }
+  69.23% { background-position: -1760px -361px; }
+  76.92% { background-position: -2640px -361px; }
+  84.62% { background-position: -3520px -361px; }
+  92.31% { background-position: -4400px -361px; }
+  100% { background-position: 0 0; }
+}
+
+/* Head-down waiting idle: still with a blink every ~2.8s (4 frames, variable timing). */
+.dog-lie-wait-blink { width:880px; height:361px; background:url(dog_lie_wait_blink_sheet.png) 0 0 no-repeat; animation: doglieWaitBlinkV 2.791s step-end infinite; }
+@keyframes doglieWaitBlinkV {
+  0.00% { background-position: -0px 0; }
+  89.57% { background-position: -880px 0; }
+  92.55% { background-position: -1760px 0; }
+  97.03% { background-position: -2640px 0; }
+  100% { background-position: 0 0; }
+}

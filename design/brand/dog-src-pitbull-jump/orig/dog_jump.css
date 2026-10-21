@@ -1,0 +1,53 @@
+/* Pitbull jump: 21 frames, plays once (4.247s) and holds the last frame. step-end = each keyframe holds until the next. */
+.dog-jump { width:790px; height:580px; background:url(dog_jump_sheet.png) 0 0 no-repeat;
+  animation: dogjump 4.247s step-end 1 forwards; }
+@keyframes dogjump {
+  0.0% { background-position: -0px 0; }
+  5.9% { background-position: -790px 0; }
+  23.5% { background-position: -1580px 0; }
+  35.3% { background-position: -2370px 0; }
+  40.2% { background-position: -3160px 0; }
+  42.2% { background-position: -3950px 0; }
+  44.1% { background-position: -4740px 0; }
+  46.1% { background-position: -5530px 0; }
+  48.0% { background-position: -6320px 0; }
+  50.0% { background-position: -7110px 0; }
+  53.9% { background-position: -7900px 0; }
+  58.8% { background-position: -8690px 0; }
+  64.7% { background-position: -9480px 0; }
+  70.6% { background-position: -10270px 0; }
+  76.5% { background-position: -11060px 0; }
+  80.4% { background-position: -11850px 0; }
+  82.4% { background-position: -12640px 0; }
+  84.3% { background-position: -13430px 0; }
+  86.3% { background-position: -14220px 0; }
+  88.2% { background-position: -15010px 0; }
+  100.0% { background-position: -15800px 0; }
+}
+
+/* In-place version (travel removed, vertical arc kept): */
+.dog-jump-inplace { width:542px; height:580px; background:url(dog_jump_inplace_sheet.png) 0 0 no-repeat;
+  animation: dogjumpinplace 4.247s step-end 1 forwards; }
+@keyframes dogjumpinplace {
+  0.0% { background-position: -0px 0; }
+  5.9% { background-position: -542px 0; }
+  23.5% { background-position: -1084px 0; }
+  35.3% { background-position: -1626px 0; }
+  40.2% { background-position: -2168px 0; }
+  42.2% { background-position: -2710px 0; }
+  44.1% { background-position: -3252px 0; }
+  46.1% { background-position: -3794px 0; }
+  48.0% { background-position: -4336px 0; }
+  50.0% { background-position: -4878px 0; }
+  53.9% { background-position: -5420px 0; }
+  58.8% { background-position: -5962px 0; }
+  64.7% { background-position: -6504px 0; }
+  70.6% { background-position: -7046px 0; }
+  76.5% { background-position: -7588px 0; }
+  80.4% { background-position: -8130px 0; }
+  82.4% { background-position: -8672px 0; }
+  84.3% { background-position: -9214px 0; }
+  86.3% { background-position: -9756px 0; }
+  88.2% { background-position: -10298px 0; }
+  100.0% { background-position: -10840px 0; }
+}

@@ -12,13 +12,16 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6.
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept).
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
 # mode "still": frames play in place (for checking single frames).
 LEDGE_H = 80
 ANIMS = {
+    "PITBULL jump, travelling (sit back, rear up, leap, front paws land)": {"mode": "path", "fps": 12, "keys": [[90, 0.12, 0], [90, 0.12, 0], [90, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [93, 0.12, 0], [93, 0.12, 0], [94, 0.12, 0], [95, 0.12, 0], [96, 0.12, 0], [97, 0.12, 0], [98, 0.12, 0], [99, 0.148, 0], [99, 0.176, 0], [100, 0.203, 0], [100, 0.231, 0], [101, 0.259, 0], [101, 0.287, 0], [101, 0.314, 0], [102, 0.342, 0], [102, 0.37, 0], [102, 0.398, 0], [103, 0.426, 0], [103, 0.453, 0], [103, 0.481, 0], [104, 0.509, 0], [104, 0.537, 0], [105, 0.564, 0], [106, 0.592, 0], [107, 0.62, 0], [108, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0]]},
+    "PITBULL jump in place (your timing)": {"mode": "still", "frames": [90, 90, 90, 91, 91, 91, 91, 91, 91, 91, 91, 91, 92, 92, 92, 92, 92, 92, 93, 93, 94, 95, 96, 97, 98, 99, 99, 100, 100, 101, 101, 101, 102, 102, 102, 103, 103, 103, 104, 104, 105, 106, 107, 108, 109, 109, 109, 109, 109, 109, 110, 110, 110, 110, 110, 110], "fps": 12},
+    "PITBULL jump frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(90, 111)), "fps": 2},
     "PITBULL sit down (frames 1-6, then holds)": {"mode": "still", "frames": [69, 70, 71, 72, 73, 74, 74, 74, 74, 74], "fps": 5},
     "PITBULL give paw (frames 7-15, then hold loop)": {"mode": "still", "frames": list(range(75, 84)) + [84, 85, 86, 87, 88, 89] * 2, "fps": 6},
     "PITBULL sitting hold loop (tail wag + blink)": {"mode": "still", "frames": [84, 85, 86, 87, 88, 89], "fps": 5},

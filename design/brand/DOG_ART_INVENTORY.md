@@ -36,3 +36,8 @@ B1-6 lying -> pushes up, B7-13 stands/trots, B14-18 head dips + rolls, B19-32 on
 Packed with `dog_art.build_travel(..., scale=0.379, top_y=0, floor_y=401, on_top=0, on_floor=1)`.
 Lab hover box takes turns: give paw / belly rub (starts at B8 standing; get-up = roll frames reversed).
 Vision notes: B21->B22 belly colour/pose pop; leg tangles in some on-back frames (B27, W3, W11, W15).
+
+## Pitbull lying tail wag (owner zip, 2026-10-21) — cells 215-226 (G1-12)
+Seamless 12-frame loop, 0.5s (41.7 ms/frame), same 880x361 canvas as lie-down; G1 matches lie-down L27.
+Packed with `dog_art.build_travel(..., scale=149/399, top_y=0, floor_y=345, on_top=0, on_floor=1)`.
+Lab: lie down -> tail wag 2.5s -> panting loop.

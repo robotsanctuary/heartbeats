@@ -1,0 +1,32 @@
+{
+ "video": "liewag_v1.mp4",
+ "loop_frames": [
+  50,
+  51,
+  52,
+  53,
+  54,
+  55,
+  56,
+  57,
+  58,
+  59,
+  60,
+  61
+ ],
+ "ms_per_frame": 41.7,
+ "loop_ms": 500,
+ "size": [
+  880,
+  361
+ ],
+ "ground_y": 345,
+ "scale_correction": 1.0,
+ "crop_in_video": [
+  40,
+  256,
+  920,
+  617
+ ],
+ "chains_from": "/workspace/dog-liedown/out/frames/frame_27.png"
+}

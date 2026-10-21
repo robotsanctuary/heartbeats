@@ -12,13 +12,14 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND).
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk.
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
 # mode "still": frames play in place (for checking single frames).
 LEDGE_H = 80
 ANIMS = {
+    "Walk across (one paw at a time)": {"mode": "run", "frames": [23, 24, 25, 26, 27, 28, 29, 30], "fps": 8, "speed": .12, "hop": 0},
     "Run across (bounding)": {"mode": "run", "frames": [12, 13, 14, 15, 16, 17], "fps": 14, "speed": .32, "hop": .2},
     "Jump UP onto a card": {"mode": "path", "fps": 7, "ledge": ["right", .58, LEDGE_H], "keys": [
         [7, .10, 0], [7, .10, 0], [6, .11, 0], [6, .11, 0], [9, .16, 25], [3, .30, 120], [3, .42, 150],
@@ -28,6 +29,7 @@ ANIMS = {
         [22, .72, 0], [22, .72, 0], [22, .72, 0]]},
     "All jump frames 1-12 (in place)": {"mode": "still", "frames": list(range(12)), "fps": 2},
     "All run frames 1-6 (in place)": {"mode": "still", "frames": list(range(12, 18)), "fps": 2},
+    "Walk frames 1-8 (in place)": {"mode": "still", "frames": list(range(23, 31)), "fps": 2},
     "Landing frames 1-5 (in place)": {"mode": "still", "frames": list(range(18, 23)), "fps": 2},
 }
 

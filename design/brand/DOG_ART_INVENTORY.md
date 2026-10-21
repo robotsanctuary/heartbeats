@@ -47,3 +47,14 @@ Same 880x361 canvas as lie-down; F1 = lie-down L27. F1-15 mouth closes + head lo
 F22 hold, F23-30 tail starts wagging -> head-down wag loop (83 ms/frame) or waiting blink loop (2.5s still + blink).
 Per-frame timing in orig/meta.json `sequence[].ms`. Eyes open in the hold (it waits, not asleep).
 Packed with `dog_art.build_travel(..., scale=149/399, top_y=0, floor_y=345, on_top=0, on_floor=1)`.
+
+## v2 replacements (owner, 2026-10-21 afternoon) — everything at the WALK scale
+Owner rescaled the lying dog (~17.7% too big): lie-down (frames 24-27 + pant idle), lie-wag, lie-wait, belly rub (now 590x344,
+ground 328, sits at lie-down canvas x+328 / y+17). Run v2 = pink cleaned from paws. NEW get-up sets, both start on lie-down L27:
+- get-up -> walk: 44 frames, 1120x421 (lie-down canvas at y+60), ends = walk frame_10; loop continues at frame 11, +606 px, 101 px/s.
+- get-up -> run: 69 frames, 1500x471 (y+110), ends = run frame_07; loop continues at frame 8, +981 px, 300 px/s.
+Cells: liedown 132, bellyrub 165, liewag 215, liewait 227, getupwalk 274-317, getuprun 318-386 (387 cells).
+Repack ALL pitbull v2 sets with `/Users/ghost/venv/bin/python3 design/pack_pitbull.py` (scale 150/399, adds `cxa` canvas x
+per cell + get-up hand-off data). Measured hand-off seam: walk -1.5 px, run -0.4 px on screen.
+Owner note: walk art is ~5% stockier than the lying dog (matched by head size), so the body looks a bit shorter at the get-up -> walk switch.
+Old run frames kept in dog-src-pitbull-run/orig/v1.

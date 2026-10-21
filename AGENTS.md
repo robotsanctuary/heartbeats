@@ -35,7 +35,7 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
      Last request (in lab, commit pending if not already): jump up/down **three box heights**
      (tall 130px / medium 80px / small 35px).
    - Owner jump-down set (21 frames) in lab: own box + used for the DOWN half of the 3-height course.
-   - Owner lie-down set (27 + 6 pant idle + 12 tail-wag loop) + lie-wait (chin on paws, head-down wag, blink) in lab. Still missing: sleep (eyes closed) + get-up; optional sit hold with paw DOWN.
+   - Owner v2 sets (all at walk scale): lie-down, tail-wag, lie-wait, belly rub, run (no pink), get-up -> walk, get-up -> run. Repack: `/Users/ghost/venv/bin/python3 design/pack_pitbull.py`. Still missing: sleep (eyes closed); optional sit hold with paw DOWN.
    - Puppy walk attempts failed (back legs never step); code-rig walk rejected. Inventory:
      `design/brand/DOG_ART_INVENTORY.md`. Packer: `design/dog_art.py` (move un-numbered sheets
      into `orig/`). Combine: `python design/dog_art.py --combine jump run land walk frolic walkmix pitbull pitbullrun pitbullsit pitbulljump pitbulljumpdown pitbullliedown pitbullbellyrub pitbullliewag pitbullliewait` (jumpdown is packed by `dog_art.build_travel`, see inventory)

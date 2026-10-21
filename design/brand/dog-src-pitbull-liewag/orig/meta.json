@@ -28,5 +28,12 @@
   920,
   617
  ],
- "chains_from": "/workspace/dog-liedown/out/frames/frame_27.png"
+ "chains_from": "/workspace/dog-liedown/out/frames/frame_27.png",
+ "rescale_after_export": {
+  "factor": 0.8496,
+  "anchor": [
+   590,
+   345
+  ]
+ }
 }

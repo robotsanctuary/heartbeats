@@ -1,0 +1,81 @@
+/* Pitbull gets up from lying down (pushes up, settles into a sit, stands) and walks off to the right, starts on the rescaled (walk-scale) lie-down frame, keeps the same size throughout, then hands off to the walk loop.
+   44 frames, 4.573s, plays once and holds the last frame. Canvas 1120x421px; ground line at y=405px (15px above the bottom).
+   Frame 1 = dog-liedown frame_27 exactly. Last frame = walk frame_10 exactly.
+
+   PLACEMENT relative to the .dog-liedown element (880x361):
+     .dog-getup-walk left = liedown left + 0px,  top = liedown top - 60px   (canvas is 240px wider to the right and 60px taller on top).
+   HANDOFF to the walk loop (500x350, 12 frames x 83ms):
+     put the loop element at  left = dog-getup-walk left + 606px,  top = dog-getup-walk top + 71px
+     (= liedown left + 606px, liedown top + 11px), start it on frame 11 with animation-delay:-0.8300s,
+     and from then move it right at about 101px/s (the get-up ends travelling at that speed).
+*/
+.dog-getup-walk { width:1120px; height:421px; background:url(dog_getup_walk_sheet_rows.png) 0 0 no-repeat; background-size:10080px 2105px; animation: dogGetupWalkRows 4.573s step-end 1 forwards; }
+@keyframes dogGetupWalkRows {
+  0.00% { background-position: -0px -0px; }
+  5.47% { background-position: -1120px -0px; }
+  9.12% { background-position: -2240px -0px; }
+  12.77% { background-position: -3360px -0px; }
+  16.42% { background-position: -4480px -0px; }
+  20.07% { background-position: -5600px -0px; }
+  21.89% { background-position: -6720px -0px; }
+  23.70% { background-position: -7840px -0px; }
+  25.52% { background-position: -8960px -0px; }
+  27.33% { background-position: -0px -421px; }
+  29.15% { background-position: -1120px -421px; }
+  30.96% { background-position: -2240px -421px; }
+  32.78% { background-position: -3360px -421px; }
+  34.59% { background-position: -4480px -421px; }
+  36.41% { background-position: -5600px -421px; }
+  38.22% { background-position: -6720px -421px; }
+  40.04% { background-position: -7840px -421px; }
+  41.85% { background-position: -8960px -421px; }
+  43.67% { background-position: -0px -842px; }
+  49.14% { background-position: -1120px -842px; }
+  54.60% { background-position: -2240px -842px; }
+  60.07% { background-position: -3360px -842px; }
+  61.88% { background-position: -4480px -842px; }
+  63.70% { background-position: -5600px -842px; }
+  65.51% { background-position: -6720px -842px; }
+  67.33% { background-position: -7840px -842px; }
+  69.14% { background-position: -8960px -842px; }
+  70.96% { background-position: -0px -1263px; }
+  72.77% { background-position: -1120px -1263px; }
+  74.59% { background-position: -2240px -1263px; }
+  76.40% { background-position: -3360px -1263px; }
+  78.22% { background-position: -4480px -1263px; }
+  80.03% { background-position: -5600px -1263px; }
+  81.85% { background-position: -6720px -1263px; }
+  83.66% { background-position: -7840px -1263px; }
+  85.48% { background-position: -8960px -1263px; }
+  87.29% { background-position: -0px -1684px; }
+  89.11% { background-position: -1120px -1684px; }
+  90.92% { background-position: -2240px -1684px; }
+  92.74% { background-position: -3360px -1684px; }
+  94.55% { background-position: -4480px -1684px; }
+  96.37% { background-position: -5600px -1684px; }
+  98.18% { background-position: -6720px -1684px; }
+  100.00% { background-position: -7840px -1684px; }
+}
+
+/* Walk loop (from /workspace/dog-walk9/out, 12 frames x 83ms, 500x350): */
+.dog-walk { width:500px; height:350px; background:url(dog_walk_sheet.png) 0 0 no-repeat; background-size:6000px 350px; animation: dogWalk 0.996s steps(12) infinite; }
+@keyframes dogWalk { to { background-position: -6000px 0; } }
+/* when chaining from the get-up use:  .dog-walk.from-getup { animation-delay:-0.8300s; } */
+.dog-walk.from-getup { animation-delay:-0.8300s; }
+
+/* CHAIN: .dog-liedown -> .dog-getup-walk -> loop.  Markup: one wrapper positioned where the lying dog is, three children.
+   <div class="dog-stage" style="position:relative">
+     <div id="lie" class="dog-liedown" style="position:absolute;left:0;top:0"></div>
+     <div id="up"  style="position:absolute;left:0;top:-60px;display:none"></div>
+     <div id="go"  style="position:absolute;left:606px;top:11px;display:none"></div>
+   </div>
+   const lie=document.getElementById('lie'), up=document.getElementById('up'), go=document.getElementById('go');
+   lie.addEventListener('animationend', () => {          // if the dog idles (.dog-liedown-idle) first, run this handler's two lines whenever it should get up
+     lie.style.display='none'; up.style.display='block'; up.className='dog-getup-walk';
+   }, {once:true});
+   up.addEventListener('animationend', () => {
+     up.style.display='none'; go.style.display='block'; go.className='dog-walk from-getup';
+     go.style.animationDelay='-0.8300s';      // continue from frame 11
+     go.animate([{transform:'translateX(0)'},{transform:'translateX(2000px)'}], {duration:2000/101*1000, fill:'forwards'}); // ~101px/s, optional
+   }, {once:true});
+   Copy dog_walk_sheet.png next to this CSS (it is included in the zip). */

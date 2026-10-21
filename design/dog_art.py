@@ -108,12 +108,13 @@ def build_travel(src: Path, name: str, scale: float, top_y: float, floor_y: floa
     on the floor). Each frame is scaled by ONE factor (to match the other sets) and centred in its cell; the
     motion the art had on its canvas is kept as data in dog-<name>.json so the engine can replay it:
       dx[i]  = how far (cell px) frame i's cell sits right of frame 1's cell,
+      cxa[i] = canvas x (scaled px) of cell i's centre, so sets drawn on the same canvas line up exactly,
       up[i]  = height above the floor as a fraction of the drawn box height (1 = on the box top, 0 = floor).
     Frames 1..on_top stand on the box top (top_y), frames on_floor..N on the floor (floor_y); the frames in
     between are airborne and use their lowest pixel. Feet go on the cell ground line (ANCHOR y).
     hind[i] = the hind-foot x in the cell for standing frames (to join walk cycles without a jump)."""
     files = sorted(src.glob("*.png"), key=lambda p: int(re.findall(r"(\d+)\.png$", p.name)[0]))
-    cells, dx, up, hind, ox0 = [], [], [], [], None
+    cells, dx, up, hind, cxa, ox0 = [], [], [], [], [], None
     for n, f in enumerate(files, 1):
         raw = Image.open(f).convert("RGBA")
         x0, y0, x1, y1 = raw.getchannel("A").getbbox()
@@ -128,6 +129,7 @@ def build_travel(src: Path, name: str, scale: float, top_y: float, floor_y: floa
         if ox0 is None:
             ox0 = cx
         dx.append(round(cx - ox0, 1))
+        cxa.append(round(cx - (px + im.width / 2 - CELL / 2), 1))  # canvas x (scaled) of the cell's centre
         up.append(round((floor_y - support) / (floor_y - top_y), 3))
         hind.append(round(px + hind_foot_x(im), 1) if (n <= on_top or n >= on_floor) else None)
     sheet = Image.new("RGBA", (CELL * len(cells), CELL))
@@ -136,7 +138,7 @@ def build_travel(src: Path, name: str, scale: float, top_y: float, floor_y: floa
     out = BRAND / f"dog-{name}.png"
     sheet.save(out, optimize=True)
     meta = {"frames": len(cells), "cell": CELL, "cx": ANCHOR[0] / CELL, "foot": ANCHOR[1] / CELL,
-            "dx": dx, "up": up, "hind": hind}
+            "dx": dx, "up": up, "hind": hind, "cxa": cxa}
     (BRAND / f"dog-{name}.json").write_text(json.dumps(meta))
     return out, meta
 

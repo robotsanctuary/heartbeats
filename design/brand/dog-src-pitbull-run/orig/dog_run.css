@@ -1,0 +1,3 @@
+/* Pitbull happy run LOOP: 10 frames x 41.7ms = 0.417s, in place. Frame 500x375, ground line 359px from top (15px above bottom). Paw tints cleaned. */
+.dog-run { width:500px; height:375px; background:url(dog_run_sheet.png) 0 0 no-repeat; animation: dogRun 0.417s steps(10) infinite; }
+@keyframes dogRun { to { background-position: -5000px 0; } }

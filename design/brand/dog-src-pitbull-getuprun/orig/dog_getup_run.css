@@ -1,0 +1,105 @@
+/* Pitbull perks up, springs to its feet with an excited little hop and breaks into the happy run to the right, starts on the rescaled (walk-scale) lie-down frame, keeps the same size throughout, then hands off to the run loop.
+   69 frames, 3.186s, plays once and holds the last frame. Canvas 1500x471px; ground line at y=455px (15px above the bottom).
+   Frame 1 = dog-liedown frame_27 exactly. Last frame = run frame_07 exactly.
+
+   PLACEMENT relative to the .dog-liedown element (880x361):
+     .dog-getup-run left = liedown left + 0px,  top = liedown top - 110px   (canvas is 620px wider to the right and 110px taller on top).
+   HANDOFF to the run loop (500x375, 10 frames x 41.7ms):
+     put the loop element at  left = dog-getup-run left + 981px,  top = dog-getup-run top + 96px
+     (= liedown left + 981px, liedown top + -14px), start it on frame 8 with animation-delay:-0.2919s,
+     and from then move it right at about 300px/s (the get-up ends travelling at that speed).
+*/
+.dog-getup-run { width:1500px; height:471px; background:url(dog_getup_run_sheet_rows.png) 0 0 no-repeat; background-size:12000px 4239px; animation: dogGetupRunRows 3.186s step-end 1 forwards; }
+@keyframes dogGetupRunRows {
+  0.00% { background-position: -0px -0px; }
+  5.24% { background-position: -1500px -0px; }
+  7.85% { background-position: -3000px -0px; }
+  10.45% { background-position: -4500px -0px; }
+  13.06% { background-position: -6000px -0px; }
+  15.66% { background-position: -7500px -0px; }
+  18.27% { background-position: -9000px -0px; }
+  19.59% { background-position: -10500px -0px; }
+  20.90% { background-position: -0px -471px; }
+  22.22% { background-position: -1500px -471px; }
+  23.54% { background-position: -3000px -471px; }
+  24.86% { background-position: -4500px -471px; }
+  26.18% { background-position: -6000px -471px; }
+  27.50% { background-position: -7500px -471px; }
+  28.81% { background-position: -9000px -471px; }
+  30.13% { background-position: -10500px -471px; }
+  31.45% { background-position: -0px -942px; }
+  32.77% { background-position: -1500px -942px; }
+  34.09% { background-position: -3000px -942px; }
+  35.40% { background-position: -4500px -942px; }
+  36.72% { background-position: -6000px -942px; }
+  38.04% { background-position: -7500px -942px; }
+  39.36% { background-position: -9000px -942px; }
+  40.68% { background-position: -10500px -942px; }
+  42.00% { background-position: -0px -1413px; }
+  43.31% { background-position: -1500px -1413px; }
+  44.63% { background-position: -3000px -1413px; }
+  45.95% { background-position: -4500px -1413px; }
+  47.27% { background-position: -6000px -1413px; }
+  48.59% { background-position: -7500px -1413px; }
+  49.91% { background-position: -9000px -1413px; }
+  51.22% { background-position: -10500px -1413px; }
+  52.54% { background-position: -0px -1884px; }
+  53.86% { background-position: -1500px -1884px; }
+  55.18% { background-position: -3000px -1884px; }
+  56.50% { background-position: -4500px -1884px; }
+  57.82% { background-position: -6000px -1884px; }
+  59.13% { background-position: -7500px -1884px; }
+  60.45% { background-position: -9000px -1884px; }
+  61.77% { background-position: -10500px -1884px; }
+  63.09% { background-position: -0px -2355px; }
+  64.41% { background-position: -1500px -2355px; }
+  65.73% { background-position: -3000px -2355px; }
+  67.04% { background-position: -4500px -2355px; }
+  68.36% { background-position: -6000px -2355px; }
+  69.68% { background-position: -7500px -2355px; }
+  71.00% { background-position: -9000px -2355px; }
+  72.32% { background-position: -10500px -2355px; }
+  73.63% { background-position: -0px -2826px; }
+  74.95% { background-position: -1500px -2826px; }
+  76.27% { background-position: -3000px -2826px; }
+  77.59% { background-position: -4500px -2826px; }
+  78.91% { background-position: -6000px -2826px; }
+  80.23% { background-position: -7500px -2826px; }
+  81.54% { background-position: -9000px -2826px; }
+  82.86% { background-position: -10500px -2826px; }
+  84.18% { background-position: -0px -3297px; }
+  85.50% { background-position: -1500px -3297px; }
+  86.82% { background-position: -3000px -3297px; }
+  88.14% { background-position: -4500px -3297px; }
+  89.45% { background-position: -6000px -3297px; }
+  90.77% { background-position: -7500px -3297px; }
+  92.09% { background-position: -9000px -3297px; }
+  93.41% { background-position: -10500px -3297px; }
+  94.73% { background-position: -0px -3768px; }
+  96.05% { background-position: -1500px -3768px; }
+  97.36% { background-position: -3000px -3768px; }
+  98.68% { background-position: -4500px -3768px; }
+  100.00% { background-position: -6000px -3768px; }
+}
+
+/* Run loop (from /workspace/dog-run/out, 10 frames x 41.7ms, 500x375): */
+.dog-run { width:500px; height:375px; background:url(dog_run_sheet.png) 0 0 no-repeat; background-size:5000px 375px; animation: dogRun 0.417s steps(10) infinite; }
+@keyframes dogRun { to { background-position: -5000px 0; } }
+.dog-run.from-getup { animation-delay:-0.2919s; }
+
+/* CHAIN: .dog-liedown -> .dog-getup-run -> loop.  Markup: one wrapper positioned where the lying dog is, three children.
+   <div class="dog-stage" style="position:relative">
+     <div id="lie" class="dog-liedown" style="position:absolute;left:0;top:0"></div>
+     <div id="up"  style="position:absolute;left:0;top:-110px;display:none"></div>
+     <div id="go"  style="position:absolute;left:981px;top:-14px;display:none"></div>
+   </div>
+   const lie=document.getElementById('lie'), up=document.getElementById('up'), go=document.getElementById('go');
+   lie.addEventListener('animationend', () => {          // if the dog idles (.dog-liedown-idle) first, run this handler's two lines whenever it should get up
+     lie.style.display='none'; up.style.display='block'; up.className='dog-getup-run';
+   }, {once:true});
+   up.addEventListener('animationend', () => {
+     up.style.display='none'; go.style.display='block'; go.className='dog-run from-getup';
+     go.style.animationDelay='-0.2919s';      // continue from frame 8
+     go.animate([{transform:'translateX(0)'},{transform:'translateX(2000px)'}], {duration:2000/300*1000, fill:'forwards'}); // ~300px/s, optional
+   }, {once:true});
+   Copy dog_run_sheet.png next to this CSS (it is included in the zip). */

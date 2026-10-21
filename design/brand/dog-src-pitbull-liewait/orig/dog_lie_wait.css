@@ -4,8 +4,10 @@
      el.addEventListener('animationend', function step(){ if(el.classList.contains('dog-liedown')) el.className='dog dog-lie-wait';
         else { el.className='dog dog-lie-wait-wag'; el.removeEventListener('animationend',step); } });
    Frame 1 of .dog-lie-wait is the liedown frame_27 pose (outline difference 1.3%). Its last frame hands off to frame 1 of the wag loop with no jump.
-   Optional: .dog-lie-wait-blink is a head-down waiting idle (long still + blink), use it instead of the wag loop if you want the dog to keep waiting. */
-.dog-lie-wait { width:880px; height:361px; background:url(dog_lie_wait_sheet.png) 0 0 no-repeat; animation: doglieWait 4.792s step-end 1 forwards; }
+   Optional: .dog-lie-wait-blink is a head-down waiting idle (long still + blink), use it instead of the wag loop if you want the dog to keep waiting. 
+   Rescaled 2026-10-21 to the walk/run scale: the lying dog was ~17.7% too large (eye-to-nose 67.7px vs 57.5px on the walk). Same canvas, ground line and chaining as before.
+*/
+.dog-lie-wait { width:880px; height:361px; background:url(dog_lie_wait_sheet.png) 0 0 no-repeat; background-size:26400px 361px; animation: doglieWait 4.792s step-end 1 forwards; }
 @keyframes doglieWait {
   0.00% { background-position: -0px -0px; }
   5.22% { background-position: -880px -0px; }
@@ -40,7 +42,7 @@
 }
 
 /* Multi-row sheet (10 per row x 3 rows) */
-.dog-lie-wait-rows { width:880px; height:361px; background:url(dog_lie_wait_sheet_rows.png) 0 0 no-repeat; animation: doglieWaitRows 4.792s step-end 1 forwards; }
+.dog-lie-wait-rows { width:880px; height:361px; background:url(dog_lie_wait_sheet_rows.png) 0 0 no-repeat; background-size:8800px 1083px; animation: doglieWaitRows 4.792s step-end 1 forwards; }
 @keyframes doglieWaitRows {
   0.00% { background-position: -0px -0px; }
   5.22% { background-position: -880px -0px; }
@@ -75,10 +77,10 @@
 }
 
 /* Head-down tail-wag LOOP: 13 frames, 1.079s, seamless. */
-.dog-lie-wait-wag { width:880px; height:361px; background:url(dog_lie_wait_wag_sheet.png) 0 0 no-repeat; animation: doglieWaitWag 1.079s steps(13) infinite; }
+.dog-lie-wait-wag { width:880px; height:361px; background:url(dog_lie_wait_wag_sheet.png) 0 0 no-repeat; background-size:11440px 361px; animation: doglieWaitWag 1.079s steps(13) infinite; }
 @keyframes doglieWaitWag { to { background-position: -11440px 0; } }
 /* Wag loop, 2-row sheet (7 per row) */
-.dog-lie-wait-wag-rows { width:880px; height:361px; background:url(dog_lie_wait_wag_sheet_rows.png) 0 0 no-repeat; animation: doglieWaitWagRows 1.079s step-end infinite; }
+.dog-lie-wait-wag-rows { width:880px; height:361px; background:url(dog_lie_wait_wag_sheet_rows.png) 0 0 no-repeat; background-size:6160px 722px; animation: doglieWaitWagRows 1.079s step-end infinite; }
 @keyframes doglieWaitWagRows {
   0.00% { background-position: -0px -0px; }
   7.69% { background-position: -880px -0px; }
@@ -97,7 +99,7 @@
 }
 
 /* Head-down waiting idle: still with a blink every ~2.8s (4 frames, variable timing). */
-.dog-lie-wait-blink { width:880px; height:361px; background:url(dog_lie_wait_blink_sheet.png) 0 0 no-repeat; animation: doglieWaitBlinkV 2.791s step-end infinite; }
+.dog-lie-wait-blink { width:880px; height:361px; background:url(dog_lie_wait_blink_sheet.png) 0 0 no-repeat; background-size:3520px 361px; animation: doglieWaitBlinkV 2.791s step-end infinite; }
 @keyframes doglieWaitBlinkV {
   0.00% { background-position: -0px 0; }
   89.57% { background-position: -880px 0; }

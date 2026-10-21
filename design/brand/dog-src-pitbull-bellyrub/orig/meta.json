@@ -70,10 +70,10 @@
  ],
  "total_ms": 3790,
  "size": [
-  710,
-  417
+  590,
+  344
  ],
- "ground_y": 401,
+ "ground_y": 328,
  "wiggle_loop_frames": [
   92,
   94,
@@ -289,5 +289,22 @@
    "wiggle_17": 1144,
    "wiggle_18": 1171
   }
+ },
+ "rescale_after_export": {
+  "factor": 0.8496,
+  "anchor": [
+   317,
+   401
+  ],
+  "crop_of_old_canvas": [
+   56,
+   73,
+   646,
+   417
+  ],
+  "offset_vs_liedown": [
+   328,
+   17
+  ]
  }
 }

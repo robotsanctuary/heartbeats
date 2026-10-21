@@ -264,5 +264,12 @@
   617
  ],
  "chains_from": "/workspace/dog-liedown/out/frames/frame_27.png",
- "seam_outline_diff_vs_f27": 0.0131
+ "seam_outline_diff_vs_f27": 0.0131,
+ "rescale_after_export": {
+  "factor": 0.8496,
+  "anchor": [
+   590,
+   345
+  ]
+ }
 }

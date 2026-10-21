@@ -1,6 +1,8 @@
 /* Pitbull lying tail-wag LOOP: 12 frames, 0.500s, seamless. Frame 880x361, ground line 345px from top (15px above bottom).
    Same canvas/position/scale as dog_liedown.css (880x361), so it chains directly after .dog-liedown:
    el.addEventListener('animationend', () => { el.className = 'dog-lie-wag'; }, {once:true});
-   Frame 1 is the closest pose in the clip to liedown frame_27 (outline difference ~1.6% outline difference after keying, mostly the tail tip). */
-.dog-lie-wag { width:880px; height:361px; background:url(dog_lie_wag_sheet.png) 0 0 no-repeat; animation: doglieWag 0.500s steps(12) infinite; }
+   Frame 1 is the closest pose in the clip to liedown frame_27 (outline difference ~1.6% outline difference after keying, mostly the tail tip). 
+   Rescaled 2026-10-21 to the walk/run scale: the lying dog was ~17.7% too large (eye-to-nose 67.7px vs 57.5px on the walk). Same canvas, ground line and chaining as before.
+*/
+.dog-lie-wag { width:880px; height:361px; background:url(dog_lie_wag_sheet.png) 0 0 no-repeat; background-size:10560px 361px; animation: doglieWag 0.500s steps(12) infinite; }
 @keyframes doglieWag { to { background-position: -10560px 0; } }

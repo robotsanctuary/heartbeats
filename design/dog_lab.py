@@ -12,14 +12,15 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic.
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix.
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
 # mode "still": frames play in place (for checking single frames).
 LEDGE_H = 80
 ANIMS = {
-    "Walk across (one paw at a time)": {"mode": "run", "frames": [23, 24, 25, 26, 27, 28, 29, 30], "fps": 8, "speed": .12, "hop": 0},
+    "Walk across A: new sheet, near front paw steps": {"mode": "run", "frames": [23, 24, 25, 26, 27, 28, 29, 30], "fps": 8, "speed": .12, "hop": 0},
+    "Walk across B: mix, near front then far front": {"mode": "run", "frames": [39, 40, 41, 42, 43, 44, 45, 46], "fps": 7, "speed": .12, "hop": 0},
     "Frolic across (front together, back together)": {"mode": "run", "frames": [32, 33, 34, 35, 36], "fps": 9, "speed": .30, "hop": .3},
     "Frolic, all 8 frames as sent": {"mode": "run", "frames": [31, 32, 33, 34, 35, 36, 37, 38], "fps": 12, "speed": .30, "hop": .18},
     "Run across (bounding)": {"mode": "run", "frames": [12, 13, 14, 15, 16, 17], "fps": 14, "speed": .32, "hop": .2},

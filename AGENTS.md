@@ -7,7 +7,7 @@ Scrapes Texas shelter at-risk (euthanasia-deadline) feeds into a private local
 SQLite DB and builds the public site **Fading Heartbeats** (fadingheartbeats.com,
 tagline "Every heartbeat deserves a home."). Nothing is published yet.
 
-## Current status (2026-10-20)
+## Current status (2026-10-21, paused for another task)
 - Live: Dallas Animal Services scraper, run by Hermes cron at 9am/3pm/9pm Central
   (9pm also sends a Telegram summary). Run log: `RUN_LOG_PATH` (.env).
 - Site preview: `python design/build_site.py` builds into
@@ -24,32 +24,25 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
 - Texas expansion research: `docs/texas-shelter-survey.md`.
 
 ## Next steps
-1. **Header: DONE 2026-10-20 (option B + "Out of time today" spotlight).** Full-width sticky `.topbar`
-   on every page. Home has a full-width pink `.band`: text left; on the right (below on phones) a big
-   square `.spot` that cycles through ONLY the animals whose shelter date is today (`spot_pets()`; if
-   nobody is due today it shows the next day that has anyone, labelled e.g. "Out of time tomorrow").
-   Crossfade + slow zoom every 4.5s, dots to jump, pauses on hover/touch, no auto-advance under
-   reduced motion (`SPOT_JS`). Rebuilt with the site, so it changes daily.
-2. **Site dog: owner's puppy art IN (2026-10-20).** Owner sent 12 jump frames (golden puppy,
-   transparent PNGs) -> `design/brand/dog-src-jump/`, packed by `python design/dog_art.py <folder>`
-   into `design/brand/dog-jump.png` (300px cells, hind feet anchored at x110,y250; build copies it to
-   `dog.png`). Engine `DOG_JS`: jump UP = frames 8 sit -> 7 rear up, paws in air -> 10 spring -> 4 leap
-   -> 11 reach -> 12 land, on a lower arc; jump DOWN = 12 -> 4 -> 11 -> 12. A card scrolling up from
-   below now LIFTS a dog standing on the floor. Wanders, rides cards, hops off at the top bar.
-   RUN art in (2nd zip, `design/brand/dog-src-run/`): packed with `--name run --frames 3,6,1,4,7,8`, then
-   `python design/dog_art.py --combine jump run` -> `dog-all.png` (cells 0-11 jump, 12-17 run; build
-   copies it to `dog.png`). Landing art (owner, 3 frames on one white JPG) in `dog-src-land/`: background + white border flooded out, cut into 3, scaled 0.6, packed as `landart` (anchored on FRONT paws), used as land cells 3-5. Run/skip play run frames over a bounding hop (`STRIDE`). Weakness: the run
-   frames are all stretched-leap poses (no gathered-legs frame), so it reads as bounding, not galloping.
-   WALK is code-rigged (`design/dog_rig.py`): legs of standing frame walk-8 cut below y86 and swung one at a time (lateral 4-beat), fixed body, 2px bob; writes dog-walk.png directly, then `dog_art.py --combine jump run land walk frolic`.
-   Trot/nap/sit still use jump frames as stand-ins (owner is doing animations one at a time). Old stick-dog sheet: `design/sprite_template.py` (template only).
-3. Small polish: "More…" share button alone on its row; check nav edge on wide screens.
-4. Hosting: Cloudflare (same account as the owner's other sites). The domain stays
-   at Porkbun and its nameservers point to Cloudflare. A static Worker goes to a
-   private test URL first. Ask the owner before deploying. Owner wants everything
-   checked on the LAN preview before launch.
-5. Next shelters: Fort Worth (awaiting go-ahead), San Antonio, Austin, then Abilene and El Paso.
-6. Open questions for owner: [draft] copy wording; show shelter descriptions verbatim?
-7. Data review ~2026-10-26.
+1. **Header: DONE.** Option B: full-width sticky `.topbar`; home pink `.band` with text left and a
+   daily `.spot` square (animals due today; if none, next closest day — owner confirmed). `SPOT_JS`.
+2. **Site dog: IN PROGRESS on dog-lab.html, NOT on the live site yet.**
+   - Live site still uses the **golden puppy** (jump + landing + bounding run) in `DOG_JS`.
+   - Owner prefers the **pitbull** art (walk/run/sit/jump zips, real RGBA). Do NOT switch `DOG_JS`
+     until they say so.
+   - Lab: `http://192.168.1.71:8787/dog-lab.html` (rebuild: `$PY design/build_site.py`).
+     Interactive: hover/tap dog -> sit -> paw up -> hold (tail wag/blink) -> stand -> walk.
+     Last request (in lab, commit pending if not already): jump up/down **three box heights**
+     (tall 130px / medium 80px / small 35px).
+   - Still missing pitbull art: lie down + sleep; optional sitting hold with paw DOWN.
+   - Puppy walk attempts failed (back legs never step); code-rig walk rejected. Inventory:
+     `design/brand/DOG_ART_INVENTORY.md`. Packer: `design/dog_art.py` (move un-numbered sheets
+     into `orig/`). Combine: `python design/dog_art.py --combine jump run land walk frolic walkmix pitbull pitbullrun pitbullsit pitbulljump`
+   - HOLD Cloudflare hosting and Fort Worth scraper until design is locked.
+3. Hosting (later): Cloudflare Worker, private test URL first. Ask before deploying.
+4. Next shelters after go-ahead: Fort Worth, San Antonio, Austin, Abilene, El Paso.
+5. Open: [draft] copy; verbatim shelter descriptions?
+6. Data review ~2026-10-26.
 
 ## Rules
 - Only `db.py` opens the DB; timestamps are canonical UTC strings.

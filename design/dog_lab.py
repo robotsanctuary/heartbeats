@@ -96,6 +96,31 @@ items.forEach(it=>{it.acc=0;adv(it)})};
 document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".box").forEach(x=>{x.style.setProperty("--bg",b.dataset.bg);const dk=b.dataset.bg==="#2a2020";x.style.setProperty("--fg",dk?"#fff":"#1F1A17");x.style.setProperty("--fg2",dk?"#d8cfc9":"#6B625C")});
 document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x===b))});
 document.querySelectorAll(".box").forEach(x=>x.style.setProperty("--bg","#FBF7F3"));
+/* ---- pitbull obstacle course: walk in, jump UP onto a box, walk the top, jump DOWN, walk off; 3 box heights ---- */
+(()=>{const WALK=[...Array(12).keys()].map(i=>47+i),JD=[3,9,6,2,1,1,1,1,1,2,2,3,3,3,2,1,1,1,1,6,6],S=110,AX=S*110/300,CELLS=__BGW__/150;
+const sum=a=>a.reduce((x,y)=>x+y,0),items=[];
+function plan(W,h){const bx0=W*.36,bx1=W*.74,segs=[];
+ const walk=(x0,x1,y)=>{const d=Math.abs(x1-x0)/55;segs.push({t:d,f:(p)=>[WALK[Math.floor(p*d*10)%12],x0+(x1-x0)*p,y,"walk"]})};
+ const jump=(x0,x1,y0,y1,from,name)=>{const ds=JD.slice(from),tot=sum(ds),a0=Math.max(0,9-from),a1=17-from,
+   before=sum(ds.slice(0,a0)),airT=sum(ds.slice(a0,a1+1));
+   segs.push({t:tot/12,f:(p)=>{let u=p*tot,i=0;while(i<ds.length-1&&u>=ds[i]){u-=ds[i];i++}
+     const q=Math.min(1,Math.max(0,(p*tot-before)/airT));return[90+from+i,x0+(x1-x0)*q,y0+(y1-y0)*q,name+" · art cell "+(91+from+i)]}})};
+ const stand=(x,y,t)=>segs.push({t,f:()=>[110,x,y,"stand"]});
+ walk(-S,bx0-70,0);jump(bx0-70,bx0+12,0,h,0,"jump UP");stand(bx0+12,h,.5);walk(bx0+12,bx1-75,h);
+ jump(bx1-75,bx1+35,h,0,9,"jump DOWN");stand(bx1+35,0,.4);walk(bx1+35,W+S,0);return segs}
+[["tall",130],["medium",80],["small",35]].forEach(([label,h])=>{const b=document.createElement("div");b.className="box";
+ b.innerHTML=`<h3>PITBULL: up and down a ${label} box (${h}px)</h3><small>walks in → jumps up → walks across the top → jumps down → walks off</small><div class="stage" style="height:330px"><div class="ground"></div><div class="ledge"></div><div class="dog"></div></div><div class="info"></div>`;
+ boxes.prepend(b);b.style.setProperty("--bg","#FBF7F3");
+ const dog=b.querySelector(".dog");dog.style.cssText+=`;width:${S}px;height:${S}px;bottom:2px;background-size:${CELLS*S}px ${S}px`;
+ items.push({b,h,st:b.querySelector(".stage"),ledge:b.querySelector(".ledge"),dog,info:b.querySelector(".info"),segs:null,t:0})});
+let last=performance.now();(function tick(n){const dt=Math.min(.05,(n-last)/1000)*speed;last=n;
+ items.forEach(it=>{const W=it.st.clientWidth;it.ledge.style.cssText=`left:${W*.36}px;width:${W*.38}px;height:${it.h}px`;
+  if(!it.segs)it.segs=plan(W,it.h);if(!stepping)it.t+=dt;
+  let t=it.t,k=0;while(k<it.segs.length&&t>=it.segs[k].t){t-=it.segs[k].t;k++}
+  if(k>=it.segs.length){it.segs=plan(W,it.h);it.t=0;k=0;t=0}
+  const[cell,x,y,label]=it.segs[k].f(t/it.segs[k].t);
+  it.dog.style.backgroundPosition=-cell*S+"px 0";it.dog.style.transform=`translate(${(x-AX).toFixed(1)}px,${(-y).toFixed(1)}px)`;
+  it.info.textContent=label});requestAnimationFrame(tick)})(last)})();
 /* ---- interactive pitbull: walks; hover/tap the dog -> sits, gives paw, holds (tail wag + blink); leave -> stands, walks on ---- */
 (()=>{const WALK=[...Array(12).keys()].map(i=>47+i),SIT=[69,70,71,72,73,74],PAW=[75,76,77,78,79,80,81,82,83],HOLD=[84,85,86,87,88,89];
 const b=document.createElement("div");b.className="box";

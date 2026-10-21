@@ -17,7 +17,8 @@ from PIL import Image, ImageFilter
 BRAND = Path(__file__).resolve().parent / "brand"
 FRONT_OFFSET = 100  # landing art: front paws sit this far in front of where hind feet usually go
 CELL = 300          # px per square cell (native frames are ~150-185 px wide)
-ANCHOR = (110, 250)  # where the hind feet land inside each cell (x, y)
+ANCHOR = (110, 250)
+CHUNK = 50          # cells per lab sheet (50 * 300 = 15000 px, under the 16384 px texture limit)  # where the hind feet land inside each cell (x, y)
 
 
 def clean(im: Image.Image, max_depth: int = 14) -> Image.Image:
@@ -186,6 +187,12 @@ def combine(names=("jump", "run", "land")):
         out.paste(im, (x, 0))
         x += im.width
     out.save(BRAND / "dog-all.png", optimize=True)
+    # Lab sheets: chunks of CHUNK cells. The full strip is 100k+ px wide, past the GPU's max texture size (16384),
+    # so browsers (phones especially) redraw it slowly and the lab animations stutter.
+    for old in BRAND.glob("dog-lab-*.png"):
+        old.unlink()
+    for k in range(0, x // CELL, CHUNK):
+        out.crop((k * CELL, 0, min(x, (k + CHUNK) * CELL), CELL)).save(BRAND / f"dog-lab-{k // CHUNK}.png", optimize=True)
     return {"cells": x // CELL, "start": starts}
 
 

@@ -64,7 +64,7 @@ button.on{background:#D9472F;color:#fff;border-color:#D9472F}
 .box h3{margin:0 0 4px;font-size:15px;color:var(--fg,#1F1A17)}.box small{color:var(--fg2,#6B625C)}
 .stage{position:relative;height:300px;overflow:hidden}
 .ground{position:absolute;left:0;right:0;bottom:20px;border-top:2px dashed rgba(0,0,0,.15)}
-.dog{position:absolute;left:0;bottom:-5px;width:150px;height:150px;background:url(dog.png) no-repeat;
+.dog{position:absolute;left:0;bottom:-5px;width:150px;height:150px;background-repeat:no-repeat;
 background-size:__BGW__px 150px;z-index:1}
 .ledge{position:absolute;bottom:20px;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:16px 16px 0 0;
 box-shadow:0 10px 24px -14px rgba(120,60,40,.5)}
@@ -75,7 +75,13 @@ box-shadow:0 10px 24px -14px rgba(120,60,40,.5)}
 <button id="step">Step ▶</button>
 <button data-bg="#FBF7F3" class="on">Cream</button><button data-bg="#FCE6EE">Pink band</button><button data-bg="#ffffff">White card</button><button data-bg="#2a2020">Dark</button></div>
 <div id="boxes"></div>
-<script>const ANIMS=__ANIMS__;let speed=1,stepping=false;
+<script>const CHUNK=50;
+/* one sprite cell -> the right lab sheet (dog-lab-N.png); skips boxes that are off screen so only visible ones draw */
+const io=new IntersectionObserver(es=>es.forEach(e=>e.target._vis=e.isIntersecting),{rootMargin:"100px"});
+function bg(el,c,S){const b=el._box||(el._box=el.closest(".box"));if(!b._io){b._io=1;b._vis=true;io.observe(b)}if(!b._vis)return;
+const u="dog-lab-"+Math.floor(c/CHUNK)+".png";if(el._u!==u||el._S!==S){el.style.backgroundImage="url("+u+")";el.style.backgroundSize=(CHUNK*S)+"px "+S+"px";el._u=u;el._S=S}
+el.style.backgroundPosition=-(c%CHUNK)*S+"px 0"}
+const ANIMS=__ANIMS__;let speed=1,stepping=false;
 const boxes=document.getElementById("boxes"),items=[];
 for(const[name,A]of Object.entries(ANIMS)){const b=document.createElement("div");b.className="box";
 const n=A.keys?A.keys.length:A.frames.length;
@@ -90,7 +96,7 @@ if(A.mode==="path"){const k=A.keys[it.i],k2=A.keys[Math.min(it.i+1,it.n-1)],f=st
 cell=k[0];x=(k[1]+(k2[1]-k[1])*f)*W;y=k[2]+(k2[2]-k[2])*f}
 else if(A.mode==="run"){cell=A.frames[it.i];x=it.x*W;y=Math.sin(Math.PI*(it.i+it.acc)/it.n)*A.hop*150}
 else{cell=A.frames[it.i];x=W/2}
-it.dog.style.backgroundPosition=-cell*150+"px 0";it.dog.style.transform=`translate(${(x-AX).toFixed(1)}px,${(-y).toFixed(1)}px)`;
+bg(it.dog,cell,150);it.dog.style.transform=`translate(${(x-AX).toFixed(1)}px,${(-y).toFixed(1)}px)`;
 it.info.textContent=`frame ${it.i+1}/${it.n} · art cell ${cell+1}`}
 function adv(it){it.i=(it.i+1)%it.n;if(it.A.mode==="run"&&stepping)it.x+=it.A.speed/it.A.fps}
 let last=performance.now();(function tick(t){const dt=Math.min(.05,(t-last)/1000);last=t;
@@ -116,7 +122,7 @@ document.getElementById("step").addEventListener("click",()=>{si=(si+1)%T.length
 (function tick(n){const dt=Math.min(.05,(n-last)/1000)*speed;last=n;if(!stepping)t=(t+dt)%tot;
  let i=0,u=t;if(stepping)i=si;else{while(i<T.length-1&&u>=T[i][2]){u-=T[i][2];i++}}
  const[c,ox,,lab]=T[i],W=st.clientWidth,x0=W*.04;
- dog.style.backgroundPosition=-c*S+"px 0";dog.style.transform=`translate(${(x0+ox*k).toFixed(1)}px,0)`;
+ bg(dog,c,S);dog.style.transform=`translate(${(x0+ox*k).toFixed(1)}px,0)`;
  info.textContent=`${lab} · art cell ${c+1}`;requestAnimationFrame(tick)})(last)})})();
 /* ---- pitbull lie down -> chin on paws (wait) -> head-down tail wag -> waiting blink; timeline built in Python (LWT) ---- */
 (()=>{const T=__LWT__,S=150,k=S/300,tot=T.reduce((a,e)=>a+e[2],0);
@@ -129,7 +135,7 @@ document.getElementById("step").addEventListener("click",()=>{si=(si+1)%T.length
 (function tick(n){const dt=Math.min(.05,(n-last)/1000)*speed;last=n;if(!stepping)t=(t+dt)%tot;
  let i=0,u=t;if(stepping)i=si;else{while(i<T.length-1&&u>=T[i][2]){u-=T[i][2];i++}}
  const[c,ox,,lab]=T[i],W=st.clientWidth,x0=W*.5-T[0][1]*k-60*k-S/2;
- dog.style.backgroundPosition=-c*S+"px 0";dog.style.transform=`translate(${(x0+ox*k).toFixed(1)}px,0)`;
+ bg(dog,c,S);dog.style.transform=`translate(${(x0+ox*k).toFixed(1)}px,0)`;
  info.textContent=`${lab} · art cell ${c+1}`;requestAnimationFrame(tick)})(last)})();
 /* ---- pitbull lie-down (27 frames, owner's timing) then idle loop (6 frames, 0.5s) ---- */
 (()=>{const LD=__LDN__,WG=__WGN__,S=150,k=S/300,WAG_T=2.5,IDLE_T=5,tot=LD.t.reduce((a,b)=>a+b,0)+IDLE_T;
@@ -145,7 +151,7 @@ document.getElementById("step").addEventListener("click",()=>{si=(si+1)%45});
   if(i<0){if(u<WAG_T)i=100+Math.floor(u/(0.5/12))%12;else i=27+Math.floor((u-WAG_T)/(0.5/6))%6}}
  lab=i>=100?`tail wag loop · frame ${i-99}/12`:i<27?`lie down · frame ${i+1}/27`:`panting loop · frame ${i-26}/6`;
  const c=i>=100?WG.start+i-100:LD.start+i,ox=i>=100?LD.dx[26]+WG.dx[i-100]+WG.off:LD.dx[i];
- dog.style.backgroundPosition=-c*S+"px 0";dog.style.transform=`translate(${(x0+ox*k).toFixed(1)}px,0)`;
+ bg(dog,c,S);dog.style.transform=`translate(${(x0+ox*k).toFixed(1)}px,0)`;
  info.textContent=lab+` · art cell ${c+1}`;requestAnimationFrame(tick)})(last)})();
 /* ---- pitbull NEW jump-down set (21 frames, owner's timing): walks to the edge, crouches, dives, front paws land ---- */
 (()=>{const JDN=__JDN__,S=150,k=S/300,H=Math.round(302*149/399),tot=sum0(JDN.t)+1.2;
@@ -160,7 +166,7 @@ document.getElementById("step").addEventListener("click",()=>{si=(si+1)%21});
  const W=st.clientWidth,x0=W*.5-(JDN.dx[20]*k)/2-S/2;
  led.style.cssText=`left:0;width:${(x0+(JDN.hind[0]+JDN.edge)*k).toFixed(0)}px;height:${H}px`;
  let i=20,u=t;if(stepping)i=si;else{for(let j=0;j<21;j++){if(u<JDN.t[j]){i=j;break}u-=JDN.t[j]}}
- dog.style.backgroundPosition=-(JDN.start+i)*S+"px 0";dog.style.transform=`translate(${(x0+JDN.dx[i]*k).toFixed(1)}px,${(-H*Math.max(0,JDN.up[i])).toFixed(1)}px)`;
+ bg(dog,(JDN.start+i),S);dog.style.transform=`translate(${(x0+JDN.dx[i]*k).toFixed(1)}px,${(-H*Math.max(0,JDN.up[i])).toFixed(1)}px)`;
  info.textContent=`frame ${i+1}/21 · art cell ${JDN.start+i+1}`;requestAnimationFrame(tick)})(last)})();
 /* ---- pitbull obstacle course: walk in, jump UP onto a box, walk the top, jump DOWN, walk off; 3 box heights ---- */
 (()=>{const JDN=__JDN__,WALK=[...Array(12).keys()].map(i=>47+i),JD=[3,9,6,2,1,1,1,1,1,2,2,3,3,3,2,1,1,1,1,6,6],S=110,AX=S*110/300,CELLS=__BGW__/150;
@@ -189,7 +195,7 @@ let last=performance.now();(function tick(n){const dt=Math.min(.05,(n-last)/1000
   let t=it.t,k=0;while(k<it.segs.length&&t>=it.segs[k].t){t-=it.segs[k].t;k++}
   if(k>=it.segs.length){it.segs=plan(W,it.h);it.t=0;k=0;t=0}
   const[cell,x,y,label]=it.segs[k].f(t/it.segs[k].t);
-  it.dog.style.backgroundPosition=-cell*S+"px 0";it.dog.style.transform=`translate(${(x-AX).toFixed(1)}px,${(-y).toFixed(1)}px)`;
+  bg(it.dog,cell,S);it.dog.style.transform=`translate(${(x-AX).toFixed(1)}px,${(-y).toFixed(1)}px)`;
   it.info.textContent=label});requestAnimationFrame(tick)})(last)})();
 /* ---- interactive pitbull: walks; hover/tap the dog -> it takes turns between two tricks:
    A) sits, gives paw, holds (tail wag + blink)   B) rolls onto its back for a belly rub, wiggles while you stay.
@@ -220,7 +226,7 @@ if(mode==="hold"&&!want())go("stand");if(mode==="wiggle"&&!want())go("unroll");
 if(mode==="walk"&&!stepping){x+=dt*.12;if(x>1.1)x=-.1}
 const W=st.clientWidth,[fr2,,isB2]=seq[mode],f=fr2[Math.min(i,fr2.length-1)];let cell,left;
 if(isB2){cell=BR.start+f;left=x*W-BR.hind[RS]*k+(BR.dx[f]-BR.dx[RS])*k}else{cell=f;left=x*W-AX}
-dog.style.backgroundPosition=-cell*150+"px 0";dog.style.transform=`translate(${left.toFixed(1)}px,0)`;
+bg(dog,cell,150);dog.style.transform=`translate(${left.toFixed(1)}px,0)`;
 info.textContent=`${mode} · frame ${i+1}/${fr2.length} · art cell ${cell+1} · next trick: ${turn%2?"belly rub":"give paw"}`;requestAnimationFrame(tick)})(last)})();
 
 </script></body></html>"""
@@ -229,6 +235,8 @@ info.textContent=`${mode} · frame ${i+1}/${fr2.length} · art cell ${cell+1} ·
 def build(out: Path = OUT):
     out.mkdir(parents=True, exist_ok=True)
     shutil.copy2(BRAND / "dog-all.png", out / "dog.png")
+    for f in BRAND.glob("dog-lab-*.png"):
+        shutil.copy2(f, out / f.name)
     page = out / "dog-lab.html"
     import struct
     cells = struct.unpack(">I", (BRAND / "dog-all.png").read_bytes()[16:20])[0] // 300  # PNG width / cell

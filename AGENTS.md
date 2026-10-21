@@ -34,10 +34,11 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
      Interactive: hover/tap dog -> sit -> paw up -> hold (tail wag/blink) -> stand -> walk.
      Last request (in lab, commit pending if not already): jump up/down **three box heights**
      (tall 130px / medium 80px / small 35px).
+   - Owner jump-down set (21 frames) in lab: own box + used for the DOWN half of the 3-height course.
    - Still missing pitbull art: lie down + sleep; optional sitting hold with paw DOWN.
    - Puppy walk attempts failed (back legs never step); code-rig walk rejected. Inventory:
      `design/brand/DOG_ART_INVENTORY.md`. Packer: `design/dog_art.py` (move un-numbered sheets
-     into `orig/`). Combine: `python design/dog_art.py --combine jump run land walk frolic walkmix pitbull pitbullrun pitbullsit pitbulljump`
+     into `orig/`). Combine: `python design/dog_art.py --combine jump run land walk frolic walkmix pitbull pitbullrun pitbullsit pitbulljump pitbulljumpdown` (jumpdown is packed by `dog_art.build_travel`, see inventory)
    - HOLD Cloudflare hosting and Fort Worth scraper until design is locked.
 3. Hosting (later): Cloudflare Worker, private test URL first. Ask before deploying.
 4. Next shelters after go-ahead: Fort Worth, San Antonio, Austin, Abilene, El Paso.

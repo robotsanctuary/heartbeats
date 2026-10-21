@@ -1,0 +1,30 @@
+/* Pitbull jump-down: 21 frames, plays once (5.168s), holds the last frame.
+   Frame 1016x649. Floor ground line = 633px from top (15px of space below it).
+   Ledge: box top is 302px above the floor line (y=331px from top); box right edge at x=439px. */
+.dog-jumpdown { width:1016px; height:649px; background:url(dog_jumpdown_sheet.png) 0 0 no-repeat;
+  animation: dogjumpdown 5.168s step-end 1 forwards; }
+@keyframes dogjumpdown {
+  0.0% { background-position: -0px 0; }
+  8.9% { background-position: -1016px 0; }
+  16.9% { background-position: -2032px 0; }
+  24.2% { background-position: -3048px 0; }
+  31.4% { background-position: -4064px 0; }
+  46.0% { background-position: -5080px 0; }
+  48.4% { background-position: -6096px 0; }
+  50.8% { background-position: -7112px 0; }
+  53.2% { background-position: -8128px 0; }
+  55.6% { background-position: -9144px 0; }
+  58.0% { background-position: -10160px 0; }
+  61.3% { background-position: -11176px 0; }
+  64.5% { background-position: -12192px 0; }
+  66.9% { background-position: -13208px 0; }
+  69.3% { background-position: -14224px 0; }
+  71.8% { background-position: -15240px 0; }
+  74.2% { background-position: -16256px 0; }
+  76.6% { background-position: -17272px 0; }
+  79.8% { background-position: -18288px 0; }
+  91.9% { background-position: -19304px 0; }
+  100.0% { background-position: -20320px 0; }
+}
+.dog-jumpdown-withbox { width:1016px; height:649px; background:url(dog_jumpdown_withbox_sheet.png) 0 0 no-repeat;
+  animation: dogjumpdown 5.168s step-end 1 forwards; }

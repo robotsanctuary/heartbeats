@@ -12,7 +12,7 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept).
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept), 111-131 pitbull jump-down (travel set, dx/up/hind in dog-pitbulljumpdown.json).
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
@@ -21,6 +21,7 @@ LEDGE_H = 80
 ANIMS = {
     "PITBULL jump, travelling (sit back, rear up, leap, front paws land)": {"mode": "path", "fps": 12, "keys": [[90, 0.12, 0], [90, 0.12, 0], [90, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [93, 0.12, 0], [93, 0.12, 0], [94, 0.12, 0], [95, 0.12, 0], [96, 0.12, 0], [97, 0.12, 0], [98, 0.12, 0], [99, 0.148, 0], [99, 0.176, 0], [100, 0.203, 0], [100, 0.231, 0], [101, 0.259, 0], [101, 0.287, 0], [101, 0.314, 0], [102, 0.342, 0], [102, 0.37, 0], [102, 0.398, 0], [103, 0.426, 0], [103, 0.453, 0], [103, 0.481, 0], [104, 0.509, 0], [104, 0.537, 0], [105, 0.564, 0], [106, 0.592, 0], [107, 0.62, 0], [108, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0]]},
     "PITBULL jump in place (your timing)": {"mode": "still", "frames": [90, 90, 90, 91, 91, 91, 91, 91, 91, 91, 91, 91, 92, 92, 92, 92, 92, 92, 93, 93, 94, 95, 96, 97, 98, 99, 99, 100, 100, 101, 101, 101, 102, 102, 102, 103, 103, 103, 104, 104, 105, 106, 107, 108, 109, 109, 109, 109, 109, 109, 110, 110, 110, 110, 110, 110], "fps": 12},
+    "PITBULL NEW jump-down frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(111, 132)), "fps": 2},
     "PITBULL jump frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(90, 111)), "fps": 2},
     "PITBULL sit down (frames 1-6, then holds)": {"mode": "still", "frames": [69, 70, 71, 72, 73, 74, 74, 74, 74, 74], "fps": 5},
     "PITBULL give paw (frames 7-15, then hold loop)": {"mode": "still", "frames": list(range(75, 84)) + [84, 85, 86, 87, 88, 89] * 2, "fps": 6},
@@ -96,8 +97,23 @@ items.forEach(it=>{it.acc=0;adv(it)})};
 document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".box").forEach(x=>{x.style.setProperty("--bg",b.dataset.bg);const dk=b.dataset.bg==="#2a2020";x.style.setProperty("--fg",dk?"#fff":"#1F1A17");x.style.setProperty("--fg2",dk?"#d8cfc9":"#6B625C")});
 document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x===b))});
 document.querySelectorAll(".box").forEach(x=>x.style.setProperty("--bg","#FBF7F3"));
+/* ---- pitbull NEW jump-down set (21 frames, owner's timing): walks to the edge, crouches, dives, front paws land ---- */
+(()=>{const JDN=__JDN__,S=150,k=S/300,H=Math.round(302*149/399),tot=sum0(JDN.t)+1.2;
+function sum0(a){return a.reduce((x,y)=>x+y,0)}
+const b=document.createElement("div");b.className="box";
+b.innerHTML=`<h3>PITBULL: NEW jump DOWN set (your 21 frames, your timing)</h3><small>art drawn for a ${H}px box · loops with a 1.2s pause</small><div class="stage" style="height:330px"><div class="ground"></div><div class="ledge"></div><div class="dog"></div></div><div class="info"></div>`;
+boxes.prepend(b);b.style.setProperty("--bg","#FBF7F3");
+const st=b.querySelector(".stage"),dog=b.querySelector(".dog"),info=b.querySelector(".info"),led=b.querySelector(".ledge");
+let t=0,si=0,last=performance.now();
+document.getElementById("step").addEventListener("click",()=>{si=(si+1)%21});
+(function tick(n){const dt=Math.min(.05,(n-last)/1000)*speed;last=n;if(!stepping)t=(t+dt)%tot;
+ const W=st.clientWidth,x0=W*.5-(JDN.dx[20]*k)/2-S/2;
+ led.style.cssText=`left:0;width:${(x0+(JDN.hind[0]+JDN.edge)*k).toFixed(0)}px;height:${H}px`;
+ let i=20,u=t;if(stepping)i=si;else{for(let j=0;j<21;j++){if(u<JDN.t[j]){i=j;break}u-=JDN.t[j]}}
+ dog.style.backgroundPosition=-(JDN.start+i)*S+"px 0";dog.style.transform=`translate(${(x0+JDN.dx[i]*k).toFixed(1)}px,${(-H*Math.max(0,JDN.up[i])).toFixed(1)}px)`;
+ info.textContent=`frame ${i+1}/21 · art cell ${JDN.start+i+1}`;requestAnimationFrame(tick)})(last)})();
 /* ---- pitbull obstacle course: walk in, jump UP onto a box, walk the top, jump DOWN, walk off; 3 box heights ---- */
-(()=>{const WALK=[...Array(12).keys()].map(i=>47+i),JD=[3,9,6,2,1,1,1,1,1,2,2,3,3,3,2,1,1,1,1,6,6],S=110,AX=S*110/300,CELLS=__BGW__/150;
+(()=>{const JDN=__JDN__,WALK=[...Array(12).keys()].map(i=>47+i),JD=[3,9,6,2,1,1,1,1,1,2,2,3,3,3,2,1,1,1,1,6,6],S=110,AX=S*110/300,CELLS=__BGW__/150;
 const sum=a=>a.reduce((x,y)=>x+y,0),items=[];
 function plan(W,h){const bx0=W*.36,bx1=W*.74,segs=[];
  const walk=(x0,x1,y)=>{const d=Math.abs(x1-x0)/55;segs.push({t:d,f:(p)=>[WALK[Math.floor(p*d*10)%12],x0+(x1-x0)*p,y,"walk"]})};
@@ -106,8 +122,12 @@ function plan(W,h){const bx0=W*.36,bx1=W*.74,segs=[];
    segs.push({t:tot/12,f:(p)=>{let u=p*tot,i=0;while(i<ds.length-1&&u>=ds[i]){u-=ds[i];i++}
      const q=Math.min(1,Math.max(0,(p*tot-before)/airT));return[90+from+i,x0+(x1-x0)*q,y0+(y1-y0)*q,name+" · art cell "+(91+from+i)]}})};
  const stand=(x,y,t)=>segs.push({t,f:()=>[110,x,y,"stand"]});
- walk(-S,bx0-70,0);jump(bx0-70,bx0+12,0,h,0,"jump UP");stand(bx0+12,h,.5);walk(bx0+12,bx1-75,h);
- jump(bx1-75,bx1+35,h,0,9,"jump DOWN");stand(bx1+35,0,.4);walk(bx1+35,W+S,0);return segs}
+ walk(-S,bx0-70,0);jump(bx0-70,bx0+12,0,h,0,"jump UP");stand(bx0+12,h,.5);walk(bx0+12,bx1-JDN.edge*S/300,h);
+ const down=(x0,y0)=>{const k=S/300,L=x0-JDN.hind[0]*k,tot=sum(JDN.t);
+   segs.push({t:tot,f:(p)=>{let u=p*tot,i=0;while(i<JDN.t.length-1&&u>=JDN.t[i]){u-=JDN.t[i];i++}
+     return[JDN.start+i,L+JDN.dx[i]*k+AX,y0*Math.max(0,JDN.up[i]),"jump DOWN (new set) · frame "+(i+1)+"/21"]}});
+   return L+(JDN.dx[20]+JDN.hind[20])*k};
+ const xe=down(bx1-JDN.edge*S/300,h);walk(xe,W+S,0);return segs}
 [["tall",130],["medium",80],["small",35]].forEach(([label,h])=>{const b=document.createElement("div");b.className="box";
  b.innerHTML=`<h3>PITBULL: up and down a ${label} box (${h}px)</h3><small>walks in → jumps up → walks across the top → jumps down → walks off</small><div class="stage" style="height:330px"><div class="ground"></div><div class="ledge"></div><div class="dog"></div></div><div class="info"></div>`;
  boxes.prepend(b);b.style.setProperty("--bg","#FBF7F3");
@@ -153,7 +173,14 @@ def build(out: Path = OUT):
     page = out / "dog-lab.html"
     import struct
     cells = struct.unpack(">I", (BRAND / "dog-all.png").read_bytes()[16:20])[0] // 300  # PNG width / cell
-    page.write_text(PAGE.replace("__ANIMS__", json.dumps(ANIMS)).replace("__BGW__", str(cells * 150)))
+    starts = {"pitbulljumpdown": 111}
+    jd = json.loads((BRAND / "dog-pitbulljumpdown.json").read_text())
+    css = (BRAND / "dog-src-pitbull-jumpdown/orig/dog_jumpdown.css").read_text()
+    import re
+    pct = [float(x) for x in re.findall(r"([\d.]+)% \{ background-position", css)]
+    jdn = {"start": starts["pitbulljumpdown"], "dx": jd["dx"], "up": jd["up"], "hind": jd["hind"], "edge": round((439 - 202) * 149 / 399 + 150 - jd["hind"][0], 1),
+           "t": [round((b - a) / 100 * 5.168, 3) for a, b in zip(pct, pct[1:])] + [0.4]}
+    page.write_text(PAGE.replace("__JDN__", json.dumps(jdn)).replace("__ANIMS__", json.dumps(ANIMS)).replace("__BGW__", str(cells * 150)))
     return page
 
 

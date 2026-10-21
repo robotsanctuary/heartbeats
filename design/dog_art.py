@@ -103,6 +103,44 @@ def build(src: Path, name: str = "jump", pick=None):
     return out, meta
 
 
+def build_travel(src: Path, name: str, scale: float, top_y: float, floor_y: float, on_top: int, on_floor: int):
+    """Pack a set that moves across its own canvas (e.g. the owner's jump-down: dog walks off a box and lands
+    on the floor). Each frame is scaled by ONE factor (to match the other sets) and centred in its cell; the
+    motion the art had on its canvas is kept as data in dog-<name>.json so the engine can replay it:
+      dx[i]  = how far (cell px) frame i's cell sits right of frame 1's cell,
+      up[i]  = height above the floor as a fraction of the drawn box height (1 = on the box top, 0 = floor).
+    Frames 1..on_top stand on the box top (top_y), frames on_floor..N on the floor (floor_y); the frames in
+    between are airborne and use their lowest pixel. Feet go on the cell ground line (ANCHOR y).
+    hind[i] = the hind-foot x in the cell for standing frames (to join walk cycles without a jump)."""
+    files = sorted(src.glob("*.png"), key=lambda p: int(re.findall(r"(\d+)\.png$", p.name)[0]))
+    cells, dx, up, hind, ox0 = [], [], [], [], None
+    for n, f in enumerate(files, 1):
+        raw = Image.open(f).convert("RGBA")
+        x0, y0, x1, y1 = raw.getchannel("A").getbbox()
+        support = top_y if n <= on_top else floor_y if n >= on_floor else y1
+        im = clean(raw)  # cropped to bbox
+        im = im.resize((round(im.width * scale), round(im.height * scale)), Image.LANCZOS)
+        cx = (x0 + x1) / 2 * scale
+        cell = Image.new("RGBA", (CELL, CELL))
+        px, py = round(CELL / 2 - im.width / 2), round(ANCHOR[1] - (support - y0) * scale)
+        cell.paste(im, (px, py), im)
+        cells.append(cell)
+        if ox0 is None:
+            ox0 = cx
+        dx.append(round(cx - ox0, 1))
+        up.append(round((floor_y - support) / (floor_y - top_y), 3))
+        hind.append(round(px + hind_foot_x(im), 1) if (n <= on_top or n >= on_floor) else None)
+    sheet = Image.new("RGBA", (CELL * len(cells), CELL))
+    for i, c in enumerate(cells):
+        sheet.paste(c, (i * CELL, 0))
+    out = BRAND / f"dog-{name}.png"
+    sheet.save(out, optimize=True)
+    meta = {"frames": len(cells), "cell": CELL, "cx": ANCHOR[0] / CELL, "foot": ANCHOR[1] / CELL,
+            "dx": dx, "up": up, "hind": hind}
+    (BRAND / f"dog-{name}.json").write_text(json.dumps(meta))
+    return out, meta
+
+
 def tilt(cell: Image.Image, deg: float) -> Image.Image:
     """Tip a packed cell nose-down (negative deg) around its FRONT paw, then drop it so the lowest
     point touches the ground line. Used to draw landing frames where the front paws hit first."""

@@ -12,13 +12,16 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run.
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6.
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
 # mode "still": frames play in place (for checking single frames).
 LEDGE_H = 80
 ANIMS = {
+    "PITBULL sit down (frames 1-6, then holds)": {"mode": "still", "frames": [69, 70, 71, 72, 73, 74, 74, 74, 74, 74], "fps": 5},
+    "PITBULL give paw (frames 7-15, then hold loop)": {"mode": "still", "frames": list(range(75, 84)) + [84, 85, 86, 87, 88, 89] * 2, "fps": 6},
+    "PITBULL sitting hold loop (tail wag + blink)": {"mode": "still", "frames": [84, 85, 86, 87, 88, 89], "fps": 5},
     "Run across: PITBULL gallop (10 frames)": {"mode": "run", "frames": list(range(59, 69)), "fps": 14, "speed": .38, "hop": .12},
     "Walk across: PITBULL sheet (12 frames)": {"mode": "run", "frames": list(range(47, 59)), "fps": 10, "speed": .12, "hop": 0},
     "Walk across A: new sheet, near front paw steps": {"mode": "run", "frames": [23, 24, 25, 26, 27, 28, 29, 30], "fps": 8, "speed": .12, "hop": 0},

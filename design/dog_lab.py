@@ -12,7 +12,7 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept), 111-131 pitbull jump-down (travel set, dx/up/hind in dog-pitbulljumpdown.json), 132-158 pitbull lie-down L1-27, 159-164 lying idle I1-6 (travel set).
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk, 59-68 pitbull run, 69-83 pitbull sit S1-15, 84-89 sit hold H1-6, 90-110 pitbull jump (in-place sheet, arc kept), 111-131 pitbull jump-down (travel set, dx/up/hind in dog-pitbulljumpdown.json), 132-158 pitbull lie-down L1-27, 159-164 lying idle I1-6 (travel set), 165-196 belly rub B1-32, 197-214 belly wiggle W1-18 (travel set).
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
@@ -21,6 +21,7 @@ LEDGE_H = 80
 ANIMS = {
     "PITBULL jump, travelling (sit back, rear up, leap, front paws land)": {"mode": "path", "fps": 12, "keys": [[90, 0.12, 0], [90, 0.12, 0], [90, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [91, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [92, 0.12, 0], [93, 0.12, 0], [93, 0.12, 0], [94, 0.12, 0], [95, 0.12, 0], [96, 0.12, 0], [97, 0.12, 0], [98, 0.12, 0], [99, 0.148, 0], [99, 0.176, 0], [100, 0.203, 0], [100, 0.231, 0], [101, 0.259, 0], [101, 0.287, 0], [101, 0.314, 0], [102, 0.342, 0], [102, 0.37, 0], [102, 0.398, 0], [103, 0.426, 0], [103, 0.453, 0], [103, 0.481, 0], [104, 0.509, 0], [104, 0.537, 0], [105, 0.564, 0], [106, 0.592, 0], [107, 0.62, 0], [108, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [109, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0], [110, 0.62, 0]]},
     "PITBULL jump in place (your timing)": {"mode": "still", "frames": [90, 90, 90, 91, 91, 91, 91, 91, 91, 91, 91, 91, 92, 92, 92, 92, 92, 92, 93, 93, 94, 95, 96, 97, 98, 99, 99, 100, 100, 101, 101, 101, 102, 102, 102, 103, 103, 103, 104, 104, 105, 106, 107, 108, 109, 109, 109, 109, 109, 109, 110, 110, 110, 110, 110, 110], "fps": 12},
+    "PITBULL belly rub B1-32 + wiggle W1-18 (in place, slow)": {"mode": "still", "frames": list(range(165, 215)), "fps": 3},
     "PITBULL NEW lie-down frames 1-27 + idle 1-6 (in place, slow)": {"mode": "still", "frames": list(range(132, 165)), "fps": 2},
     "PITBULL NEW jump-down frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(111, 132)), "fps": 2},
     "PITBULL jump frames 1-21 (in place, slow)": {"mode": "still", "frames": list(range(90, 111)), "fps": 2},
@@ -157,28 +158,37 @@ let last=performance.now();(function tick(n){const dt=Math.min(.05,(n-last)/1000
   const[cell,x,y,label]=it.segs[k].f(t/it.segs[k].t);
   it.dog.style.backgroundPosition=-cell*S+"px 0";it.dog.style.transform=`translate(${(x-AX).toFixed(1)}px,${(-y).toFixed(1)}px)`;
   it.info.textContent=label});requestAnimationFrame(tick)})(last)})();
-/* ---- interactive pitbull: walks; hover/tap the dog -> sits, gives paw, holds (tail wag + blink); leave -> stands, walks on ---- */
-(()=>{const WALK=[...Array(12).keys()].map(i=>47+i),SIT=[69,70,71,72,73,74],PAW=[75,76,77,78,79,80,81,82,83],HOLD=[84,85,86,87,88,89];
+/* ---- interactive pitbull: walks; hover/tap the dog -> it takes turns between two tricks:
+   A) sits, gives paw, holds (tail wag + blink)   B) rolls onto its back for a belly rub, wiggles while you stay.
+   Leave -> A stands up / B rolls back over (belly-rub frames reversed), then walks on. ---- */
+(()=>{const BR=__BRN__,WALK=[...Array(12).keys()].map(i=>47+i),SIT=[69,70,71,72,73,74],PAW=[75,76,77,78,79,80,81,82,83],HOLD=[84,85,86,87,88,89];
+const RS=7,ROLL=[...Array(32-RS).keys()].map(i=>i+RS),WIG=[...Array(18).keys()].map(i=>32+i); /* belly-rub frames (0-based within its set); starts at B8 = standing */
 const b=document.createElement("div");b.className="box";
-b.innerHTML=`<h3>PITBULL: hover or tap the dog</h3><small>walks → (hover/tap) sits → paw up → holds while you stay → stands and walks on</small><div class="stage"><div class="ground"></div><div class="dog" style="cursor:pointer"></div></div><div class="info"></div>`;
-boxes.prepend(b);b.style.setProperty("--bg",getComputedStyle(document.querySelector(".box:not(:first-child)")||b).getPropertyValue("--bg")||"#FBF7F3");
-const st=b.querySelector(".stage"),dog=b.querySelector(".dog"),info=b.querySelector(".info");
-let mode="walk",i=0,acc=0,x=.1,held=false,tapUntil=0,last=performance.now();
-const seq={walk:[WALK,10],sit:[SIT,9],paw:[PAW,9],hold:[HOLD,5],stand:[SIT.slice().reverse(),12]};
+b.innerHTML=`<h3>PITBULL: hover or tap the dog (takes turns: give paw / belly rub)</h3><small>walks → (hover/tap) 1st time sits + paw up, 2nd time rolls over for a belly rub, then alternates · stays while you hover (tap = 4s) → gets up and walks on</small><div class="stage"><div class="ground"></div><div class="dog" style="cursor:pointer"></div></div><div class="info"></div>`;
+boxes.prepend(b);b.style.setProperty("--bg","#FBF7F3");
+const st=b.querySelector(".stage"),dog=b.querySelector(".dog"),info=b.querySelector(".info"),k=150/300;
+let mode="walk",i=0,acc=0,x=.1,held=false,tapUntil=0,turn=0,last=performance.now();
+/* [frames, fps or per-frame seconds, is belly-rub set] */
+const brT=f=>BR.t[f]||1/12;
+const seq={walk:[WALK,10],sit:[SIT,9],paw:[PAW,9],hold:[HOLD,5],stand:[SIT.slice().reverse(),12],
+ roll:[ROLL,0,1],wiggle:[WIG,12,1],unroll:[ROLL.slice().reverse(),16,1]};
 const go=m=>{mode=m;i=0;acc=0};
 const want=()=>held||performance.now()<tapUntil;
-dog.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse"){held=true;if(mode==="walk"||mode==="stand")go("sit")}});
+const react=()=>{if(mode!=="walk")return;go(turn++%2?"roll":"sit")};
+dog.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse"){held=true;react()}});
 dog.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")held=false});
-dog.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"){tapUntil=performance.now()+4000;if(mode==="walk"||mode==="stand")go("sit")}});
-(function tick(t){const dt=Math.min(.05,(t-last)/1000)*speed;last=t;const[fr,fps]=seq[mode];
-if(!stepping){acc+=dt*fps;while(acc>=1){acc--;i++;
- if(i>=fr.length){if(mode==="walk"||mode==="hold")i=0;
-  else if(mode==="sit")go("paw");else if(mode==="paw")go("hold");else if(mode==="stand")go("walk")}}}
-if(mode==="hold"&&!want())go("stand");
+dog.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"){tapUntil=performance.now()+4000;react()}});
+(function tick(t){const dt=Math.min(.05,(t-last)/1000)*speed;last=t;const[fr,fps,isB]=seq[mode];
+if(!stepping){acc+=dt*(fps||1/brT(fr[Math.min(i,fr.length-1)]));while(acc>=1){acc--;i++;
+ if(i>=fr.length){if(mode==="walk"||mode==="hold"||mode==="wiggle")i=0;
+  else if(mode==="sit")go("paw");else if(mode==="paw")go("hold");else if(mode==="stand"||mode==="unroll")go("walk");else if(mode==="roll")go("wiggle")}
+ if(!fps)break}}
+if(mode==="hold"&&!want())go("stand");if(mode==="wiggle"&&!want())go("unroll");
 if(mode==="walk"&&!stepping){x+=dt*.12;if(x>1.1)x=-.1}
-const W=st.clientWidth,cell=seq[mode][0][Math.min(i,seq[mode][0].length-1)];
-dog.style.backgroundPosition=-cell*150+"px 0";dog.style.transform=`translate(${(x*W-AX).toFixed(1)}px,0)`;
-info.textContent=`${mode} · frame ${i+1}/${seq[mode][0].length} · art cell ${cell+1}`;requestAnimationFrame(tick)})(last)})();
+const W=st.clientWidth,[fr2,,isB2]=seq[mode],f=fr2[Math.min(i,fr2.length-1)];let cell,left;
+if(isB2){cell=BR.start+f;left=x*W-BR.hind[RS]*k+(BR.dx[f]-BR.dx[RS])*k}else{cell=f;left=x*W-AX}
+dog.style.backgroundPosition=-cell*150+"px 0";dog.style.transform=`translate(${left.toFixed(1)}px,0)`;
+info.textContent=`${mode} · frame ${i+1}/${fr2.length} · art cell ${cell+1} · next trick: ${turn%2?"belly rub":"give paw"}`;requestAnimationFrame(tick)})(last)})();
 
 </script></body></html>"""
 
@@ -200,7 +210,11 @@ def build(out: Path = OUT):
     css = (BRAND / "dog-src-pitbull-liedown/orig/dog_liedown.css").read_text().split("Multi-row")[0]
     pct = [float(x) for x in re.findall(r"([\d.]+)% \{ background-position", css)]
     ldn = {"start": 132, "dx": ld["dx"], "t": [round((b - a) / 100 * 4.631, 3) for a, b in zip(pct, pct[1:])] + [0.25]}
-    page.write_text(PAGE.replace("__LDN__", json.dumps(ldn)).replace("__JDN__", json.dumps(jdn)).replace("__ANIMS__", json.dumps(ANIMS)).replace("__BGW__", str(cells * 150)))
+    br = json.loads((BRAND / "dog-pitbullbellyrub.json").read_text())
+    bm = json.loads((BRAND / "dog-src-pitbull-bellyrub/orig/meta.json").read_text())
+    brn = {"start": 165, "dx": br["dx"], "hind": br["hind"],
+           "t": [(d or 167) / 1000 for d in bm["durations_ms"]] + [bm["wiggle_ms_per_frame"] / 1000] * 18}
+    page.write_text(PAGE.replace("__BRN__", json.dumps(brn)).replace("__LDN__", json.dumps(ldn)).replace("__JDN__", json.dumps(jdn)).replace("__ANIMS__", json.dumps(ANIMS)).replace("__BGW__", str(cells * 150)))
     return page
 
 

@@ -31,14 +31,14 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    - Owner prefers the **pitbull** art (walk/run/sit/jump zips, real RGBA). Do NOT switch `DOG_JS`
      until they say so.
    - Lab: `http://192.168.1.71:8787/dog-lab.html` (rebuild: `$PY design/build_site.py`).
-     Interactive: hover/tap dog -> sit -> paw up -> hold (tail wag/blink) -> stand -> walk.
+     Interactive: hover/tap dog takes turns: (A) sit -> paw up -> hold -> stand, (B) belly-rub roll -> wiggle -> roll back; then walks on.
      Last request (in lab, commit pending if not already): jump up/down **three box heights**
      (tall 130px / medium 80px / small 35px).
    - Owner jump-down set (21 frames) in lab: own box + used for the DOWN half of the 3-height course.
    - Owner lie-down set (27 + 6 idle) in lab. Still missing: sleep (head down, eyes closed) + get-up; optional sit hold with paw DOWN.
    - Puppy walk attempts failed (back legs never step); code-rig walk rejected. Inventory:
      `design/brand/DOG_ART_INVENTORY.md`. Packer: `design/dog_art.py` (move un-numbered sheets
-     into `orig/`). Combine: `python design/dog_art.py --combine jump run land walk frolic walkmix pitbull pitbullrun pitbullsit pitbulljump pitbulljumpdown pitbullliedown` (jumpdown is packed by `dog_art.build_travel`, see inventory)
+     into `orig/`). Combine: `python design/dog_art.py --combine jump run land walk frolic walkmix pitbull pitbullrun pitbullsit pitbulljump pitbulljumpdown pitbullliedown pitbullbellyrub` (jumpdown is packed by `dog_art.build_travel`, see inventory)
    - HOLD Cloudflare hosting and Fort Worth scraper until design is locked.
 3. Hosting (later): Cloudflare Worker, private test URL first. Ask before deploying.
 4. Next shelters after go-ahead: Fort Worth, San Antonio, Austin, Abilene, El Paso.

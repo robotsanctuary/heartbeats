@@ -1,0 +1,101 @@
+/* Pitbull belly-rub roll: 32 frames, 3.790s, plays once and holds the last frame. Frame 710x417, ground line 401px from top (15px below). */
+.dog-bellyrub { width:710px; height:417px; background:url(dog_bellyrub_sheet.png) 0 0 no-repeat; animation: dogbellyrub 3.790s step-end 1 forwards; }
+@keyframes dogbellyrub {
+  0.00% { background-position: -0px -0px; }
+  4.41% { background-position: -710px -0px; }
+  8.81% { background-position: -1420px -0px; }
+  11.00% { background-position: -2130px -0px; }
+  13.19% { background-position: -2840px -0px; }
+  15.38% { background-position: -3550px -0px; }
+  17.57% { background-position: -4260px -0px; }
+  19.76% { background-position: -4970px -0px; }
+  21.95% { background-position: -5680px -0px; }
+  24.14% { background-position: -6390px -0px; }
+  26.33% { background-position: -7100px -0px; }
+  28.52% { background-position: -7810px -0px; }
+  30.71% { background-position: -8520px -0px; }
+  32.90% { background-position: -9230px -0px; }
+  35.09% { background-position: -9940px -0px; }
+  37.28% { background-position: -10650px -0px; }
+  39.47% { background-position: -11360px -0px; }
+  43.88% { background-position: -12070px -0px; }
+  46.07% { background-position: -12780px -0px; }
+  48.26% { background-position: -13490px -0px; }
+  50.45% { background-position: -14200px -0px; }
+  55.94% { background-position: -14910px -0px; }
+  60.34% { background-position: -15620px -0px; }
+  64.75% { background-position: -16330px -0px; }
+  69.16% { background-position: -17040px -0px; }
+  73.56% { background-position: -17750px -0px; }
+  77.97% { background-position: -18460px -0px; }
+  82.37% { background-position: -19170px -0px; }
+  86.78% { background-position: -19880px -0px; }
+  91.19% { background-position: -20590px -0px; }
+  95.59% { background-position: -21300px -0px; }
+  100.00% { background-position: -22010px -0px; }
+}
+
+/* Multi-row sheet (16 per row x 2 rows) */
+.dog-bellyrub-rows { width:710px; height:417px; background:url(dog_bellyrub_sheet_rows.png) 0 0 no-repeat; animation: dogbellyrubrows 3.790s step-end 1 forwards; }
+@keyframes dogbellyrubrows {
+  0.00% { background-position: -0px -0px; }
+  4.41% { background-position: -710px -0px; }
+  8.81% { background-position: -1420px -0px; }
+  11.00% { background-position: -2130px -0px; }
+  13.19% { background-position: -2840px -0px; }
+  15.38% { background-position: -3550px -0px; }
+  17.57% { background-position: -4260px -0px; }
+  19.76% { background-position: -4970px -0px; }
+  21.95% { background-position: -5680px -0px; }
+  24.14% { background-position: -6390px -0px; }
+  26.33% { background-position: -7100px -0px; }
+  28.52% { background-position: -7810px -0px; }
+  30.71% { background-position: -8520px -0px; }
+  32.90% { background-position: -9230px -0px; }
+  35.09% { background-position: -9940px -0px; }
+  37.28% { background-position: -10650px -0px; }
+  39.47% { background-position: -0px -417px; }
+  43.88% { background-position: -710px -417px; }
+  46.07% { background-position: -1420px -417px; }
+  48.26% { background-position: -2130px -417px; }
+  50.45% { background-position: -2840px -417px; }
+  55.94% { background-position: -3550px -417px; }
+  60.34% { background-position: -4260px -417px; }
+  64.75% { background-position: -4970px -417px; }
+  69.16% { background-position: -5680px -417px; }
+  73.56% { background-position: -6390px -417px; }
+  77.97% { background-position: -7100px -417px; }
+  82.37% { background-position: -7810px -417px; }
+  86.78% { background-position: -8520px -417px; }
+  91.19% { background-position: -9230px -417px; }
+  95.59% { background-position: -9940px -417px; }
+  100.00% { background-position: -10650px -417px; }
+}
+
+/* Paws-up wiggle loop, 18 frames, 1.494s, seamless (starts on the once-animation's last pose). Use for hover/click. */
+.dog-bellyrub-wiggle { width:710px; height:417px; background:url(dog_bellyrub_wiggle_sheet.png) 0 0 no-repeat; animation: dogbellyrubwiggle 1.494s steps(18) infinite; }
+@keyframes dogbellyrubwiggle { to { background-position: -12780px 0; } }
+
+/* Wiggle loop, multi-row sheet (9 per row x 2 rows) */
+.dog-bellyrub-wiggle-rows { width:710px; height:417px; background:url(dog_bellyrub_wiggle_sheet_rows.png) 0 0 no-repeat; animation: dogbellyrubwigglerows 1.494s step-end infinite; }
+@keyframes dogbellyrubwigglerows {
+  0.00% { background-position: -0px -0px; }
+  5.88% { background-position: -710px -0px; }
+  11.76% { background-position: -1420px -0px; }
+  17.65% { background-position: -2130px -0px; }
+  23.53% { background-position: -2840px -0px; }
+  29.41% { background-position: -3550px -0px; }
+  35.29% { background-position: -4260px -0px; }
+  41.18% { background-position: -4970px -0px; }
+  47.06% { background-position: -5680px -0px; }
+  52.94% { background-position: -0px -417px; }
+  58.82% { background-position: -710px -417px; }
+  64.71% { background-position: -1420px -417px; }
+  70.59% { background-position: -2130px -417px; }
+  76.47% { background-position: -2840px -417px; }
+  82.35% { background-position: -3550px -417px; }
+  88.24% { background-position: -4260px -417px; }
+  94.12% { background-position: -4970px -417px; }
+  100.00% { background-position: -5680px -417px; }
+}
+/* Chain: .dog-bellyrub, then swap to .dog-bellyrub-wiggle on animationend. */

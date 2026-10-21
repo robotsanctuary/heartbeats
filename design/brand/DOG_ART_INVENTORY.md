@@ -29,3 +29,10 @@ Vision notes: ears look pointier in 11-16 (dive); frame 21 turns toward the view
 Packed with `dog_art.build_travel(..., scale=149/399, top_y=0, floor_y=345, on_top=0, on_floor=1)` (all floor frames).
 Vision notes: L23->L24 pops (tail upright->flat, eyes closed->open, head a bit bigger). No sleep (eyes closed / head
 on paws) and no get-up frames yet.
+
+## Pitbull belly rub (owner zip, 2026-10-21) — cells 165-196 (B1-32) + 197-214 (wiggle W1-18)
+710x417 canvas, ground y=401, per-frame timing in orig/meta.json (durations_ms, wiggle 83ms).
+B1-6 lying -> pushes up, B7-13 stands/trots, B14-18 head dips + rolls, B19-32 on back, W1-18 paws-up wiggle loop.
+Packed with `dog_art.build_travel(..., scale=0.379, top_y=0, floor_y=401, on_top=0, on_floor=1)`.
+Lab hover box takes turns: give paw / belly rub (starts at B8 standing; get-up = roll frames reversed).
+Vision notes: B21->B22 belly colour/pose pop; leg tangles in some on-back frames (B27, W3, W11, W15).

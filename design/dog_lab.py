@@ -12,13 +12,14 @@ from pathlib import Path
 BRAND = Path(__file__).resolve().parent / "brand"
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
 
-# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix.
+# Cells in dog-all.png: 0-11 jump zip frames 1-12, 12-17 run (zip 2 frames 3,6,1,4,7,8), 18-22 landing (dog_art.LAND), 23-30 walk, 31-38 frolic, 39-46 walk mix, 47-58 pitbull walk.
 # mode "run":  frames loop while the dog travels across the box (speed = box widths per second), hop per stride.
 # mode "path": keys = [cell, x (0-1 across the box), height above the floor in px]; position glides between keys.
 #              ledge = a card the dog jumps onto / off: [side, where it starts/ends (0-1), height px].
 # mode "still": frames play in place (for checking single frames).
 LEDGE_H = 80
 ANIMS = {
+    "Walk across: PITBULL sheet (12 frames)": {"mode": "run", "frames": list(range(47, 59)), "fps": 10, "speed": .12, "hop": 0},
     "Walk across A: new sheet, near front paw steps": {"mode": "run", "frames": [23, 24, 25, 26, 27, 28, 29, 30], "fps": 8, "speed": .12, "hop": 0},
     "Walk across B: mix, near front then far front": {"mode": "run", "frames": [39, 40, 41, 42, 43, 44, 45, 46], "fps": 7, "speed": .12, "hop": 0},
     "Frolic across (front together, back together)": {"mode": "run", "frames": [32, 33, 34, 35, 36], "fps": 9, "speed": .30, "hop": .3},
@@ -34,6 +35,7 @@ ANIMS = {
     "All run frames 1-6 (in place)": {"mode": "still", "frames": list(range(12, 18)), "fps": 2},
     "Walk frames 1-8 (in place)": {"mode": "still", "frames": list(range(23, 31)), "fps": 2},
     "Frolic frames 1-8 (in place)": {"mode": "still", "frames": list(range(31, 39)), "fps": 2},
+    "Pitbull frames 1-12 (in place)": {"mode": "still", "frames": list(range(47, 59)), "fps": 2},
     "Landing frames 1-5 (in place)": {"mode": "still", "frames": list(range(18, 23)), "fps": 2},
 }
 

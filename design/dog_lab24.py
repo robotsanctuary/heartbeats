@@ -72,16 +72,16 @@ def boxes():
 
     add("PITBULL hover or tap me: sits and gives paw (24 fps)",
         "walks → hover (mouse) / tap (4 s) → sit + paw up, holds while you stay → stands → walks on",
-        loop("walk", 1.0), interactive=True, world=[-60, 1400])
-    add("Walk across (24 frames, 1.0 s per stride)", "", loop("walk", 19, -500, 101), world=[0, 1400])
-    add("NEW sniff-walk across (33 frames, nose to the ground)", "", loop("sniffwalk", 19, -500, 103), world=[0, 1400])
+        loop("walk", 1.0), interactive=True, world=[0, 1016])
+    add("Walk across (24 frames, 1.0 s per stride)", "", loop("walk", 15, -500, 101), world=[0, 1016])
+    add("NEW sniff-walk across (33 frames, nose to the ground)", "", loop("sniffwalk", 15, -500, 103), world=[0, 1016])
     T = []
-    for k in range(4):
+    for k in range(3):
         T += loop("walk", 2.0, -500 + 101 * 4.75 * k, 101)
         T += loop("sniffwalk", 2.75, -500 + 101 * 4.75 * k + 202, 103)
     add("NEW walk ↔ sniff-walk switching (same canvas, swap in place)", "walks 2 s, sniffs 2.75 s, repeats", T,
-        world=[0, 1400])
-    add("Run across (10 frames, 0.42 s per stride)", "", loop("run", 6, -500, 300), world=[0, 1400])
+        world=[0, 1016])
+    add("Run across (10 frames, 0.42 s per stride)", "", loop("run", 5, -500, 300), world=[0, 1016])
     add("NEW sniff-box: walks up to the box and sniffs (box in front)", "119 frames + sniff loop ×6, your timing",
         play("sniffbox") + loop("sniffloop", 3.5) + [["sniffloop", 0, .8, 0]], box="front")
     add("NEW paw-box: walks up and paws at the box, looks back at you (box behind)",
@@ -125,7 +125,7 @@ canvas{display:block;width:100%;margin-top:6px}
 <a href="dog-lab.html" style="align-self:center;margin-left:6px">old 12 fps lab</a></div>
 <div id="boxes"></div>
 <script>
-const M=__META__,B=__BOXES__,SC=M.sc,IMG={},DIR="dog24/";let speed=1,stepping=false;
+const M=__META__,B=__BOXES__,SC=M.sc,VIEW=1056,IMG={},DIR="dog24/";let speed=1,stepping=false;
 function img(f){return IMG[f]||(IMG[f]=Object.assign(new Image(),{src:DIR+f}))}
 const io=new IntersectionObserver(es=>es.forEach(e=>e.target._vis=e.isIntersecting),{rootMargin:"150px"});
 const items=[];
@@ -140,7 +140,7 @@ for(const A of B){const b=document.createElement("div");b.className="box";
  if(A.interactive)setupHover(it);items.push(it)}
 img(M.box.file);
 function size(it){const W=it.cv.clientWidth,dpr=Math.min(2,devicePixelRatio||1);
- const k=Math.min(1.25,W/((it.x1-it.x0)*SC)),H=Math.round(it.h*SC*k+18);
+ const k=Math.min(1,W/(VIEW*SC)),H=Math.round(it.h*SC*k+18);
  if(it.cv.width!==Math.round(W*dpr)||it.cv.height!==Math.round(H*dpr)){it.cv.width=Math.round(W*dpr);it.cv.height=Math.round(H*dpr);it.cv.style.height=H+"px"}
  return{k:k*dpr,gy:(H-14)*dpr,W:W*dpr}}
 function draw(it,step){const ctx=it.cv.getContext("2d"),{k,gy,W}=size(it),[s,f,,L]=step,S=M.sets[s];

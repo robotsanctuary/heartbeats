@@ -122,11 +122,14 @@ canvas{display:block;width:100%;margin-top:6px}
 <button data-sp="0.25">¼ speed</button><button data-sp="0.5">½</button><button data-sp="1" class="on">1×</button>
 <button id="step">Step ▶</button>
 <button data-bg="#FBF7F3" class="on">Cream</button><button data-bg="#FCE6EE">Pink band</button><button data-bg="#ffffff">White card</button><button data-bg="#2a2020">Dark</button>
+<button id="q">Quality: …</button>
 <a href="dog-lab.html" style="align-self:center;margin-left:6px">old 12 fps lab</a></div>
 <div id="boxes"></div>
 <script>
-const M=__META__,B=__BOXES__,SC=M.sc,VIEW=1056,IMG={},DIR="dog24/";let speed=1,stepping=false;
-function img(f){return IMG[f]||(IMG[f]=Object.assign(new Image(),{src:DIR+f}))}
+const M=__META__,B=__BOXES__,SC=M.sc,VIEW=1056,IMG={};let DIR=localStorage.q==="lossy"?"dog24-lossy/":"dog24/";let speed=1,stepping=false;
+function img(f){const u=DIR+f;return IMG[u]||(IMG[u]=Object.assign(new Image(),{src:u}))}
+const qb=document.getElementById("q"),qlab=()=>qb.textContent=DIR==="dog24/"?"Quality: FULL (19.7 MB)":"Quality: SMALLER (7.3 MB)";qlab();
+qb.onclick=()=>{DIR=DIR==="dog24/"?"dog24-lossy/":"dog24/";localStorage.q=DIR==="dog24/"?"full":"lossy";qlab()};
 const io=new IntersectionObserver(es=>es.forEach(e=>e.target._vis=e.isIntersecting),{rootMargin:"150px"});
 const items=[];
 for(const A of B){const b=document.createElement("div");b.className="box";
@@ -197,6 +200,11 @@ def build(out: Path = OUT):
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(BRAND, dst)
+    lossy = BRAND.with_name("dog24-lossy")
+    if lossy.exists():
+        if (out / "dog24-lossy").exists():
+            shutil.rmtree(out / "dog24-lossy")
+        shutil.copytree(lossy, out / "dog24-lossy")
     meta = json.loads((BRAND / "frames.json").read_text())
     page = out / "dog-lab24.html"
     page.write_text(PAGE.replace("__META__", json.dumps(meta)).replace("__BOXES__", json.dumps(boxes())))

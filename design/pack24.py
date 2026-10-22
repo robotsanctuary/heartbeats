@@ -15,12 +15,16 @@ How it differs from dog_art.py (the 12 fps packer):
 import glob
 import json
 import math
+import sys
 from pathlib import Path
 
 from PIL import Image
 
 INBOX = Path("/Volumes/Extreme/heartbeats-data/art-inbox")
 OUT = Path(__file__).resolve().parent / "brand" / "dog24"
+LOSSY = "--lossy" in sys.argv  # smaller test copy: lossy WebP q85, alpha q90 -> brand/dog24-lossy/
+if LOSSY:
+    OUT = OUT.with_name("dog24-lossy")
 SC = 150 / 399     # walk frame_01 is 399 px wide in the owner's canvas -> 150 px packed (same factor as v2)
 MAXW = 2048        # atlas width; small sheets decode fast on phones and stay far under GPU texture limits
 
@@ -90,7 +94,7 @@ def pack(name, items):
         for im, px, py in pl:
             sh.paste(im, (px, py))
         fn = f"{name}-{k}.webp"
-        sh.save(OUT / fn, lossless=True, method=4)
+        sh.save(OUT / fn, **({"quality": 85, "alpha_quality": 90, "method": 6} if LOSSY else {"lossless": True, "method": 4}))
         files.append(fn)
     for r in recs:
         r[0] = files[r[0]]

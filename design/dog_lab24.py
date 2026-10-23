@@ -194,6 +194,29 @@ document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{document.queryS
 </script></body></html>"""
 
 
+PLAY = r"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dog play 24 fps</title><style>
+body{margin:0;font:15px system-ui,sans-serif;background:#FBF7F3;color:#1F1A17;min-height:100vh}
+.bar{position:sticky;top:0;z-index:30;background:#fff;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.bar a{margin-left:8px}#st{font:12px ui-monospace,monospace;color:#6B625C;display:block;margin-top:4px}
+button{font:600 14px system-ui;border:1px solid #ddd;background:#fff;border-radius:999px;padding:6px 11px}
+button.on{background:#D9472F;color:#fff;border-color:#D9472F}
+p{max-width:60ch;margin:18px}
+</style></head><body>
+<div class="bar"><b>Dog play · piece 1: walking only</b>
+<button data-sp="0.25">¼</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button>
+<a href="dog-lab24.html">lab</a><span id="st"></span></div>
+<p>The dog walks along the bottom of the screen, off the right edge, waits a few seconds, and comes back in
+from the left. No tricks or cards yet: this page is only for checking the walk is smooth and the paws don't slide.</p>
+<script src="dog24.js" data-base="dog24-lossy/"></script>
+<script>
+document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
+ document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});
+setInterval(()=>{if(!window.__dog24)return;const s=__dog24.state();
+ document.getElementById("st").textContent=`${s.mode} · ${s.set} frame ${s.f+1} · x ${s.x?Math.round(s.x[0]):"-"}–${s.x?Math.round(s.x[1]):"-"} of ${s.W}px`},200);
+</script></body></html>"""
+
+
 def build(out: Path = OUT):
     out.mkdir(parents=True, exist_ok=True)
     dst = out / "dog24"
@@ -205,6 +228,8 @@ def build(out: Path = OUT):
         if (out / "dog24-lossy").exists():
             shutil.rmtree(out / "dog24-lossy")
         shutil.copytree(lossy, out / "dog24-lossy")
+    shutil.copy(BRAND.parent.parent / "dog24.js", out / "dog24.js")
+    (out / "dog-play24.html").write_text(PLAY)
     meta = json.loads((BRAND / "frames.json").read_text())
     page = out / "dog-lab24.html"
     page.write_text(PAGE.replace("__META__", json.dumps(meta)).replace("__BOXES__", json.dumps(boxes())))

@@ -131,6 +131,13 @@ def main():
     J["walk>belly"] = best("walk", allw[::3], "belly", range(n["belly"]))
     J["run>walk"] = best("run", range(n["run"]), "walk", allw)
     J["belly>liedown"] = [1, 0, n["liedown"] - 1, -328]
+    # lying "base" pose = last lie-down frame; every lying set shares the lie-down canvas (dx 0)
+    base = [n["liedown"] - 1]
+    for b in ("lieidle", "liewag", "liewait", "getupwalk", "getuprun"):
+        J["base>" + b] = best("liedown", base, b, range(n[b]), span=12)
+    J["liewait>waitblink"] = best("liewait", [n["liewait"] - 1], "waitblink", range(n["waitblink"]), span=12)
+    J["waitblink>waitwag"] = best("waitblink", range(n["waitblink"]), "waitwag", [0], span=12)
+    J["wiggle>belly"] = best("wiggle", range(n["wiggle"]), "belly", [n["belly"] - 1], span=12)
     print("walk>belly", J["walk>belly"], "run>walk", J["run>walk"])
     T = {"sniffbox": entry_table("sniffbox", range(0, 46)), "pawbox": entry_table("pawbox", range(0, 46)),
          "jumpdown": entry_table("jumpdown", range(0, 50), bg=331)}

@@ -213,7 +213,7 @@ from the left. No tricks or cards yet: this page is only for checking the walk i
 document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
  document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});
 setInterval(()=>{if(!window.__dog24)return;const s=__dog24.state();
- document.getElementById("st").textContent=`${s.mode} · ${s.set} frame ${s.f+1} · x ${s.x?Math.round(s.x[0]):"-"}–${s.x?Math.round(s.x[1]):"-"} of ${s.W}px`},200);
+ document.getElementById("st").textContent=`${s.mode}${s.mode==="offstage"?" (back in "+s.wait.toFixed(1)+" s)":""} · ${s.set} frame ${s.f+1} · x ${s.x?Math.round(s.x[0]):"-"}–${s.x?Math.round(s.x[1]):"-"} of ${s.W}px`},200);
 </script></body></html>"""
 
 

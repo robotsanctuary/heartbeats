@@ -15,7 +15,7 @@
   const cv = document.createElement("canvas");
   cv.className = "dog24";
   cv.setAttribute("aria-hidden", "true");
-  cv.style.cssText = "position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:25";
+  cv.style.cssText = "position:fixed;left:0;top:0;pointer-events:none;z-index:25";
   document.body.appendChild(cv);
   const ctx = cv.getContext("2d");
 
@@ -28,7 +28,11 @@
 
   function resize() {
     DPR = Math.min(2, devicePixelRatio || 1);
-    W = innerWidth; H = innerHeight;
+    /* the VISIBLE viewport (phones: excludes pinch-zoom and toolbars); size the canvas to it exactly */
+    const vv = window.visualViewport;
+    W = Math.round(vv ? vv.width : document.documentElement.clientWidth || innerWidth);
+    H = Math.round(vv ? vv.height : innerHeight);
+    cv.style.width = W + "px"; cv.style.height = H + "px";
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
     /* dog size on screen: walk is ~150 packed px long; ~105 px on phones, ~135 px on desktops */
     K = (W >= 900 ? 0.9 : 0.7);
@@ -52,6 +56,10 @@
   }
 
   function step(dt) {
+    /* watchdog: if the dog is ever fully off screen for 6 s without being "offstage", bring it back */
+    const [x0, x1] = extent();
+    dog.lost = (x1 < -40 || x0 > W + 40) && dog.mode !== "offstage" ? (dog.lost || 0) + dt : 0;
+    if (dog.lost > 6) { dog.lost = 0; enterLeft(); }
     if (dog.mode === "offstage") {                  // walked off the right edge: pause, then come back from the left
       dog.wait -= dt;
       if (dog.wait <= 0) enterLeft();
@@ -61,7 +69,7 @@
     dog.L += walkSpeed() * dt;
     dog.u += dt;
     while (dog.u >= D[dog.f]) { dog.u -= D[dog.f]; dog.f = (dog.f + 1) % D.length; }
-    if (extent()[0] > W + 10) { dog.mode = "offstage"; dog.wait = 2 + Math.random() * 3; }
+    if (extent()[0] > W + 10) { dog.mode = "offstage"; dog.wait = 1.5 + Math.random() * 2; }
   }
 
   function draw() {
@@ -87,6 +95,7 @@
       M = m; E = e; SC = m.sc;
       img(M.sets.walk.frames[0][0]);                // walk sheet first (~0.1 MB); other sheets load on demand later
       resize(); addEventListener("resize", resize);
+      if (window.visualViewport) visualViewport.addEventListener("resize", resize);
       enterLeft();
       dog.L = -E.bbox.walk[0][0] + 40 / (SC * K);   // first appearance: already on screen near the left
       requestAnimationFrame(tick);

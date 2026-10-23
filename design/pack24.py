@@ -51,6 +51,7 @@ SETS = {
     "sniffloop": ("pitbull-sniffbox24-192821/sniff_loop_dog_only/sniff_*.png", 334),
     "pawbox": ("pitbull-pawbox24-192932/dog_only/frame_*.png", 334),
     "pawloop": ("pitbull-pawbox24-192932/paw_loop_dog_only/paw_*.png", 334),
+    "turn": ("pitbull-turn24-103347/frames/frames/frame_*.png", 334),   # piece 5: right -> stop -> turn -> left
 }
 EXTRA = {"box": "pitbull-sniffbox24-192821/box_layer.png"}  # same box for sniff + paw (cmp-identical)
 

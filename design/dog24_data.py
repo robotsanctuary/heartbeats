@@ -139,8 +139,15 @@ def main():
     J["waitblink>waitwag"] = best("waitblink", range(n["waitblink"]), "waitwag", [0], span=12)
     J["wiggle>belly"] = best("wiggle", range(n["wiggle"]), "belly", [n["belly"] - 1], span=12)
     print("walk>belly", J["walk>belly"], "run>walk", J["run>walk"])
+    # piece 5: turn-around (walk right -> slow -> stop -> turn -> walk left), ends matching the MIRRORED walk.
+    # Owner meta: walk frame 4 -> turn frame 1 at -20; turn frame 157 = mirrored walk 23, continue at 24, left -1.
+    tm = json.loads((INBOX / "pitbull-turn24-103347/meta.json").read_text())
+    J["walk>turn"] = list(best("walk", allw, "turn", [0]))
+    J["turn>walkm"] = [tm["handoff_out"]["iou"], n["turn"] - 1, tm["handoff_out"]["continue_with_frame"] - 1,
+                       tm["handoff_out"]["mirrored_walk_left_vs_turnaround"]]
     T = {"sniffbox": entry_table("sniffbox", range(0, 46)), "pawbox": entry_table("pawbox", range(0, 46)),
-         "jumpdown": entry_table("jumpdown", range(0, 50), bg=331)}
+         "jumpdown": entry_table("jumpdown", range(0, 50), bg=331),
+         "turn": entry_table("turn", range(0, 57), min_score=.8)}   # walk-right + slow-down frames only
     for k, v in T.items():
         print(k, "entry options per walk frame:", [len(r) for r in v])
     import dog_lab24

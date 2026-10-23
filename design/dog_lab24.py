@@ -203,17 +203,23 @@ button{font:600 14px system-ui;border:1px solid #ddd;background:#fff;border-radi
 button.on{background:#D9472F;color:#fff;border-color:#D9472F}
 p{max-width:60ch;margin:18px}
 </style></head><body>
-<div class="bar"><b>Dog play · piece 1: walking only</b>
+<div class="bar"><b>Dog play · piece 2: random floor tricks</b>
 <button data-sp="0.25">¼</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button>
 <a href="dog-lab24.html">lab</a><span id="st"></span></div>
-<p>The dog walks along the bottom of the screen, off the right edge, waits a few seconds, and comes back in
-from the left. No tricks or cards yet: this page is only for checking the walk is smooth and the paws don't slide.</p>
+<p>The dog walks along the bottom, and every few seconds picks a trick at random (never the same one twice
+in a row): sniff the ground, sit + give paw, or lie down and then pant / wag / chin-on-paws / belly rub, then get up
+and walk or run off. No cards yet. The buttons below make it do a trick next (when it has room).</p>
+<p><button data-t="sniff">Sniff</button> <button data-t="sit">Sit + paw</button> <button data-t="lie" data-a="pant">Lie + pant</button>
+<button data-t="lie" data-a="wag">Lie + wag</button> <button data-t="lie" data-a="wait">Lie + chin on paws</button>
+<button data-t="lie" data-a="belly">Lie + belly rub</button> <button data-t="lie" data-a="pant" data-run="1">Lie + get up running</button></p>
 <script src="dog24.js" data-base="dog24-lossy/"></script>
 <script>
 document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
  document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});
+document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>__dog24.force(b.dataset.t,
+ b.dataset.a?{acts:[b.dataset.a],run:!!b.dataset.run}:{}));
 setInterval(()=>{if(!window.__dog24)return;const s=__dog24.state();
- document.getElementById("st").textContent=`${s.mode}${s.mode==="offstage"?" (back in "+s.wait.toFixed(1)+" s)":""} · ${s.set} frame ${s.f+1} · x ${s.x?Math.round(s.x[0]):"-"}–${s.x?Math.round(s.x[1]):"-"} of ${s.W}px`},200);
+ document.getElementById("st").textContent=`${s.label?s.label+" · ":s.pending?"next: "+s.pending+" · ":""}${s.mode}${s.mode==="offstage"?" (back in "+s.wait.toFixed(1)+" s)":""} · ${s.set} frame ${s.f+1} · x ${s.x?Math.round(s.x[0]):"-"}–${s.x?Math.round(s.x[1]):"-"} of ${s.W}px`},200);
 </script></body></html>"""
 
 

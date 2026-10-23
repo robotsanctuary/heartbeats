@@ -215,13 +215,14 @@ p{max-width:62ch;margin:18px}
   .card24{height:187px}
 }
 </style></head><body>
-<div class="bar"><b>Dog play · piece 3: solid cards</b>
+<div class="bar"><b>Dog play · piece 4: ride + jump down</b>
 <button data-sp="0.25">¼</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button>
 <a href="dog-lab24.html">lab</a><span id="st"></span></div>
-<p>Scroll the page. The cards are solid. On a computer, a card that is too high to hop onto is sniffed or pawed
-until it scrolls out of the way. When a card's top edge is about the dog's height above the floor, the dog hops
-up and stands on it. Scroll that card away and it hops back down. On a phone the cards are full width, so there
-is no side to sniff — it hops up or waits. Riding the card is the next piece.</p>
+<p>Scroll the page. The cards are solid. A card too high to hop onto is sniffed or pawed until it scrolls
+out of the way; a low card is hopped onto. On a card the dog walks along it and rides it as you scroll (sometimes it
+sits). On a computer it walks across to the card next to it when that one is level. At the right edge it jumps down
+(front paws first) onto a card below or the floor. If you scroll its card up toward the top bar first, it hops
+straight down. Phone layout is the next piece.</p>
 <p><button data-t="sniff">Sniff</button> <button data-t="sit">Sit + paw</button> <button data-t="lie" data-a="pant">Lie + pant</button>
 <button data-t="lie" data-a="wag">Lie + wag</button> <button data-t="lie" data-a="wait">Lie + chin on paws</button>
 <button data-t="lie" data-a="belly">Lie + belly rub</button> <button data-t="lie" data-a="pant" data-run="1">Lie + get up running</button></p>
@@ -231,7 +232,7 @@ const pets=document.getElementById("pets");
 for(let i=1;i<=12;i++){const d=document.createElement("div");d.className="card24";d.dataset.n=i;
  d.innerHTML=`<i></i><b>Test card ${i}</b><span>Fake card — not a real animal</span>`;pets.appendChild(d);}
 </script>
-<script src="dog24.js?p3c" data-base="dog24-lossy/"></script>
+<script src="dog24.js?p4d" data-base="dog24-lossy/"></script>
 <script>
 document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
  document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});

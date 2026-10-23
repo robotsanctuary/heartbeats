@@ -201,18 +201,37 @@ body{margin:0;font:15px system-ui,sans-serif;background:#FBF7F3;color:#1F1A17;mi
 .bar a{margin-left:8px}#st{font:12px ui-monospace,monospace;color:#6B625C;display:block;margin-top:4px}
 button{font:600 14px system-ui;border:1px solid #ddd;background:#fff;border-radius:999px;padding:6px 11px}
 button.on{background:#D9472F;color:#fff;border-color:#D9472F}
-p{max-width:60ch;margin:18px}
+p{max-width:62ch;margin:18px}
+.pets{display:flex;flex-direction:column;gap:13px;padding:8px 22px 78vh}
+.card24{height:225px;background:#fff;border-radius:18px;box-shadow:0 8px 24px rgba(80,40,20,.08);position:relative;overflow:hidden}
+.card24 i{position:absolute;inset:0 0 52px;background:linear-gradient(160deg,#f0d2c4,#e7b7a2)}
+.card24:nth-child(3n) i{background:linear-gradient(160deg,#f3ddc4,#e6c3a0)}
+.card24:nth-child(3n+2) i{background:linear-gradient(160deg,#f6d5cf,#e7b4b0)}
+.card24 b,.card24 span{position:absolute;left:14px;right:14px}
+.card24 b{bottom:26px;font-family:Georgia,serif}
+.card24 span{bottom:8px;color:#6B625C;font-size:13px}
+@media(min-width:900px){
+  .pets{display:grid;grid-template-columns:507px 507px;gap:21px;justify-content:center;padding:24px 0 80vh}
+  .card24{height:187px}
+}
 </style></head><body>
-<div class="bar"><b>Dog play · piece 2: random floor tricks</b>
+<div class="bar"><b>Dog play · piece 3: solid cards</b>
 <button data-sp="0.25">¼</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button>
 <a href="dog-lab24.html">lab</a><span id="st"></span></div>
-<p>The dog walks along the bottom, and every few seconds picks a trick at random (never the same one twice
-in a row): sniff the ground, sit + give paw, or lie down and then pant / wag / chin-on-paws / belly rub, then get up
-and walk or run off. No cards yet. The buttons below make it do a trick next (when it has room).</p>
+<p>Scroll the page. The cards are solid. On a computer, a card that is too high to hop onto is sniffed or pawed
+until it scrolls out of the way. When a card's top edge is about the dog's height above the floor, the dog hops
+up and stands on it. Scroll that card away and it hops back down. On a phone the cards are full width, so there
+is no side to sniff — it hops up or waits. Riding the card is the next piece.</p>
 <p><button data-t="sniff">Sniff</button> <button data-t="sit">Sit + paw</button> <button data-t="lie" data-a="pant">Lie + pant</button>
 <button data-t="lie" data-a="wag">Lie + wag</button> <button data-t="lie" data-a="wait">Lie + chin on paws</button>
 <button data-t="lie" data-a="belly">Lie + belly rub</button> <button data-t="lie" data-a="pant" data-run="1">Lie + get up running</button></p>
-<script src="dog24.js" data-base="dog24-lossy/"></script>
+<div class="pets" id="pets"></div>
+<script>
+const pets=document.getElementById("pets");
+for(let i=1;i<=12;i++){const d=document.createElement("div");d.className="card24";d.dataset.n=i;
+ d.innerHTML=`<i></i><b>Test card ${i}</b><span>Fake card — not a real animal</span>`;pets.appendChild(d);}
+</script>
+<script src="dog24.js?p3c" data-base="dog24-lossy/"></script>
 <script>
 document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
  document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});

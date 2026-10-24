@@ -43,6 +43,12 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    - Next (not started, ask the owner): wiring the pitbull engine into the real site (real `.pet` cards
      instead of `.card24`, lazy sheet loading), hover/tap tricks, art still pending (run->walk stop,
      one-paw "pick this dog", sleep).
+   - Pieces 7-9 (2026-10-23, waiting on the owner): 7 b25e9b3 a card rising under the dog picks it up;
+     8 ccdb6df near the top it goes down to the card below, skipping cards also near the top (else floor);
+     9 f11fbe1 that descent uses the jump-down art (front paws first); phones turn away from the near edge first.
+     Open: phone fast scroll (300+ px/s) the ~5 s turn is too slow -> falls back to the hop, head briefly over
+     the top bar. Owner to choose: skip the turn on fast scroll (recommended) or send a ~1 s pivot art.
+     Test hooks: `__dog24.put(n, at, dir)`, `__dog24.dbg()`.
    - Details and pitfalls: Hermes skill `heartbeats-shelter-aggregator` + its `references/site-dog-animation.md`.
    - HOLD Cloudflare hosting and Fort Worth scraper until design is locked.
 3. Hosting (later): Cloudflare Worker, private test URL first. Ask before deploying.

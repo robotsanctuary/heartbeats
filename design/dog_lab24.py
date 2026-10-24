@@ -239,7 +239,7 @@ const pets=document.getElementById("pets");
 for(let i=1;i<=12;i++){const d=document.createElement("div");d.className="card24";d.dataset.n=i;
  d.innerHTML=`<i></i><b>Test card ${i}</b><span>Fake card — not a real animal</span>`;pets.appendChild(d);}
 </script>
-<script src="dog24.js?p6b" data-base="dog24-lossy/"></script>
+<script src="dog24.js?p7" data-base="dog24-lossy/"></script>
 <script>
 document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
  document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});

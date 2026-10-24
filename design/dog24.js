@@ -36,6 +36,13 @@
  * get-up-run) slows down with the art at a cycle start when the next stride would leave too little room;
  * the old hard run->walk join is only the fallback. Card sides get a third wait: "pick" = the one-paw
  * "pick me" (pawone walk-in, then its scratch loop).
+ *
+ * Piece 7: a card scrolling up from under a dog on the floor picks it up. When a card's top passes up
+ * through the dog's feet (and the dog's middle is over that card), the dog stands on it and rides it from
+ * then on, also mid-trick: sit / sniff / lie / turn keep playing with the feet on the rising card, and the
+ * trick ends in "oncard" instead of the floor walk. A lying dog carried toward the top bar skips to its
+ * get-up. Not scooped: runs, hops, jump-downs, and the card-side waits (the card in front is the one it
+ * sniffs; a card under it there is rare).
  */
 (() => {
   const BASE = (document.currentScript && document.currentScript.dataset.base) || "dog24-lossy/";
@@ -395,6 +402,38 @@
     dog.gy = null; dog.cardEl = null; dog.hop = null; dog.jd = null; dog.kind = ""; dog.wantEdge = "";
   }
 
+  /* ---------- piece 7: a rising card scoops the dog up ---------- */
+  const PREV = new WeakMap();                       // card element -> its top last frame
+  const SCOOP_OK = { walk: 1, sit: 1, sniff: 1, lie: 1, turn: 1 };
+  function scoop() {
+    const feet = floorY();
+    let hit = null;
+    for (const el of document.querySelectorAll(".card24")) {
+      const top = el.getBoundingClientRect().top, was = PREV.get(el);
+      PREV.set(el, top);
+      if (hit || was == null || dog.gy != null || dog.cardEl) continue;
+      if (!(was >= feet - 1 && top < feet - 1)) continue;          // its top just came up through the feet
+      if (top - px(DOG_H) * 1.1 < topbar()) continue;               // a fling past the top bar: let it go by
+      const c = rectOf(el), [x0, x1] = extent(), mid = (x0 + x1) / 2;
+      if (mid < c.l + px(40) || mid > c.r - px(40)) continue;       // middle of the dog must be over the card
+      hit = { el, top };
+    }
+    if (!hit) return false;
+    const trick = dog.mode === "walk" ? "walk" : dog.mode === "play" ? dog.trick : "";
+    if (!SCOOP_OK[trick]) return false;
+    dog.cardEl = hit.el; dog.gy = hit.top; dog.vy = null; dog.satOn = null; dog.scooped = true;
+    if (dog.mode === "walk") {
+      Object.assign(dog, { mode: "oncard", set: "walk", label: "picked up by the card", pending: "" });
+      dog.edgePlan = Math.random() < .45 ? "turn" : "jump";
+      dog.nextTry = NOW + rnd(1, 3);
+    }
+    return true;
+  }
+  function cutLie() {                               // lying on a card carried up: skip ahead to the get-up
+    const i = dog.T.findIndex((st, k) => k > dog.i && /^gets up/.test(st[4]));
+    if (i > dog.i) { dog.i = i; dog.u = 0; }
+  }
+
   /* ---------- piece 4: on a card ---------- */
   function rectOf(el) {
     const r = el.getBoundingClientRect();
@@ -559,7 +598,7 @@
       return;
     }
     Object.assign(dog, { mode: next.mode, set: next.mode === "run" ? "run" : "walk", f: next.f, u: 0, L: next.L, label: "" });
-    clearCard();
+    clearCard(); dog.scooped = false;
     dog.nextTry = NOW + rnd(2.5, 6);
   }
   function enterLeft() {
@@ -575,12 +614,22 @@
     if (dog.lost > 6) { dog.lost = 0; enterLeft(); }
 
     if (dog.mode === "offstage") { dog.wait -= dt; if (dog.wait <= 0) enterLeft(); return; }
+    if (M && scoop() && dog.mode === "oncard") return onCard(dt);
 
     if (dog.mode === "play") {
       dog.u += dt;
       while (dog.T && dog.u >= dog.T[dog.i][2]) {
         dog.u -= dog.T[dog.i][2];
-        if (++dog.i >= dog.T.length) { const u = dog.u; goto(dog.next); return step(u); }
+        if (++dog.i >= dog.T.length) {
+          const u = dog.u;
+          let nx = dog.next;
+          if (dog.scooped && dog.cardEl && (nx.mode === "walk" || nx.mode === "run")) {   // piece 7
+            if (nx.mode === "run") { const [, , wf, dx] = J("run>walk"); nx = Object.assign({}, nx, { f: wf, L: nx.L + dx }); }
+            nx = Object.assign({}, nx, { mode: "oncard", card: dog.cardEl });
+          }
+          dog.scooped = false;
+          goto(nx); return step(u);
+        }
       }
       if (dog.mode !== "play") return;
       const s = dog.T[dog.i]; dog.set = s[0]; dog.f = s[1]; dog.L = s[3]; dog.label = s[4];
@@ -591,6 +640,7 @@
         if (t != null) { trackVy(dog.cardEl, t, dt); dog.gy = t; }
         if (t != null && dog.trick === "sit" && tooHigh(t, 2.5)) cutSit();
         if (t != null && dog.trick === "turn" && tooHigh(t, 2) && dog.f < 57) cutTurn();
+        if (t != null && dog.trick === "lie" && tooHigh(t, 4)) cutLie();
       }
       return;
     }
@@ -720,7 +770,7 @@
     });
 
   window.__dog24 = {
-    piece: 6,
+    piece: 7,
     state: () => ({ dir: dog.dir, phone: PHONE, xr: M ? (dog.dir > 0 ? extent() : extent().map(v => W - v).reverse()) : null, mode: dog.mode, set: dog.set, f: dog.f, L: dog.L, trick: dog.trick, label: dog.label,
                     pending: dog.pending, wait: dog.wait, x: M ? extent() : null, K, W, H,
                     gy: dog.gy, feet: M ? groundY() : null, floor: M ? floorY() : null, kind: dog.kind,

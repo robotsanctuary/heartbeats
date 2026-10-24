@@ -43,6 +43,13 @@
  * trick ends in "oncard" instead of the floor walk. A lying dog carried toward the top bar skips to its
  * get-up. Not scooped: runs, hops, jump-downs, and the card-side waits (the card in front is the one it
  * sniffs; a card under it there is rare).
+ *
+ * Piece 8: near the top of the screen the dog jumps down to the card below. "Near the top" = its head would
+ * reach the top bar soon at the card's current speed (or, card standing still, the card is in the top band).
+ * The landing card is picked again at take-off from the LIVE positions: the highest card under the landing spot
+ * that will still be clear of the top bar for a few seconds; a card below that is itself near the top is
+ * skipped for the next one down, else the floor. Fast scroll: the hop starts from any walk frame and the
+ * wind-up (sit back, rear up) plays faster, so the dog leaves before it is carried off the top.
  */
 (() => {
   const BASE = (document.currentScript && document.currentScript.dataset.base) || "dog24-lossy/";
@@ -304,26 +311,37 @@
     if (over > 0) dog.L -= own(over);
     dog.holdX = true;
   }
-  function startHop(card, dir) {
+  // piece 8: highest card under screen x `mid` (dog space), below src, that stays clear of the top bar for `sec` s
+  function landCard(srcEl, mid, sec) {
+    const src = srcEl && srcEl.isConnected ? rectOf(srcEl) : null;
+    let best = null;
+    for (const el of document.querySelectorAll(".card24")) {
+      if (el === srcEl) continue;
+      const m = rectOf(el);
+      if (src && m.t < src.t + 30) continue;
+      if (m.t > floorY() - 10 || mid < m.l + 12 || mid > m.r - 12) continue;
+      if (m.t < TOP_BAND() || tooHigh(m.t, sec)) continue;   // this one is near the top too: try the next one down
+      if (!best || m.t < best.t) best = m;
+    }
+    return best;
+  }
+  function startHop(card, dir, rate = 1) {
     if (!preload("jump")) return false;
-    const [, , to, dx] = J("walk>jump");
+    let [, , to, dx] = J("walk>jump");
+    if (rate !== 1) to = 30;                        // piece 8, no time: start from the crouch (small pose pop)
     const Lj = dog.L + dx;
     const T = [];
     once(T, "jump", Lj, to, N("jump") - 1, dir === "up" ? "hops up" : "hops down");
+    if (rate !== 1) T.forEach(st => { if (st[1] < E.jump_air[0]) { st[2] /= rate; st[4] = "hops down (quick!)"; } });
     const [, , wf, wdx] = J("jump>walk");
-    let below = null;
+    let below = null, mid = 0;
     if (dir === "down" && dog.cardEl) {
-      const bb = E.bbox.jump[N("jump") - 1], mid = px(Lj + (bb[0] + bb[2]) / 2), src = rectOf(dog.cardEl);
-      for (const el of document.querySelectorAll(".card24")) {
-        if (el === dog.cardEl) continue;
-        const m = rectOf(el);
-        if (m.t < src.t + 30 || m.t > floorY() - 10 || mid < m.l + 12 || mid > m.r - 12) continue;
-        if (m.t - topbar() < px(DOG_H) * 1.4) continue;    // would be too high again right away
-        if (!below || m.t < below.t) below = m;
-      }
+      const bb = E.bbox.jump[N("jump") - 1];
+      mid = px(Lj + (bb[0] + bb[2]) / 2);
+      below = landCard(dog.cardEl, mid, 2);      // first guess; picked again at take-off (applyHop)
     }
     dog.hop = { y0: groundY(), y1: dir === "up" ? card.t : below ? below.t : floorY(), a0: E.jump_air[0], a1: E.jump_air[1],
-                src: dir === "down" ? dog.cardEl : null, tgt: dir === "up" ? card.el : below && below.el };
+                src: dir === "down" ? dog.cardEl : null, tgt: dir === "up" ? card.el : below && below.el, mid, picked: dir === "up" };
     Object.assign(dog, {
       mode: "play", T, i: 0, u: 0, trick: "hop", pending: "", holdX: false, label: T[0][4],
       next: { mode: dir === "up" || below ? "oncard" : "walk", f: (wf + 1) % N("walk"), L: Lj + wdx, card: dir === "up" ? card.el : below && below.el }
@@ -378,7 +396,16 @@
   function applyHop() {
     if (!dog.hop || dog.set !== "jump") return;
     const h = dog.hop, f = dog.f, live = el => el && el.isConnected ? Math.min(el.getBoundingClientRect().top, floorY()) : null;
-    if (h.src) h.y0 = live(h.src) ?? h.y0;          // still on the rising card until take-off
+    if (!h.picked && f >= h.a0) {                   // piece 8: take-off: choose the landing from where cards are NOW
+      h.picked = true;
+      const air = E.dur.jump.slice(f, h.a1).reduce((a, b) => a + b, 0);
+      const t = landCard(h.src, h.mid, air + .3);
+      h.tgt = t && t.el; h.y1 = t ? t.t : floorY();
+      Object.assign(dog.next, { mode: t ? "oncard" : "walk", card: t && t.el });
+      dog.label = t ? "hops down to card " + (t.el.dataset.n || "") : "hops down to the floor";
+      dog.T.forEach(st => { if (st[1] >= f) st[4] = dog.label; });
+    }
+    if (h.src) h.y0 = Math.max(live(h.src) ?? h.y0, topbar() + px(DOG_H) * 1.05);   // rides until take-off, head stays below the bar
     if (h.tgt) h.y1 = live(h.tgt) ?? h.y1;          // land where the card IS now, not where it was
     const { y0, y1, a0, a1 } = h;
     dog.gy = f <= a0 ? y0 : f >= a1 ? y1 : y0 + (y1 - y0) * (f - a0) / (a1 - a0);
@@ -391,6 +418,14 @@
   function applyJD() {
     if (!dog.jd || dog.set !== "jumpdown") return;
     const j = dog.jd, f = dog.f, box = E.jd_box, low = E.jd_low;
+    if (!j.picked && f >= E.jd_air[0]) {            // piece 8: leaving the card: re-check the landing card
+      j.picked = true;
+      if (j.tgt && j.tgt.isConnected && rectOf(j.tgt).t < TOP_BAND()) {
+        const t = j.src.isConnected ? jdTarget(rectOf(j.src), j.Ljd) : null;
+        j.tgt = t && t.el;
+        Object.assign(dog.next, { mode: t ? "oncard" : "walk", card: t && t.el });
+      }
+    }
     const c = j.src.isConnected ? j.src.getBoundingClientRect().top : j.c0;
     const t = j.tgt && j.tgt.isConnected ? Math.min(j.tgt.getBoundingClientRect().top, floorY()) : floorY();
     if (f < E.jd_air[0]) { dog.gy = c + px(box.floor - box.top); return; }
@@ -458,6 +493,7 @@
       const m = rectOf(el);
       if (m.t < src.t + 30 || m.t > floorY() - 10) continue;
       if (mid < m.l + 12 || mid > m.r - 12) continue;
+      if (m.t < TOP_BAND() || tooHigh(m.t, 1.5)) continue;   // piece 8: near the top too -> the next card down
       if (!best || m.t < best.t) best = m;
     }
     return best;
@@ -468,7 +504,7 @@
     const T = [];
     once(T, "jumpdown", Ljd, j, N("jumpdown") - 1, tgt ? "jumps down to a card" : "jumps down");
     const [, , wf, wdx] = J("jumpdown>walk");
-    dog.jd = { src: c.el, tgt: tgt && tgt.el, c0: c.t };
+    dog.jd = { src: c.el, tgt: tgt && tgt.el, c0: c.t, Ljd };
     Object.assign(dog, {
       mode: "play", T, i: 0, u: 0, trick: "jumpdown", pending: "", holdX: false, label: T[0][4],
       next: { mode: tgt ? "oncard" : "walk", f: (wf + 1) % N("walk"), L: Ljd + wdx, card: tgt && tgt.el }
@@ -493,6 +529,9 @@
   }
   // the head would reach the top bar within `sec` seconds at the card's current speed
   const tooHigh = (top, sec) => top + Math.min(0, dog.vy || 0) * sec - px(DOG_H) * 1.1 < topbar();
+  // piece 8: "near the top of the screen": about to reach the top bar, or (card still) parked in the top band
+  const TOP_BAND = () => topbar() + px(DOG_H) * 1.7;
+  const nearTop = (top, sec) => tooHigh(top, sec) || top < TOP_BAND();
   function cutSit() {                               // riding card rising fast: stand up now (pose-matched exit)
     const T = dog.T, i = dog.i, cur = T[i];
     if (cur[4] === "stands up") return;
@@ -520,16 +559,19 @@
       dog.nextTry = NOW + rnd(2, 4); return;
     }
     trackVy(el, c.t, dt);
-    dog.gy = c.t;
+    dog.gy = Math.max(c.t, topbar() + px(DOG_H) * 1.05);
     ["jumpdown", "jump", "sit", "sithold"].forEach(preload);
     const [x0, x1] = extent(), mid = (x0 + x1) / 2;
     const mate = levelMate(c);
     if (mate && mid > c.r) { dog.cardEl = mate.el; dog.label = "steps across"; }
     // head would reach the top bar before the hop's ~2 s wind-up is over (at the card's current speed)
-    const danger = tooHigh(c.t, 2.5);
-    dog.label = danger ? "too high!" : mate ? "walks to the next card" : "rides the card";
+    // piece 8: wind-up 2.1 s + up to 1 s waiting for the joining walk frame
+    const danger = nearTop(c.t, 3.3);
+    const urgent = tooHigh(c.t, 1.4);                // no time for the full wind-up
+    dog.label = danger ? "near the top!" : mate ? "walks to the next card" : "rides the card";
     if (danger) {
       dog.holdX = false;
+      if (urgent && startHop(null, "down", 2.6)) { dog.quickAt = [Math.round(c.t), Math.round(dog.vy)]; return step(0); }
       if (dog.f === J("walk>jump")[1] && startHop(null, "down")) return step(0);
     }
     // Take-off point. The landing must stay on screen: use the card's own edge when that leaves room,
@@ -637,7 +679,7 @@
       applyJD();
       if (dog.cardEl && !dog.hop && !dog.jd) {
         const t = rideTop();
-        if (t != null) { trackVy(dog.cardEl, t, dt); dog.gy = t; }
+        if (t != null) { trackVy(dog.cardEl, t, dt); dog.gy = Math.max(t, topbar() + px(DOG_H) * 1.05); }
         if (t != null && dog.trick === "sit" && tooHigh(t, 2.5)) cutSit();
         if (t != null && dog.trick === "turn" && tooHigh(t, 2) && dog.f < 57) cutTurn();
         if (t != null && dog.trick === "lie" && tooHigh(t, 4)) cutLie();
@@ -770,12 +812,19 @@
     });
 
   window.__dog24 = {
-    piece: 7,
+    piece: 8,
     state: () => ({ dir: dog.dir, phone: PHONE, xr: M ? (dog.dir > 0 ? extent() : extent().map(v => W - v).reverse()) : null, mode: dog.mode, set: dog.set, f: dog.f, L: dog.L, trick: dog.trick, label: dog.label,
                     pending: dog.pending, wait: dog.wait, x: M ? extent() : null, K, W, H,
                     gy: dog.gy, feet: M ? groundY() : null, floor: M ? floorY() : null, kind: dog.kind,
                     card: dog.cardEl ? +dog.cardEl.dataset.n || 0 : 0, jdTo: dog.jd ? (dog.jd.tgt ? +dog.jd.tgt.dataset.n : "floor") : null }),
     force: (name, opts = {}) => { dog.pending = name; dog.forced = opts; dog.nextTry = 0; },
+    dbg: () => ({ vy: dog.vy, quickAt: dog.quickAt, band: TOP_BAND(), bar: topbar(), dogH: px(DOG_H), hop: dog.hop && { mid: dog.hop.mid, picked: dog.hop.picked, tgt: dog.hop.tgt && dog.hop.tgt.dataset.n },
+      cards: [...document.querySelectorAll(".card24")].map(el => { const m = rectOf(el); return [el.dataset.n, Math.round(m.l), Math.round(m.r), Math.round(m.t), nearTop(m.t, 4.5)]; }).filter(c => c[3] > -50 && c[3] < H) }),
+    put: n => {                                       // test hook: stand the dog on card n (walking)
+      const el = document.querySelector(`.card24[data-n="${n}"]`), r = rectOf(el);
+      Object.assign(dog, { mode: "oncard", set: "walk", f: 0, u: 0, T: null, trick: "", cardEl: el, gy: r.t, vy: null, edgePlan: "jump" });
+      dog.L = own(r.l + 20) - E.bbox.walk[0][0];
+    },
     edge: kind => { dog.forceEdge = kind; dog.wantEdge = ""; },   // next card side: sniff | paw | pick
     plan: (name, opts) => TRICKS[name].plan(0, opts),
   };

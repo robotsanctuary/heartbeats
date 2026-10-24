@@ -52,6 +52,11 @@ SETS = {
     "pawbox": ("pitbull-pawbox24-192932/dog_only/frame_*.png", 334),
     "pawloop": ("pitbull-pawbox24-192932/paw_loop_dog_only/paw_*.png", 334),
     "turn": ("pitbull-turn24-103347/frames/frames/frame_*.png", 334),   # piece 5: right -> stop -> turn -> left
+    # piece 6 (2026-10-23): walk <-> run transitions (travel baked in) + one-paw "pick me" at a box/card side
+    "w2r": ("pitbull-runwalk24-212230/frames_walk_to_run/frame_*.png", 413),
+    "r2w": ("pitbull-runwalk24-212230/frames_run_to_walk/frame_*.png", 392),
+    "pawone": ("pitbull-pawone24-215417/dog_only/frame_*.png", 334),     # same 940x350 box canvas as pawbox
+    "pawoneloop": ("pitbull-pawone24-215417/scratch_loop_dog_only/scratch_*.png", 334),
 }
 EXTRA = {"box": "pitbull-sniffbox24-192821/box_layer.png"}  # same box for sniff + paw (cmp-identical)
 

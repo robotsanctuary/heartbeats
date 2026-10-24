@@ -145,7 +145,25 @@ def main():
     J["walk>turn"] = list(best("walk", allw, "turn", [0]))
     J["turn>walkm"] = [tm["handoff_out"]["iou"], n["turn"] - 1, tm["handoff_out"]["continue_with_frame"] - 1,
                        tm["handoff_out"]["mirrored_walk_left_vs_turnaround"]]
+    # piece 6: walk <-> run transitions (owner meta: element top-left deltas; ground lines differ by exactly the
+    # top delta, so the left delta is the canvas dx). Travel is baked into the frames (canvas stays put).
+    wr = json.loads((INBOX / "pitbull-runwalk24-212230/meta.json").read_text())["clips"]
+    a, b = wr["w2r"], wr["r2w"]
+    J["walk>w2r"] = [a["handoff_in"]["iou"], a["handoff_in"]["matches_frame"] - 1, 0, a["handoff_in"]["transition_left_vs_loop"]]
+    J["w2r>run"] = [a["handoff_out"]["iou"], n["w2r"] - 1, a["handoff_out"]["continue_with_frame"] - 1,
+                    a["handoff_out"]["loop_left_vs_transition"]]
+    J["run>r2w"] = [b["handoff_in"]["iou"], b["handoff_in"]["matches_frame"] - 1, 0, b["handoff_in"]["transition_left_vs_loop"]]
+    J["r2w>walk"] = [b["handoff_out"]["iou"], n["r2w"] - 1, b["handoff_out"]["continue_with_frame"] - 1,
+                     b["handoff_out"]["loop_left_vs_transition"]]
+    # one-paw "pick me" (no owner meta): last frame -> scratch loop, loop -> walk, measured
+    J["pawone>pawoneloop"] = best("pawone", [n["pawone"] - 1], "pawoneloop", range(n["pawoneloop"]), span=12)
+    J["pawoneloop>walk"] = best("pawoneloop", range(n["pawoneloop"]), "walk", allw[::2])
+    J["walk>pawone"] = best("walk", allw, "pawone", [0])
+    for k in ("walk>w2r", "w2r>run", "run>r2w", "r2w>walk", "pawone>pawoneloop", "pawoneloop>walk", "walk>pawone"):
+        v = J[k]
+        print(f"{k:22s} score {v[0]:.2f}  from {v[1] + 1:3d}  to {v[2] + 1:3d}  dx {v[3]:+d}")
     T = {"sniffbox": entry_table("sniffbox", range(0, 46)), "pawbox": entry_table("pawbox", range(0, 46)),
+         "pawone": entry_table("pawone", range(0, 70)),
          "jumpdown": entry_table("jumpdown", range(0, 50), bg=331),
          "turn": entry_table("turn", range(0, 57), min_score=.8)}   # walk-right + slow-down frames only
     for k, v in T.items():

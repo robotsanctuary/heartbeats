@@ -215,7 +215,7 @@ p{max-width:62ch;margin:18px}
   .card24{height:187px}
 }
 </style></head><body>
-<div class="bar"><b>Dog play · piece 5: stays on screen</b>
+<div class="bar"><b>Dog play · piece 6: run ↔ walk + pick me</b>
 <button data-sp="0.25">¼</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button>
 <a href="dog-lab24.html">lab</a><span id="st"></span></div>
 <p>Scroll the page. The cards are solid. A card too high to hop onto is sniffed or pawed until it scrolls
@@ -227,19 +227,25 @@ and walks back. Facing left it does everything mirrored, including jumping down 
 cards are full width, so it leaps off before the landing would leave the screen.</p>
 <p><button data-t="sniff">Sniff</button> <button data-t="sit">Sit + paw</button> <button data-t="lie" data-a="pant">Lie + pant</button>
 <button data-t="lie" data-a="wag">Lie + wag</button> <button data-t="lie" data-a="wait">Lie + chin on paws</button>
-<button data-t="lie" data-a="belly">Lie + belly rub</button> <button data-t="lie" data-a="pant" data-run="1">Lie + get up running</button> <button data-t="turn">Turn round</button></p>
+<button data-t="lie" data-a="belly">Lie + belly rub</button> <button data-t="lie" data-a="pant" data-run="1">Lie + get up running</button> <button data-t="turn">Turn round</button>
+<button data-t="run">Run (speeds up, slows down)</button> · next card side: <button data-e="pick">Pick me</button>
+<button data-e="paw">Paw</button> <button data-e="sniff">Sniff</button></p>
+<p>Piece 6: it sometimes speeds up into a run and slows back to a walk (your new art), sized to stop before the next
+card or the screen edge. At a card side too high to hop it now also does the one-paw "pick me" and scratches the
+card while it waits. The side buttons pick what it does at the NEXT card side it meets.</p>
 <div class="pets" id="pets"></div>
 <script>
 const pets=document.getElementById("pets");
 for(let i=1;i<=12;i++){const d=document.createElement("div");d.className="card24";d.dataset.n=i;
  d.innerHTML=`<i></i><b>Test card ${i}</b><span>Fake card — not a real animal</span>`;pets.appendChild(d);}
 </script>
-<script src="dog24.js?p5a" data-base="dog24-lossy/"></script>
+<script src="dog24.js?p6b" data-base="dog24-lossy/"></script>
 <script>
 document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{window.__dog24speed=+b.dataset.sp;
  document.querySelectorAll("[data-sp]").forEach(x=>x.classList.toggle("on",x===b))});
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>__dog24.force(b.dataset.t,
  b.dataset.a?{acts:[b.dataset.a],run:!!b.dataset.run}:{}));
+document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>__dog24.edge(b.dataset.e));
 setInterval(()=>{if(!window.__dog24)return;const s=__dog24.state();
  document.getElementById("st").textContent=`${s.label?s.label+" · ":s.pending?"next: "+s.pending+" · ":""}${s.dir>0?"→":"←"} ${s.mode}${s.mode==="offstage"?" (back in "+s.wait.toFixed(1)+" s)":""} · ${s.set} frame ${s.f+1} · x ${s.xr?Math.round(s.xr[0]):"-"}–${s.xr?Math.round(s.xr[1]):"-"} of ${s.W}px`},200);
 </script></body></html>"""

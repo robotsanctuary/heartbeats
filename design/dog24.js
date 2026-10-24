@@ -30,6 +30,12 @@
  * On a card, the jump-down takes off where the landing still fits on screen (phone cards are full width,
  * so that is inside the card edge); a dog already past that point turns round and walks the other way.
  * Phone vs laptop (W >= 900) still picks the scale and layout (2 columns + row-mates on laptops).
+ *
+ * Piece 6: the owner's walk->run and run->walk art. "run" is a floor trick (walk -> speeds up -> 1-5 run
+ * strides -> slows to a walk), sized to end before the next card / the turn-round zone. Any run (also the
+ * get-up-run) slows down with the art at a cycle start when the next stride would leave too little room;
+ * the old hard run->walk join is only the fallback. Card sides get a third wait: "pick" = the one-paw
+ * "pick me" (pawone walk-in, then its scratch loop).
  */
 (() => {
   const BASE = (document.currentScript && document.currentScript.dataset.base) || "dog24-lossy/";
@@ -140,7 +146,42 @@
     return true;
   }
 
+  /* piece 6: run <-> walk with the owner's transition art (travel is baked into the frames; canvas stays put). */
+  function r2wPlan(Lr) {                           // Lr = run canvas left at run frame 1 (cycle start)
+    const T = [], [, , , d1] = J("run>r2w"), Lt = Lr + d1, [, , wf, d2] = J("r2w>walk");
+    once(T, "r2w", Lt, 0, N("r2w") - 1, "slows to a walk");
+    return { T, next: { mode: "walk", f: wf, L: Lt + d2 } };
+  }
+  function floorCardLimit(x1) {                    // screen x of the first card ahead in the dog's floor row
+    let lim = 1e9;
+    for (const c of cards()) if (c.t < floorY() - 8 && c.b > headY() && c.l > x1 - 8) lim = Math.min(lim, c.l - 10);
+    return lim;
+  }
+  const RUN_CYC = () => E.dur.run.reduce((a, b) => a + b, 0);
+  // running: start slowing at this cycle start if the next cycle would leave too little room for the slow-down
+  // (r2w reaches ~440 owner px past the run's nose) before the first card ahead or the turn-round zone.
+  function runShouldStop() {
+    const reach = J("run>r2w")[3] + Math.max(...E.bbox.r2w.map(b => b[2]));
+    const end = px(dog.L + reach + E.speed.run * RUN_CYC());
+    return end > Math.min(W - px(420), floorCardLimit(extent()[1]));
+  }
+
   const TRICKS = {
+    run: { weight: .7, at: () => J("walk>w2r")[1], plan(Lw, opts = {}) {
+      const [, , , d1] = J("walk>w2r"), Lt = Lw + d1, [, , rf, d2] = J("w2r>run");
+      const room = Math.min(Wo() - 300, own(floorCardLimit(extent()[1])));
+      let best = null;
+      for (let k = opts.cycles || Math.ceil(rnd(1, 5)); k >= 1; k--) {
+        const T = [];
+        once(T, "w2r", Lt, 0, N("w2r") - 1, "speeds up");
+        const x = loopTo(T, "run", Lt + d2, rf, N("run") - 1, (k - 1) * RUN_CYC(), "runs", E.speed.run);
+        const r = r2wPlan(x);
+        best = { T: T.concat(r.T), next: r.next };
+        if (maxRight(best.T) <= room) return Object.assign(best, { fitT: best.T });
+      }
+      return Object.assign(best, { fitT: null });   // too little room: only a forced run plays
+    } },
+
     sit: { weight: 1, at: () => J("walk>sit")[1], plan(Lw) {
       const T = [], [, , s0, dx] = J("walk>sit"), Ls = Lw + dx, ns = N("sit");
       const [, h, s99] = J("sithold>sit");
@@ -235,6 +276,9 @@
     for (const c of cards()) {
       if (c.r < x0 + 8 || c.l > x1 + 90) continue;
       if (c.t > feet - 8 || c.b < head) continue;
+      // piece 6 fix: a card the dog already stands in front of (not hoppable) is behind it. Skip it here, or it
+      // hides the NEXT card and the dog walks straight through that one (seen on laptop rows: card 11 -> 12).
+      if (c.l < x1 - px(120) && !canHop(c)) continue;
       if (!best || c.l < best.l) best = c;
     }
     return best;
@@ -279,14 +323,18 @@
     });
     return true;
   }
+  // kind -> [walk-in set, wait loop, label, loop frame that follows the walk-in's last frame]
+  // pawbox last frame joins pawloop frame 14 (not stored in engine.json); pawone (piece 6) is measured.
+  const EDGE = { sniff: ["sniffbox", "sniffloop", "sniffs the card", () => 0],
+                 paw: ["pawbox", "pawloop", "paws the card", () => 13],
+                 pick: ["pawone", "pawoneloop", "pick me! (paw on the card)", () => J("pawone>pawoneloop")[2]] };
   function tryEdge(card) {
     if (!dog.wantEdge || dog.wantEdge === dog.lastEdge) {
-      const choices = ["sniff", "paw"].filter(k => k !== dog.lastEdge);
-      dog.wantEdge = choices[Math.floor(Math.random() * choices.length)] || "sniff";
+      const choices = ["sniff", "paw", "pick"].filter(k => k !== dog.lastEdge);
+      dog.wantEdge = dog.forceEdge || choices[Math.floor(Math.random() * choices.length)] || "sniff";
     }
     const kind = dog.wantEdge;
-    const set = kind === "sniff" ? "sniffbox" : "pawbox";
-    const loop = kind === "sniff" ? "sniffloop" : "pawloop";
+    const set = EDGE[kind][0], loop = EDGE[kind][1];
     if (!preload(set) || !preload(loop)) return false;
     const noseOff = E.bbox[set][N(set) - 1][2];
     const opts = (E.entry[set] && E.entry[set][dog.f]) || [];
@@ -302,8 +350,9 @@
     if (!best) return false;
     const L = edge - noseOff;                       // wait-pose nose on the card edge; small pose pop is the table gap
     const T = [];
-    once(T, set, L, best.j, N(set) - 1, kind === "sniff" ? "sniffs the card" : "paws the card");
-    const loopFrom = kind === "sniff" ? 0 : 13;     // pawbox last frame joins pawloop frame 14 (not stored in engine.json)
+    once(T, set, L, best.j, N(set) - 1, EDGE[kind][2]);
+    const loopFrom = EDGE[kind][3]();
+    dog.forceEdge = "";
     Object.assign(dog, {
       mode: "play", T, i: 0, u: 0, trick: kind, pending: "", holdX: false, label: T[0][4],
       lastEdge: kind, wantEdge: "",
@@ -560,19 +609,28 @@
           return;
         }
       }
-      dog.label = dog.kind === "paw" ? "paws the card" : "sniffs the card";
+      dog.label = { paw: "paws the card", sniff: "sniffs the card", pick: "pick me! (scratches the card)" }[dog.kind];
       return;
     }
 
     if (dog.mode === "oncard") { onCard(dt); return; }
 
-    if (cards().length) ["jump", "sniffbox", "sniffloop", "pawbox", "pawloop"].forEach(preload);
+    if (cards().length) ["jump", "sniffbox", "sniffloop", "pawbox", "pawloop", "pawone", "pawoneloop"].forEach(preload);
+    if (dog.mode === "run") preload("r2w");
     let front = dog.mode === "walk" ? frontCard() : null;
     // piece 5: a card the dog is already standing in front of (it landed there; phone cards are full width) is
     // behind it, not in its way. It can still be hopped onto, but it must never pin (that teleported the dog
     // back to the card's edge, mostly off screen).
     const inFront = front && front.l < extent()[1] - px(120);
     if (inFront && !canHop(front)) front = null;
+    if (dog.mode === "run" && dog.wrap) {            // a run cycle just started: slow down now if room is short
+      dog.wrap = false;
+      const r = runShouldStop() ? r2wPlan(dog.L) : null;
+      if (r && files(r.T).every(ready)) {
+        Object.assign(dog, { mode: "play", T: r.T, i: 0, u: dog.u, next: r.next, trick: "slow", pending: "", label: r.T[0][4] });
+        return step(0);
+      }
+    }
     if (dog.mode === "run" && frontCard()) {
       dog.holdX = true;
       if (dog.f === J("run>walk")[1]) {
@@ -607,6 +665,7 @@
     dog.u += dt;
     while (dog.u >= D[dog.f]) {
       dog.u -= D[dog.f]; dog.f = (dog.f + 1) % D.length;
+      if (dog.mode === "run" && dog.f === 0) dog.wrap = true;
       if (dog.mode !== "walk") continue;
       const blocked = cardNear();
       if (!dog.pending && NOW >= dog.nextTry && !blocked) dog.pending = choose();
@@ -661,12 +720,13 @@
     });
 
   window.__dog24 = {
-    piece: 5,
+    piece: 6,
     state: () => ({ dir: dog.dir, phone: PHONE, xr: M ? (dog.dir > 0 ? extent() : extent().map(v => W - v).reverse()) : null, mode: dog.mode, set: dog.set, f: dog.f, L: dog.L, trick: dog.trick, label: dog.label,
                     pending: dog.pending, wait: dog.wait, x: M ? extent() : null, K, W, H,
                     gy: dog.gy, feet: M ? groundY() : null, floor: M ? floorY() : null, kind: dog.kind,
                     card: dog.cardEl ? +dog.cardEl.dataset.n || 0 : 0, jdTo: dog.jd ? (dog.jd.tgt ? +dog.jd.tgt.dataset.n : "floor") : null }),
     force: (name, opts = {}) => { dog.pending = name; dog.forced = opts; dog.nextTry = 0; },
+    edge: kind => { dog.forceEdge = kind; dog.wantEdge = ""; },   // next card side: sniff | paw | pick
     plan: (name, opts) => TRICKS[name].plan(0, opts),
   };
 })();

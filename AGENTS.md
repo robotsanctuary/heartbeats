@@ -35,6 +35,11 @@ tagline "Every heartbeat deserves a home."). Nothing is published yet.
    - Pieces: 1 walk, 2 random floor tricks, 3 solid cards (sniff/paw/hop up), 4 ride cards + jump down,
      5 stays on screen (owner's turn-around art, mirrored left-facing logic, phone vs laptop at 900px).
      Piece 5 = 829ba61, owner approved 2026-10-23.
+   - Piece 6 (2026-10-23, waiting on the owner): owner's walk->run / run->walk art (`w2r`, `r2w`, hand-offs from
+     their meta.json) as a floor trick "run" (speeds up, 1-5 strides, slows down; must fit before the next card /
+     turn zone, so laptops only: phone screens are too narrow for both transitions) + any run slows with the art
+     when room runs short. One-paw "pick me" (`pawone` + `pawoneloop`, measured joins) = 3rd card-side wait.
+     Fix: a non-hoppable card the dog already stands in front of no longer hides the next card (dog walked through).
    - Next (not started, ask the owner): wiring the pitbull engine into the real site (real `.pet` cards
      instead of `.card24`, lazy sheet loading), hover/tap tricks, art still pending (run->walk stop,
      one-paw "pick this dog", sleep).

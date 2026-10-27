@@ -34,7 +34,7 @@ def site(tmp_path, monkeypatch):
     sys.modules["build_site"] = mod
     spec.loader.exec_module(mod)
     out = tmp_path / "site"
-    res = mod.build(out, today=date(2026, 10, 19), show_remembered=True, show_picker=True)
+    res = mod.build(out, today=date(2026, 10, 19), show_remembered=True, show_picker=True, show_dog=True)
     return out, res
 
 
@@ -152,6 +152,55 @@ def test_launch_defaults_hide_remembered_and_single_shelter_menu(site, tmp_path)
     assert "Choose your shelter" not in idx                 # only one registered shelter
     assert 'class="where"' not in idx
     assert (out / "tx/dallas/index.html").exists()          # shelter page itself still built
+
+
+def test_launch_defaults_ship_no_dog(site, tmp_path):
+    import build_site
+    out = tmp_path / "launch"
+    build_site.build(out, today=date(2026, 10, 19), show_remembered=False, show_picker=None, show_dog=False)
+    for f in ("index.html", "help.html", "animals/A1.html", "tx/dallas/index.html"):
+        page = (out / f).read_text()
+        assert 'class="dog"' not in page and "__dog" not in page and "dog.png" not in page, f
+    left = sorted(str(p.relative_to(out)) for p in out.rglob("*") if "dog" in p.name.lower())
+    assert left == []                                       # no sprite, engine or lab/test pages
+
+
+def test_every_page_has_the_analytics_tag_once(site, tmp_path):
+    import build_site
+    out = tmp_path / "launch"
+    build_site.build(out, today=date(2026, 10, 19), show_remembered=False, show_picker=None, show_dog=False)
+    for root in (site[0], out):                             # everything on and launch defaults
+        pages = list(root.rglob("*.html"))
+        assert len(pages) > 3
+        for f in pages:
+            page = f.read_text()
+            assert page.count("googletagmanager.com/gtag/js?id=G-F98F38JQ09") == 1, f
+            assert page.count("gtag('config', 'G-F98F38JQ09')") == 1, f
+            assert page.index("gtag/js") < page.index("</head>"), f
+
+
+def test_analytics_never_doubles_and_headless_page_fails(site, tmp_path):
+    import build_site
+    f = tmp_path / "x.html"
+    f.write_text('<!doctype html><html><HEAD lang="en"><title>x</title></head><body></body></html>')
+    build_site.add_analytics(f)
+    build_site.add_analytics(f)
+    assert f.read_text().count("gtag/js?id=G-F98F38JQ09") == 1
+    f.write_text("<p>no head here</p>")
+    with pytest.raises(ValueError):
+        build_site.add_analytics(f)
+
+
+def test_dog_switch_is_off_unless_asked(monkeypatch):
+    spec = importlib.util.spec_from_file_location("bs_env", ROOT / "design" / "build_site.py")
+    for env, want in ((None, False), ("0", False), ("1", True)):
+        if env is None:
+            monkeypatch.delenv("SHOW_DOG", raising=False)
+        else:
+            monkeypatch.setenv("SHOW_DOG", env)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert mod.SHOW_DOG is want, env
 
 
 def test_brand_assets_and_logo(site):

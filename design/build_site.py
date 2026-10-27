@@ -23,6 +23,7 @@ Usage:
 import html
 from urllib.parse import quote
 import os
+import re
 import shutil
 import sys
 from datetime import date, datetime
@@ -41,6 +42,20 @@ DOMAIN = "fadingheartbeats.com"
 # Launch switches. Remembered (memorial) stays hidden until it's announced: no tab, no page,
 # no pages for those animals. The shelter menu + shelter line on cards appear once 2+ shelters exist.
 SHOW_REMEMBERED = os.environ.get("SHOW_REMEMBERED") == "1"
+# The site dog (and its lab/test pages) ships only once the owner approves it.
+SHOW_DOG = os.environ.get("SHOW_DOG") == "1"
+# Google Analytics: build() adds it to every .html file it writes, so new or changed pages never need it by hand.
+GA_ID = "G-F98F38JQ09"
+GA_TAG = f"""<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+
+  gtag('config', '{GA_ID}');
+</script>
+"""
 SHOW_PICKER = None  # None = automatic (2+ registered shelters); set by build()
 SITE_URL = (os.environ.get("SITE_URL") or f"https://{DOMAIN}").rstrip("/")
 DEFAULT_TZ = ZoneInfo("America/Chicago")
@@ -432,7 +447,7 @@ def page(title, body, active, root="", wide=False, meta="", band=""):
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
 please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
-</div>{dog_html(root)}{REVEAL_JS}{SPOT_JS if band else ""}{DOG_JS}</body></html>"""
+</div>{dog_html(root) if SHOW_DOG else ""}{REVEAL_JS}{SPOT_JS if band else ""}{DOG_JS if SHOW_DOG else ""}</body></html>"""
 
 
 def photo(p, root, cls=""):
@@ -726,10 +741,24 @@ def remembered_page(gone):
 
 # ------------------------------------------------------------------ build
 
-def build(out: Path = OUT, today: date = None, show_remembered: bool = None, show_picker: bool = None):
-    global SHOW_REMEMBERED, SHOW_PICKER
+def add_analytics(f: Path):
+    """Put the Google tag at the top of <head>. A page without a <head> fails the build rather than going untracked."""
+    page = f.read_text()
+    if f"gtag/js?id={GA_ID}" in page:
+        return
+    m = re.search(r"<head[^>]*>", page, re.I)
+    if not m:
+        raise ValueError(f"{f}: no <head>, can't add the analytics tag")
+    f.write_text(page[:m.end()] + "\n" + GA_TAG + page[m.end():])
+
+
+def build(out: Path = OUT, today: date = None, show_remembered: bool = None, show_picker: bool = None,
+          show_dog: bool = None):
+    global SHOW_REMEMBERED, SHOW_PICKER, SHOW_DOG
     if show_remembered is not None:
         SHOW_REMEMBERED = show_remembered
+    if show_dog is not None:
+        SHOW_DOG = show_dog
     SHOW_PICKER = (len(SHELTERS) > 1) if show_picker is None else show_picker
     today = today or datetime.now(DEFAULT_TZ).date()
     pets, gone, saved = load(today)
@@ -745,7 +774,7 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
             shutil.copy2(p["img"], tmp / "img" / p["img"].name)
         (tmp / "animals" / f"{p['id']}.html").write_text(detail_page(p))
     for src, dst in (("dog-all.png", "dog.png"), ("icon.svg", "icon.svg"), ("apple-touch-icon.png", "apple-touch-icon.png"), ("og-1200x630.png", "og.png")):
-        if (BRAND_DIR / src).exists():
+        if (BRAND_DIR / src).exists() and (SHOW_DOG or dst != "dog.png"):
             shutil.copy2(BRAND_DIR / src, tmp / dst)
     (tmp / "index.html").write_text(index_page(pets, saved, today))
     for name, info in SHELTERS.items():
@@ -755,11 +784,14 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
     (tmp / "help.html").write_text(help_page())
     if SHOW_REMEMBERED:
         (tmp / "remembered.html").write_text(remembered_page(gone))
-    import importlib.util as _u  # dog animation test page (not linked from the site)
-    _spec = _u.spec_from_file_location("dog_lab", Path(__file__).resolve().parent / "dog_lab.py")
-    _lab = _u.module_from_spec(_spec); _spec.loader.exec_module(_lab); _lab.build(tmp)
-    _spec = _u.spec_from_file_location("dog_lab24", Path(__file__).resolve().parent / "dog_lab24.py")  # 24 fps lab
-    _lab = _u.module_from_spec(_spec); _spec.loader.exec_module(_lab); _lab.build(tmp)
+    if SHOW_DOG:
+        import importlib.util as _u  # dog animation test page (not linked from the site)
+        _spec = _u.spec_from_file_location("dog_lab", Path(__file__).resolve().parent / "dog_lab.py")
+        _lab = _u.module_from_spec(_spec); _spec.loader.exec_module(_lab); _lab.build(tmp)
+        _spec = _u.spec_from_file_location("dog_lab24", Path(__file__).resolve().parent / "dog_lab24.py")  # 24 fps lab
+        _lab = _u.module_from_spec(_spec); _spec.loader.exec_module(_lab); _lab.build(tmp)
+    for f in tmp.rglob("*.html"):
+        add_analytics(f)
     if out.exists():
         shutil.rmtree(out)
     tmp.rename(out)

@@ -163,3 +163,14 @@ def test_feed_failure_writes_nothing(monkeypatch, fake_images, conn):
 def test_upsert_requires_id_and_shelter(conn):
     with pytest.raises(ValueError):
         common.upsert_pet_local(conn, {"pet_id": None, "shelter_name": "X"})
+
+
+def test_dd_agg_pathway_is_known_and_stays_listed(fake_feeds, fake_images, conn, capsys):
+    # Seen live 2026-10-27 (3 Cane Corsos, no deadline). Owner chose to list them like any other at-risk animal.
+    fake_feeds.prelab = feed_xml(item_xml("D1", pathway="DD/AGG"), item_xml("N1", pathway="BRAND NEW"))
+    fake_feeds.neonate = feed_xml()
+    dallas.run(write=True)
+    st = {r["pet_id"]: r["status"] for r in conn.execute("SELECT pet_id, status FROM pets")}
+    assert st["D1"] == "AT_RISK"
+    out = capsys.readouterr().out
+    assert "DD/AGG" not in out and "BRAND NEW" in out   # still loud about genuinely new values

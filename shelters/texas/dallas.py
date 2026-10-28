@@ -69,7 +69,9 @@ UNKNOWN_OUTCOME_STATUS = "PENDING_VERIFICATION"
 # "RESCUE ONLY" is NOT in here on purpose -- if they
 # ever appear, check_unknown_categories() should flag them loudly.
 # "EM RESCUE" (emergency rescue) first seen in the live PRE-LAB feed 2026-10-19.
-KNOWN_PATHWAYS = {"ADOP RESCU", "RESC FOSTR", "QUARANTINE", "EM RESCUE", None}
+# "DD/AGG" first seen 2026-10-27 (3 Cane Corsos, no deadline; likely dangerous dog /
+# aggression, unconfirmed). Owner chose to list them like any other at-risk animal.
+KNOWN_PATHWAYS = {"ADOP RESCU", "RESC FOSTR", "QUARANTINE", "EM RESCUE", "DD/AGG", None}
 
 
 def _text(item, tag: str):

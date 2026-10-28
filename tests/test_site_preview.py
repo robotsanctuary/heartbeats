@@ -267,3 +267,24 @@ def test_every_page_says_when_it_was_built(site, tmp_path):
         page = f.read_text()
         assert "Updated Oct 27, 9:02 PM CT" in page, f
         assert '<meta name="hb-built" content="2026-10-28T02:02:30Z">' in page, f
+
+
+def test_launch_pages_have_no_draft_tags_and_link_privacy(site, tmp_path):
+    import build_site
+    out = tmp_path / "launch"
+    build_site.build(out, today=date(2026, 10, 19), show_remembered=False, show_dog=False)
+    pages = list(out.rglob("*.html"))
+    assert out / "privacy.html" in pages
+    for f in pages:
+        page = f.read_text()
+        assert "[draft]" not in page, f
+        assert 'privacy.html">Privacy</a>' in page, f
+    assert 'href="../../privacy.html"' in (out / "tx/dallas/index.html").read_text()   # works 2 folders down
+
+
+def test_privacy_page_discloses_analytics(site):
+    out, _ = site
+    p = (out / "privacy.html").read_text()
+    for must in ("We use Google Analytics", "It uses cookies", "https://policies.google.com/technologies/partner-sites",
+                 "https://tools.google.com/dlpage/gaoptout", "Google Fonts"):
+        assert must in p, must

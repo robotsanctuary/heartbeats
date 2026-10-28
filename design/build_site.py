@@ -450,7 +450,7 @@ def page(title, body, active, root="", wide=False, meta="", band=""):
 {band}<div class="wrap{" wide" if wide else ""}">
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
-please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span><br>Updated {BUILT_LABEL}</footer>
+please contact that shelter directly. We update this list several times a day, so it can be a few hours behind the shelter.<br><a href="{root}privacy.html">Privacy</a> · Updated {BUILT_LABEL}</footer>
 </div>{dog_html(root) if SHOW_DOG else ""}{REVEAL_JS}{SPOT_JS if band else ""}{DOG_JS if SHOW_DOG else ""}</body></html>"""
 
 
@@ -706,7 +706,7 @@ def detail_page(p):
 
 def help_page():
     body = f"""<header><h1>How you can <i class="grad">help</i></h1>
-<p class="lede">You don't need a big house or a lot of money. Most of these take one afternoon. <span class="draft">[draft]</span></p></header>
+<p class="lede">You don't need a big house or a lot of money. Most of these take one afternoon.</p></header>
 <div class="prose">
 <h2>Foster</h2>
 <p>Fostering means taking an animal home for a while, often two to four weeks. The shelter usually pays for food and vet care. It frees a kennel and is often the difference between a date and a future.</p>
@@ -727,6 +727,24 @@ def help_page():
               + "</ul>" for st, items in shelters_by_state()) + """<p>More soon.</p>
 </div>"""
     return page(f"How to help · {SITE_NAME}", body, "help")
+
+
+def privacy_page():
+    body = """<header><h1>Privacy</h1>
+<p class="lede">There are no accounts or forms here. We never ask for your name, email or payment details.</p></header>
+<div class="prose">
+<h2>Visit counts (Google Analytics)</h2>
+<p>We use Google Analytics to see how many people visit and which animals' pages are viewed and shared. It uses cookies and collects things like the pages you view, roughly where you are (city level), and your device and browser type. It does not tell us who you are.</p>
+<p>See <a href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites that use its services</a>. To opt out, block cookies for this site in your browser or install the <a href="https://tools.google.com/dlpage/gaoptout">Google Analytics opt-out add-on</a>.</p>
+<h2>Fonts</h2>
+<p>The text uses fonts from Google Fonts, so your browser fetches them from Google's servers.</p>
+<h2>Sharing</h2>
+<p>The share buttons on each animal's page open the app or site you pick. Nothing is sent anywhere until you share it there yourself.</p>
+<h2>Animal information</h2>
+<p>Every animal's details and photo come from the public listings of the shelter that has them.</p>
+<p>Last updated October 27, 2026.</p>
+</div>"""
+    return page(f"Privacy · {SITE_NAME}", body, "privacy")
 
 
 def remembered_page(gone):
@@ -789,6 +807,7 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
         d.mkdir(parents=True, exist_ok=True)
         (d / "index.html").write_text(shelter_page(name, info, [p for p in pets if p["raw_shelter"] == name], pets))
     (tmp / "help.html").write_text(help_page())
+    (tmp / "privacy.html").write_text(privacy_page())
     if SHOW_REMEMBERED:
         (tmp / "remembered.html").write_text(remembered_page(gone))
     if SHOW_DOG:

@@ -20,6 +20,10 @@ def isolated_env(tmp_path, monkeypatch):
     monkeypatch.setenv("LOCAL_DB_PATH", str(tmp_path / "test.db"))
     monkeypatch.setenv("LOCAL_IMAGE_DIR", str(tmp_path / "images"))
     monkeypatch.delenv("REMOTE_DATABASE_URL", raising=False)
+    # Never read (or deploy with) the real Cloudflare token from tests.
+    monkeypatch.setenv("CLOUDFLARE_ENV_FILE", str(tmp_path / "no-cloudflare.env"))
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
     import db
     db.init_db()
     yield tmp_path

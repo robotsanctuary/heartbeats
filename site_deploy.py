@@ -10,7 +10,8 @@ Each publish:
   2. Refuses to deploy a build that looks wrong (0 animals, under half of the last
      deployed count, a page without the Google tag, any dog file). The live site then
      keeps its previous version.
-  3. Deploys with the repo's pinned wrangler, using CLOUDFLARE_API_TOKEN from .env.
+  3. Deploys with the repo's pinned wrangler, using CLOUDFLARE_API_TOKEN from the shared
+     ~/.config/cloudflare/deploy.env (one token for every site; aidegenerates links it too).
   4. Reads the live home page back until it shows this build's stamp.
   5. Appends one line to SITE_LOG_PATH (separate from the scrape run log).
 """
@@ -34,6 +35,12 @@ MIN_SHARE_OF_LAST = 0.5
 LIVE_TRIES = 6
 LIVE_WAIT = 10  # seconds between live checks
 TOKEN_WARN_DAYS = 14
+
+
+def load_cloudflare_env():
+    """Read CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID from the shared file. A real env var still wins."""
+    from dotenv import load_dotenv
+    load_dotenv(os.environ.get("CLOUDFLARE_ENV_FILE") or Path.home() / ".config/cloudflare/deploy.env", override=False)
 
 
 def public_dir() -> Path:
@@ -115,6 +122,7 @@ def check_build(out: Path, res: dict) -> list:
 
 
 def publish(build_fn=build_public, deploy_fn=wrangler_deploy, fetch_fn=fetch_live, sleep=time.sleep) -> dict:
+    load_cloudflare_env()
     out = public_dir()
     rec = {"at": db.utcnow(), "ok": False, "deployed": False}
     try:
@@ -179,9 +187,10 @@ def _get_json(url: str, token: str) -> dict:
 
 def token_warning(now: datetime = None, get_json=_get_json) -> str:
     """Warn before the deploy token expires or once it stops working. Never prints the token."""
+    load_cloudflare_env()
     token, account = os.environ.get("CLOUDFLARE_API_TOKEN"), os.environ.get("CLOUDFLARE_ACCOUNT_ID")
     if not token or not account:
-        return "⚠️ CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID missing from .env: the site can't deploy"
+        return "⚠️ CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID missing from ~/.config/cloudflare/deploy.env: the site can't deploy"
     now = now or datetime.now(timezone.utc)
     try:
         d = get_json(f"https://api.cloudflare.com/client/v4/accounts/{account}/tokens/verify", token)
@@ -189,10 +198,10 @@ def token_warning(now: datetime = None, get_json=_get_json) -> str:
         return f"⚠️ Couldn't check the Cloudflare token ({type(e).__name__})"
     r = d.get("result") or {}
     if not d.get("success") or r.get("status") != "active":
-        return "⚠️ Cloudflare deploy token is not working: make a new one and put it in .env"
+        return "⚠️ Cloudflare deploy token is not working: make a new one and put it in ~/.config/cloudflare/deploy.env"
     exp = r.get("expires_on")
     if exp:
         days = (datetime.fromisoformat(exp.replace("Z", "+00:00")) - now).days
         if days < TOKEN_WARN_DAYS:
-            return f"⚠️ Cloudflare deploy token expires in {days} days ({exp[:10]}): make a new one and put it in .env"
+            return f"⚠️ Cloudflare deploy token expires in {days} days ({exp[:10]}): make a new one and put it in ~/.config/cloudflare/deploy.env"
     return ""

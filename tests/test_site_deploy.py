@@ -176,3 +176,25 @@ def test_plain_run_does_not_deploy(monkeypatch):
     monkeypatch.setattr(rs, "run_all", lambda: [])
     monkeypatch.setattr(sd, "publish", lambda: pytest.fail("deployed"))
     assert rs.main([]) == ""
+
+
+def test_cloudflare_token_comes_from_the_shared_file(tmp_path, monkeypatch):
+    f = tmp_path / "deploy.env"
+    f.write_text("# shared\nCLOUDFLARE_API_TOKEN=from-shared\nCLOUDFLARE_ACCOUNT_ID=acct\n")
+    monkeypatch.setenv("CLOUDFLARE_ENV_FILE", str(f))
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    sd.load_cloudflare_env()
+    import os
+    assert os.environ["CLOUDFLARE_API_TOKEN"] == "from-shared" and os.environ["CLOUDFLARE_ACCOUNT_ID"] == "acct"
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "already-set")       # a real env var still wins
+    sd.load_cloudflare_env()
+    assert os.environ["CLOUDFLARE_API_TOKEN"] == "already-set"
+
+
+def test_publish_and_token_check_load_the_shared_file(monkeypatch):
+    calls = []
+    monkeypatch.setattr(sd, "load_cloudflare_env", lambda: calls.append(1))
+    publish()
+    sd.token_warning(get_json=lambda u, t: {"success": True, "result": {"status": "active"}})
+    assert len(calls) == 2

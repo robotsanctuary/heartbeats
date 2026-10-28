@@ -474,6 +474,7 @@ def when(p):
 
 
 def blurb(text, n=150):
+    text = " ".join(text.split())  # card excerpt is one line; the animal's page keeps the shelter's paragraphs
     return text if len(text) <= n else text[:n].rsplit(" ", 1)[0].rstrip(",;:.!?") + "…"
 
 

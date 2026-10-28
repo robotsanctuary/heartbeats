@@ -30,11 +30,16 @@ PET_COLUMNS = [
 
 
 def strip_html(text: Optional[str]) -> Optional[str]:
-    """Collapse raw HTML tags/whitespace in shelter-provided description text."""
+    """Drop HTML tags from shelter-provided text but keep the shelter's own line and
+    paragraph breaks (<br>, </p>, newlines). The words themselves are never changed."""
     if not text:
         return text
-    cleaned = re.sub(r"<[^>]+>", " ", text)
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    cleaned = text.replace("\r\n", "\n").replace("\r", "\n")
+    cleaned = re.sub(r"<br\s*/?>", "\n", cleaned, flags=re.I)
+    cleaned = re.sub(r"</p\s*>", "\n\n", cleaned, flags=re.I)
+    cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+    lines = [re.sub(r"[^\S\n]+", " ", line).strip() for line in cleaned.split("\n")]
+    cleaned = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
     return cleaned or None
 
 

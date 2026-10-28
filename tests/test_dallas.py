@@ -174,3 +174,27 @@ def test_dd_agg_pathway_is_known_and_stays_listed(fake_feeds, fake_images, conn,
     assert st["D1"] == "AT_RISK"
     out = capsys.readouterr().out
     assert "DD/AGG" not in out and "BRAND NEW" in out   # still loud about genuinely new values
+
+
+@pytest.mark.parametrize("raw, want", [
+    ("Sweet <BR>boy", "Sweet\nboy"),
+    ("One.<br><br>Two.<br />Three.", "One.\n\nTwo.\nThree."),
+    ("One.\r\n\r\nTwo.", "One.\n\nTwo."),
+    ("  A   <b>bold</b>  word.\n\n\n\nB  ", "A bold word.\n\nB"),
+    ("<p>Para one.</p><p>Para two.</p>", "Para one.\n\nPara two."),
+    ("<br><br>", None),
+])
+def test_shelter_words_kept_with_their_paragraphs(raw, want):
+    from shelters.common import strip_html
+    assert strip_html(raw) == want
+
+
+def test_detail_page_shows_shelter_paragraphs():
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("bs_par", Path(__file__).resolve().parent.parent / "design" / "build_site.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    p = {"desc": "Tara is 8.\n\nShe needs help.\nCall us.", "name": "Tara", "days": 3}
+    assert m.blurb(p["desc"]) == "Tara is 8. She needs help. Call us."           # card excerpt stays one line
+    paras = [x.strip() for x in p["desc"].split("\n") if x.strip()]
+    assert paras == ["Tara is 8.", "She needs help.", "Call us."]

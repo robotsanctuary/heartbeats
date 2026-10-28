@@ -1,7 +1,8 @@
 """Offline checks for design/build_site.py using a throwaway SQLite DB."""
 import importlib.util
 import sys
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 import pytest
@@ -254,3 +255,15 @@ def test_scrolling_dog_on_every_page_and_off_for_reduced_motion(site):
     assert 'matchMedia("(prefers-reduced-motion: reduce)").matches){d.remove()' in idx           # JS off
     assert (out / "dog.png").exists() and "url(dog.png)" in idx
     assert "url(../../dog.png)" in (out / "tx/dallas/index.html").read_text()           # path works 2 folders down
+
+
+def test_every_page_says_when_it_was_built(site, tmp_path):
+    import build_site
+    out = tmp_path / "stamped"
+    at = datetime(2026, 10, 27, 21, 2, 30, tzinfo=ZoneInfo("America/Chicago"))
+    res = build_site.build(out, today=date(2026, 10, 27), show_remembered=False, show_dog=False, built_at=at)
+    assert res["built"] == "2026-10-28T02:02:30Z"
+    for f in out.rglob("*.html"):
+        page = f.read_text()
+        assert "Updated Oct 27, 9:02 PM CT" in page, f
+        assert '<meta name="hb-built" content="2026-10-28T02:02:30Z">' in page, f

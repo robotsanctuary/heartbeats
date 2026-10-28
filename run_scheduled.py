@@ -10,11 +10,16 @@ Each run:
   3. Prints NOTHING on a normal run -- the scheduler only sends a
      Telegram message when there's output.
   4. Prints a failure alert if a scraper failed.
-  5. With --summary, prints the daily summary (sent after the 9pm run).
+  5. With --site, rebuilds + deploys fadingheartbeats.com (site_deploy.py);
+     prints an alert only if that fails. --site-only does that without scraping
+     (midnight re-sort of "today"/"tomorrow").
+  6. With --summary, prints the daily summary (sent after the 9pm run).
 
 Usage:
     python run_scheduled.py              # scrape quietly
     python run_scheduled.py --summary    # scrape, then print the daily summary
+    python run_scheduled.py --site --summary
+    python run_scheduled.py --site-only
     python run_scheduled.py --summary-only
 """
 
@@ -30,6 +35,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import db
+import site_deploy
 
 LOCAL_TZ = ZoneInfo("America/Chicago")
 EXPECTED_RUNS_PER_DAY = 3
@@ -166,22 +172,37 @@ def build_summary(now: datetime | None = None) -> str:
         L.append(f"Photo download failures: {image_fail}")
     for w in warnings:
         L.append(w)
+    L.append(site_deploy.summary_line(now))
     return "\n".join(L)
 
 
-if __name__ == "__main__":
+def main(argv=None) -> str:
     ap = argparse.ArgumentParser()
     ap.add_argument("--summary", action="store_true")
     ap.add_argument("--summary-only", action="store_true")
-    args = ap.parse_args()
+    ap.add_argument("--site", action="store_true", help="after scraping, rebuild + deploy the public site")
+    ap.add_argument("--site-only", action="store_true", help="rebuild + deploy the public site, no scrape")
+    args = ap.parse_args(argv)
 
     db.init_db()
     parts = []
-    if not args.summary_only:
+    if not (args.summary_only or args.site_only):
         alert = failure_alert(run_all())
+        if alert:
+            parts.append(alert)
+    if args.site or args.site_only:
+        alert = site_deploy.alert(site_deploy.publish())
         if alert:
             parts.append(alert)
     if args.summary or args.summary_only:
         parts.append(build_summary())
-    if parts:
-        print("\n\n".join(parts))
+        token = site_deploy.token_warning()
+        if token:
+            parts.append(token)
+    return "\n\n".join(parts)
+
+
+if __name__ == "__main__":
+    out = main()
+    if out:
+        print(out)

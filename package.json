@@ -1,0 +1,11 @@
+{
+  "name": "heartbeats-site",
+  "private": true,
+  "description": "Pins the Wrangler version used to deploy the public site (run_scheduled.py --site).",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.154.0"
+  }
+}

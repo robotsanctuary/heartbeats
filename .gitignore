@@ -19,3 +19,4 @@ data/
 *.db-wal
 *.db-shm
 *.part
+.wrangler/

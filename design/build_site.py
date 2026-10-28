@@ -57,6 +57,9 @@ GA_TAG = f"""<!-- Google tag (gtag.js) -->
 </script>
 """
 SHOW_PICKER = None  # None = automatic (2+ registered shelters); set by build()
+# When this build was made: shown in every footer, and in a meta tag the auto-deploy reads back from the live site.
+BUILT = ""        # UTC, e.g. 2026-10-28T02:02:30Z
+BUILT_LABEL = ""  # e.g. Oct 27, 9:02 PM CT
 SITE_URL = (os.environ.get("SITE_URL") or f"https://{DOMAIN}").rstrip("/")
 DEFAULT_TZ = ZoneInfo("America/Chicago")
 OUT = Path(os.environ.get("SITE_PREVIEW_DIR") or "/Volumes/Extreme/heartbeats-data/site-preview")
@@ -436,6 +439,7 @@ def page(title, body, active, root="", wide=False, meta="", band=""):
     nav = "".join(f'<a href="{root}{h}" class="{"on" if k == active else ""}">{t}</a>' for h, t, k in links)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="hb-built" content="{BUILT}">
 <title>{e(title)}</title>{meta or f'<meta name="description" content="{e(TAGLINE)}"><meta property="og:title" content="{e(SITE_NAME)}"><meta property="og:description" content="{e(TAGLINE)}"><meta property="og:image" content="{SITE_URL}/og.png"><meta name="twitter:card" content="summary_large_image">'}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
@@ -446,7 +450,7 @@ def page(title, body, active, root="", wide=False, meta="", band=""):
 {band}<div class="wrap{" wide" if wide else ""}">
 {body}
 <footer>{e(SITE_NAME)} · {e(DOMAIN)}<br>We are not a shelter. Every animal's details and photo come from the shelter that has them;
-please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span></footer>
+please contact that shelter directly. Information can be out of date by a few hours. <span class="draft">[draft]</span><br>Updated {BUILT_LABEL}</footer>
 </div>{dog_html(root) if SHOW_DOG else ""}{REVEAL_JS}{SPOT_JS if band else ""}{DOG_JS if SHOW_DOG else ""}</body></html>"""
 
 
@@ -753,8 +757,11 @@ def add_analytics(f: Path):
 
 
 def build(out: Path = OUT, today: date = None, show_remembered: bool = None, show_picker: bool = None,
-          show_dog: bool = None):
-    global SHOW_REMEMBERED, SHOW_PICKER, SHOW_DOG
+          show_dog: bool = None, built_at: datetime = None):
+    global SHOW_REMEMBERED, SHOW_PICKER, SHOW_DOG, BUILT, BUILT_LABEL
+    built_at = (built_at or datetime.now(DEFAULT_TZ)).astimezone(DEFAULT_TZ)
+    BUILT = built_at.astimezone(ZoneInfo("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ")
+    BUILT_LABEL = built_at.strftime("%b %-d, %-I:%M %p CT")
     if show_remembered is not None:
         SHOW_REMEMBERED = show_remembered
     if show_dog is not None:
@@ -796,7 +803,7 @@ def build(out: Path = OUT, today: date = None, show_remembered: bool = None, sho
         shutil.rmtree(out)
     tmp.rename(out)
     return {"out": str(out), "at_risk": len(pets), "remembered": len(gone),
-            "no_adopt_link": sum(not p["adopt"] for p in pets), "shelter_pages": len(SHELTERS)}
+            "no_adopt_link": sum(not p["adopt"] for p in pets), "shelter_pages": len(SHELTERS), "built": BUILT}
 
 
 if __name__ == "__main__":

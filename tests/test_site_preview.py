@@ -286,5 +286,5 @@ def test_privacy_page_discloses_analytics(site):
     out, _ = site
     p = (out / "privacy.html").read_text()
     for must in ("We use Google Analytics", "It uses cookies", "https://policies.google.com/technologies/partner-sites",
-                 "https://tools.google.com/dlpage/gaoptout", "Google Fonts"):
+                 "https://tools.google.com/dlpage/gaoptout", "Google Fonts", "Do Not Track"):
         assert must in p, must

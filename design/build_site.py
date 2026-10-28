@@ -737,6 +737,7 @@ def privacy_page():
 <h2>Visit counts (Google Analytics)</h2>
 <p>We use Google Analytics to see how many people visit and which animals' pages are viewed and shared. It uses cookies and collects things like the pages you view, roughly where you are (city level), and your device and browser type. It does not tell us who you are.</p>
 <p>See <a href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites that use its services</a>. To opt out, block cookies for this site in your browser or install the <a href="https://tools.google.com/dlpage/gaoptout">Google Analytics opt-out add-on</a>.</p>
+<p>Some browsers can send a "Do Not Track" signal. This site doesn't respond to it differently, so please use one of the opt-out options above instead.</p>
 <h2>Fonts</h2>
 <p>The text uses fonts from Google Fonts, so your browser fetches them from Google's servers.</p>
 <h2>Sharing</h2>
